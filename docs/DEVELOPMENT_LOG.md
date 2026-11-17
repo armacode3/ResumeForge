@@ -78,3 +78,38 @@
 - Next: user review of provisional facts and missing dates; Phase 2 local job input and fake
   structured-analysis provider can proceed independently. No matching, rendering or live AI
   integration was added, and no resume was generated.
+
+## Session 004 — Offline job-analysis contracts
+
+- Read current context and inspected a clean tracked worktree. Started
+  `feat/offline-job-analysis` from the existing work; remote `main` still has the foundation.
+  No prior feature branch was merged automatically, and remote settings remain unchanged.
+- Implemented bounded local job/response loading and exact source hashes; strict Pydantic
+  requirements covering company/title, responsibilities, required/preferred qualifications,
+  languages/frameworks/concepts/domain terms and employer evidence sought. List items have
+  unique IDs; facts carry literal source quotes, with explicit missing/empty values.
+- Added a structured-output Protocol, separate trusted instructions/input/schema request,
+  versioned analysis prompt, dependency-injected service and explicit fake replay adapter.
+  The fake returns supplied JSON; it does not extract arbitrary job descriptions. No SDK,
+  credentials, live model, new dependency, candidate-profile input or tool registry was added.
+- Added `analyze-job --job ... --mock-response ...`: JSON stdout, truthful offline notice
+  on stderr, sanitized errors and no partial success output. Results include source hash,
+  provider/model/prompt version and review warnings. Bumped application version to 0.3.0.
+- Reject duplicate JSON keys, nonstandard constants, invalid schemas, duplicate IDs, invented
+  quotes, oversized/malformed responses and excessive nesting. A first test exposed differing
+  decoder recursion behavior; added an explicit 32-container depth check rather than relying
+  on the interpreter recursion threshold. Quotation validation is not semantic proof.
+- Added fictional job/response fixtures, source-layout/Unicode tests, mock/network/privacy and
+  failure tests, CLI integration tests and a CI installed-wheel job smoke test. Private profile
+  facts remain provisional; no personal data is used in fixtures or job-analysis requests.
+- Verified on Python 3.12.3: 151 unit + 16 integration = 167 tests passed; full branch-aware
+  coverage 99.83%. Ruff lint/format, strict mypy (27 source files), `pip check`, and source/wheel
+  builds passed. Fresh locked editable install passed both test groups; all 167 tests passed
+  against the wheel outside the repository. Separate runtime-only installation passed version,
+  module help, profile validation and offline-job smoke checks. Inspected distribution contents
+  for required modules/fixtures and excluded private paths.
+- Python 3.13 remains configured in CI but not locally tested; hosted CI results are unverified.
+  No matching/planning, resume generation, factual approval, PDF, history or deployment was added.
+- Next Phase 2 gate: agree on a real provider/model and job-data/cost/credential/timeout policy,
+  then implement its adapter with mocked normal tests. Offline contract work is complete;
+  live semantic extraction is deliberately not advertised as implemented.

@@ -18,6 +18,7 @@ def test_help_describes_only_implemented_commands(option: str) -> None:
     assert result.exit_code == 0
     assert "ResumeForge" in result.output
     assert "validate-profile" in result.output
+    assert "analyze-job" in result.output
     assert "--version" in result.output
     assert "generate" not in result.output
 

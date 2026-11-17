@@ -80,3 +80,30 @@ Use PyYAML with a bounded SafeLoader subset, duplicate-key rejection, explicit b
 no YAML object tags/anchors/aliases, and a depth cap. The CLI displays safe domain errors rather
 than raw YAML/Pydantic exception dumps, while a separate gap pass reports incomplete details.
 No generic Markdown parser, email-validation dependency or provider SDK is needed for this feature.
+
+## ADR-007 — Provider-neutral job contracts with explicit offline replay first
+
+**Status:** Offline contracts implemented in Phase 2; live extraction deferred pending approval.
+
+Use a small Python Protocol and dependency injection for structured JSON completion, not a
+framework, a hard-coded remote SDK or model-generated executable tools. Requests separate
+versioned trusted instructions, untrusted job text and a JSON schema. The job service has no
+candidate-profile input. This tests the integration boundary without data disclosure or API costs.
+
+The sole shipped adapter is a fake returning an explicitly supplied fixture. Alternative:
+pretend a fixed/keyword-based fake is useful semantic extraction for arbitrary jobs. Reject that
+ambiguity: `analyze-job` requires `--mock-response`, identifies fake provider/model, and prints an
+offline notice. Structured extraction by a real provider remains a distinct authorized feature.
+The fake is also useful for repeatable failure, Unicode/layout and packaging tests.
+
+Require literal job facts with source quotations rather than unconstrained paraphrased summaries
+in this initial schema. Validate text-within-quote and quote-within-source, stable unique job IDs,
+strict field types, explicit empty categories and nullable unknown metadata. Quotation existence
+does not prove correct interpretation, classification or completeness; retain human review.
+Hash exact source bytes and record provider/model/prompt version for later history provenance.
+
+Fail on duplicate/nonstandard/malformed JSON and bounded size/depth violations; sanitize errors,
+including provider exceptions. Call once, with no implicit retry/provider fallback. A live adapter
+will need explicit network timeouts/limits and structured-output compatibility decisions.
+Keep stdout machine-readable; diagnostic/mock notices go to stderr. Do not add paid dependencies
+or claim Phase 2 live extraction is complete until a real adapter is selected, approved and tested.

@@ -4,22 +4,25 @@ An evidence-first resume tailoring application, built incrementally. The goal is
 a verified Markdown profile and a job description into a reviewable, one-page resume
 without inventing experience, technologies, or metrics.
 
-## Current status: Phase 1 — profile knowledge base
+## Current status: Phase 2 — offline job-analysis foundation
 
 Implemented: an installable Typer CLI with help/version output, unit and installed-entry-point
 tests, privacy-ignore regression coverage, linting, formatting, strict typing, packaging checks,
 and a GitHub Actions workflow. Profile support now includes a documented Markdown/YAML format,
 Pydantic schemas, stable evidence IDs, safe parsing, source preservation, completeness warnings,
 and the `validate-profile` command. A fictional sample covers every supported background section.
+The next slice adds local job files, quoted structured requirements, provider injection, explicit
+fake-response replay, response validation and `analyze-job`. **The fake replays supplied JSON;
+it does not automatically analyze arbitrary job descriptions.**
 
-**Resume generation is not implemented.** There are no AI calls, job analyzer, database,
-templates, PDF compiler, API, or browser extension yet. Local verification and hosted CI
-results are reported separately.
+**Live AI analysis and resume generation are not implemented.** There is no real provider adapter,
+matching/planning engine, database, template renderer, PDF compiler, API, or browser extension yet.
+Local verification and hosted CI results are reported separately.
 
 ## Prerequisites and installation
 
 - Python 3.12+ with `pip` and `venv` (on Ubuntu, install `python3.12-venv` if needed).
-- Git. No API key, TeX installation, Docker, or paid service is required for Phase 1.
+- Git. No API key, TeX installation, Docker, or paid service is required for offline Phase 2.
 - The CI workflow targets Python 3.12 and 3.13 on Linux.
 
 From the repository root (Linux/macOS):
@@ -42,11 +45,16 @@ resumeforge --help
 resumeforge --version
 python -m resumeforge --help
 resumeforge validate-profile --profile examples/profiles/sample.md
+resumeforge analyze-job --job examples/jobs/backend_intern.md \
+  --mock-response examples/jobs/backend_intern.response.json
 ```
 
 Running `resumeforge` without arguments also displays help and exits successfully.
 Unknown commands/options fail with exit code 2. No generation commands are advertised
 until implemented. Profile validation is local and read-only; help/version do not read the profile.
+`analyze-job` reads only the two explicitly selected local inputs; it does not implicitly load the
+profile. It emits JSON to stdout and an offline notice to stderr. The required mock fixture is
+not generated from the job. See [docs/JOB_ANALYSIS.md](docs/JOB_ANALYSIS.md) for the schema and limits.
 
 ### Create your private profile
 
@@ -96,7 +104,8 @@ CI runs these checks plus a wheel-install smoke test outside the repository. The
 coverage threshold is 90%, with branch measurement and subprocess coverage.
 Normal tests require no credentials, network requests, or live LLM calls. Dependency installation
 does require package-index access.
-The wheel smoke test also validates the fictional profile. This is **not** an end-to-end
+The wheel smoke test also validates the fictional profile and replays a fictional job analysis.
+This is **not** an end-to-end
 resume-generation test; that comes in Phase 5.
 
 `requirements-dev.lock` pins the development, runtime, and build-tool dependencies resolved

@@ -2,7 +2,8 @@
 
 ## Status and approach
 
-Phases 0–1 are implemented. Everything below labeled **planned** is a design boundary, not a
+Phases 0–1 and the offline Phase 2 contracts are implemented; live extraction is not enabled.
+Everything below labeled **planned** is a design boundary, not a
 working feature. Prefer a modular monolith: one Python package, with small components and
 explicit typed contracts, rather than services or unnecessary infrastructure.
 
@@ -12,16 +13,25 @@ explicit typed contracts, rather than services or unnecessary infrastructure.
 src/resumeforge/
   __init__.py       installed distribution version
   __main__.py       python -m entry point
-  cli.py            Typer presentation layer; help/version and validate-profile
+  cli.py            Typer help/version, validate-profile and offline analyze-job
+  inputs.py         bounded local UTF-8 loading for jobs and fake response fixtures
   py.typed          typed-package marker
   profile/
     models.py       strict Pydantic schemas and evidence-reference validation
     parser.py       bounded safe YAML/front-matter parsing and source preservation
     validation.py   non-fatal missing-detail / unverified-evidence warnings
+  jobs/
+    source.py       exact local job text and SHA-256 identity
+    models.py       strict extracted facts, stable item IDs and source quotes
+    analysis.py     request orchestration, JSON/schema/quotation checks and audit metadata
+  providers/
+    base.py         structured-output Protocol and separate instructions/input/schema request
+    fake.py         explicit offline JSON replay, not language-model extraction
 tests/
   unit/             CLI/schema/parser/gap contracts and invalid inputs
   integration/      installed entry points, profile validation, privacy safeguards
 examples/profiles/   fictional comprehensive profile; shared test fixture
+examples/jobs/       fictional job and hand-authored fake response; shared smoke fixtures
 config/
   resume_rules.md   documented writing policy (not yet consumed)
 docs/               decisions, roadmap, development log
@@ -56,14 +66,33 @@ key rejection and explicit boolean behavior, and rejects anchors/aliases/tags an
 32 collections. Errors shown by the CLI omit private input values/YAML snippets. Private source
 text and models are available in memory to callers, which must not log them indiscriminately.
 
+## Implemented offline job-analysis boundary
+
+`JobDocument` preserves source text and hashes its exact UTF-8 bytes. `analyze_job` constructs
+versioned instructions separately from untrusted job text and injects a `StructuredOutputProvider`.
+Only `FakeProvider` exists: it returns supplied JSON unchanged, not extracted facts inferred from
+the job. The CLI requires an explicit `--mock-response` path; no provider is silently activated.
+
+`JobRequirements` separates responsibilities, required/preferred qualifications, languages,
+frameworks, concepts, domain terms and evidence sought, with nullable company/title. All fields
+are explicit. List items have globally unique `job_` IDs; every fact carries literal text and a
+quote. Strict types/field validation, duplicate-key/ID checks and bounded JSON handling precede
+source-quotation checks. `JobAnalysis` records source hash, provider/model and prompt version.
+Unknown/missing metadata and empty results produce review warnings, not invented values.
+
+Literal quotation checks do not establish semantic interpretation or complete extraction. The
+offline feature does not analyze arbitrary job descriptions without a hand-authored response;
+real provider selection and external-call approval remain pending. The service has no profile
+dependency or tool registry. Errors omit input/provider exception dumps; stdout JSON deliberately
+contains selected job content. See `docs/JOB_ANALYSIS.md` for schemas, limits and safety boundaries.
+
 ## Planned module responsibilities
 
 Create these modules only as their features are implemented:
 
 | Component | Responsibility and contract |
 | --- | --- |
-| `jobs/` | Accept local job text and validate structured `JobRequirements`, including required/preferred distinctions. |
-| `providers/` | Configurable LLM interface, structured responses, bounded failures, deterministic fake; real provider added explicitly later. |
+| Live provider adapter | Implement explicitly chosen SDK/model, credentials, timeouts, cost/response limits and failure policy through the existing provider interface. |
 | `matching/` | Rank evidence by technical relevance, demonstrated responsibility, specificity and constraints, not keyword counts alone. |
 | `planning/` | Produce `ResumePlan`: selected evidence, mandatory content, space budgets, review flags and concise decision explanations. |
 | `generation/` | Produce structured `ResumeDocument` and bullets with supporting accomplishment IDs; never raw model-authored LaTeX. |
@@ -88,8 +117,8 @@ Create these modules only as their features are implemented:
 7. Once history is implemented, persist provenance, validation, decisions, versions and artifact
    references. Failed generations must not masquerade as approved final resumes.
 
-Profile schemas exist now; job/plan/resume schemas remain deferred to their implementing phases.
-Pydantic validates profile input and will validate untrusted model responses, which must fail actionably.
+Profile/job schemas exist now; plan/resume schemas remain deferred to their implementing phases.
+Pydantic validates profile input and untrusted structured job responses, which fail actionably.
 `config/resume_rules.md` holds writing policy; planned `config/layout.yaml` will separately
 hold machine-readable page, spacing, and minimum-readability constraints.
 
@@ -111,8 +140,9 @@ trusted versioned template, escape all dynamic LaTeX content, and keep an editab
 export. Use `latexmk` and a compatible TeX distribution, with PyMuPDF for inspection.
 Page count alone cannot prove readable layout or ATS compatibility.
 
-An eventual provider adapter may use OpenAI structured JSON outputs. No adapter, SDK, network
-call, API key configuration or paid service is enabled now. Tests must use deterministic fakes.
+An eventual real provider adapter may use OpenAI structured JSON outputs. No live adapter, SDK,
+network call, API key configuration or paid service is enabled now. The existing fake adapter
+is deterministic replay; it does not extract requirements. Tests must remain independent of live APIs.
 
 ## Security boundaries
 
@@ -129,7 +159,7 @@ call, API key configuration or paid service is enabled now. Tests must use deter
 
 FastAPI will call the same engine and validated request/response contracts. Before exposing it,
 choose authentication, authorization, artifact access, request limits, origin policy, and long-job
-handling. No network service or deployment is configured in Phase 1.
+handling. No network service or deployment is configured in offline Phase 2.
 
 The Manifest V3 extension will extract a job only on user invocation using minimal permissions
 (such as `activeTab` and `scripting` if sufficient), let the user edit it, then call the secured

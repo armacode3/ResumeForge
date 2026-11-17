@@ -45,11 +45,23 @@ lint/format, strict mypy, dependency checks, source/wheel builds, fresh locked e
 all tests against the installed wheel outside the repository, and a runtime-only wheel/profile
 smoke test. No live services or private profile data were used. Hosted CI is not locally verified.
 
-## Phase 2 — Local jobs and structured analysis (next)
+## Phase 2 — Local jobs and structured analysis (offline slice implemented)
 
 Accept local text/Markdown, introduce provider contracts and deterministic fakes, validate job
 requirements and malformed responses, separate required/preferred qualifications. Decide on
 a real provider before enabling external calls. Gate: unit/integration tests without API costs.
+
+Implemented: bounded local UTF-8 job/response inputs, source hashes, strict quoted requirement
+schemas and IDs, provider Protocol, deterministic explicit fake replay, malformed-response and
+quotation checks, `analyze-job`, fictional fixtures, and installed-CLI tests. See `docs/JOB_ANALYSIS.md`.
+The fake does not extract requirements from arbitrary jobs. **Next Phase 2 gate:** choose and
+authorize a live provider/model with data-disclosure, credentials, cost, timeout and retry policy;
+then implement its adapter without making normal tests depend on external APIs.
+
+Offline-slice verification on Python 3.12.3: 151 unit + 16 integration = 167 tests passed,
+99.83% branch-aware coverage, Ruff lint/format, strict mypy, dependency checks and package builds.
+Fresh locked editable installation, all tests against the installed wheel outside the repository,
+and runtime-only help/profile/job smoke tests passed. Hosted CI/Python 3.13 are not locally verified.
 
 ## Phase 3 — Matching and planning
 

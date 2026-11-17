@@ -24,6 +24,8 @@ def test_gitignore_protects_private_paths_but_allows_sanitized_examples(tmp_path
         ".env",
         ".env.production",
         "data/profile/user_information.md",
+        "data/jobs/private-job.md",
+        "artifacts/job_analysis.json",
         "artifacts/resume.txt",
         "outputs/tailoring_report.md",
         "resume.pdf",
@@ -35,6 +37,8 @@ def test_gitignore_protects_private_paths_but_allows_sanitized_examples(tmp_path
     public_paths = [
         ".env.example",
         "examples/profiles/sample.md",
+        "examples/jobs/backend_intern.md",
+        "examples/jobs/backend_intern.response.json",
         "tests/fixtures/profile.md",
         "templates/jakes/resume.tex",
         "config/resume_rules.md",

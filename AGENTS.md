@@ -10,22 +10,27 @@ do not create conflicting duplicate instructions.
 ## Purpose and current state
 
 Build truthful, evidence-linked resumes from a verified Markdown profile and a job description.
-Phases 0–1 are implemented: package/CLI/tooling/CI and the Markdown/YAML profile loader,
-Pydantic schemas, stable IDs, reference checks, gap warnings and `validate-profile`.
-Read `docs/PROFILE_FORMAT.md` before changing profile behavior. Do not imply AI generation,
-semantic claim checking, PDFs or history already work.
+Phases 0–1 and offline Phase 2 contracts are implemented: profile validation plus local job
+loading, provider Protocol, fake JSON replay, structured requirements, source-quote checks and
+`analyze-job`. Read `docs/PROFILE_FORMAT.md` / `docs/JOB_ANALYSIS.md` for the corresponding features.
+The fake is not extraction of arbitrary jobs. Do not imply live AI analysis, resume generation,
+semantic claim proof, PDFs or history already work.
 
 ## Stack and repository map
 
 - Python 3.12+, Typer, Pydantic, PyYAML, pytest, Ruff, strict mypy; dependencies pinned in the lock.
 - `src/resumeforge/`: installed application; `cli.py` is the presentation boundary.
 - `src/resumeforge/profile/`: schemas, bounded safe parser, source preservation, completeness flags.
+- `src/resumeforge/jobs/`: source identity, extraction schemas and response/quotation validation.
+- `src/resumeforge/providers/`: structured-output Protocol and explicit fake replay; no live SDK.
+- `src/resumeforge/inputs.py`: bounded local text input for job/response files.
 - `examples/profiles/sample.md`: fictional fixture used by `tests/` and the CI smoke test.
+- `examples/jobs/`: fictional job and manually authored JSON response, not real application data.
 - `tests/unit/`, `tests/integration/`: deterministic schema/parser/CLI/privacy checks.
 - `config/resume_rules.md`: policy only, not currently loaded by code.
 - `docs/`: decisions, roadmap, development log; `.github/workflows/ci.yml`: checks.
 - `data/profile/user_information.md`: default private input, ignored; never create real data in Git.
-- Planned only: provider interfaces, Jinja2, LaTeX/PyMuPDF, SQLite,
+- Planned only: live provider integration, matching/planning, Jinja2, LaTeX/PyMuPDF, SQLite,
   then Docker, FastAPI, and a Manifest V3 extension. Add dependencies when needed.
 
 ## Architecture and truthfulness
@@ -43,6 +48,10 @@ Preserve stable IDs and source text; version incompatible format changes rather 
 Narrative onboarding must keep claims pending user review, preserve qualifiers/status caveats,
 and leave disputed dates unset. Record any required ID mapping only in private notes. Current
 schemas have no typed completion-state/preferences; notes are not enforced planning constraints.
+Job analysis accepts no candidate profile. Keep trusted instructions separate from job data.
+Response text and its quote must be literal source substrings; that is provenance, not proof of
+classification/completeness. Preserve required/preferred distinctions and explicit unknowns.
+Never enable a live provider just because credentials exist; discuss provider/data/cost policy first.
 
 ## Feature workflow
 
@@ -70,6 +79,7 @@ python -m pip install -r requirements-dev.lock
 python -m pip install --no-build-isolation --no-deps -e .
 resumeforge --help
 resumeforge validate-profile --profile examples/profiles/sample.md
+resumeforge analyze-job --job examples/jobs/backend_intern.md --mock-response examples/jobs/backend_intern.response.json
 python -m ruff check .
 python -m ruff format --check .
 python -m mypy

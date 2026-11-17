@@ -6,10 +6,13 @@ from typing import Annotated
 import typer
 
 from resumeforge import __version__
+from resumeforge.inputs import InputError
+from resumeforge.jobs import JobAnalysisError, analyze_job, load_job
 from resumeforge.profile import ProfileError, find_profile_gaps, load_profile
+from resumeforge.providers import FakeProvider
 
 app = typer.Typer(
-    help="ResumeForge: evidence-first resume tailoring. Validate profiles before tailoring.",
+    help="ResumeForge: evidence-first resumes. Profile validation and offline job analysis.",
     add_completion=False,
     invoke_without_command=True,
     pretty_exceptions_enable=False,
@@ -54,3 +57,23 @@ def validate_profile(
     for warning in find_profile_gaps(document.profile):
         typer.echo(f"Warning: {warning}")
     typer.echo("Structure checks do not establish factual truth; review your source evidence.")
+
+
+@app.command("analyze-job")
+def analyze_job_command(
+    job: Annotated[Path, typer.Option("--job", help="Local UTF-8 job description.")],
+    mock_response: Annotated[
+        Path,
+        typer.Option("--mock-response", help="Required JSON fixture; offline replay, not live AI."),
+    ],
+) -> None:
+    """Validate a fake structured analysis against a local job; emit JSON to stdout."""
+    try:
+        document = load_job(job)
+        provider = FakeProvider.from_file(mock_response)
+        analysis = analyze_job(document, provider)
+    except (InputError, JobAnalysisError) as error:
+        typer.echo(f"Job analysis failed:\n{error}", err=True)
+        raise typer.Exit(code=1) from None
+    typer.echo("Offline fake response replay; no live AI extraction was performed.", err=True)
+    typer.echo(analysis.model_dump_json(indent=2))
