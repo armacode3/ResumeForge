@@ -12,6 +12,8 @@ do not create conflicting duplicate instructions.
 Build truthful, evidence-linked resumes from a verified Markdown profile and a job description.
 Phases 0–2 include profile validation, local job loading, provider Protocol, fake JSON replay,
 guarded local Ollama inference, structured requirements, quotation checks and `analyze-job`.
+The first Phase 3 prerequisite adds optional completion states/preferences to profile validation,
+not matching/planning. Omitted states stay unknown; existing version-1 files need no rewrite.
 Read `docs/PROFILE_FORMAT.md`, `docs/JOB_ANALYSIS.md`, and `docs/OLLAMA.md` as applicable.
 The fake is not extraction; local model results may fail validation or be incomplete. Do not imply
 cloud inference, resume generation, semantic claim proof, PDFs or history already work.
@@ -48,7 +50,11 @@ bullets must reference existing verified accomplishments. Markdown notes are not
 Preserve stable IDs and source text; version incompatible format changes rather than guessing.
 Narrative onboarding must keep claims pending user review, preserve qualifiers/status caveats,
 and leave disputed dates unset. Record any required ID mapping only in private notes. Current
-schemas have no typed completion-state/preferences; notes are not enforced planning constraints.
+schemas validate optional completion states and root resume preferences; notes are not enforced
+planning constraints. Completion is independent of verification, dates and parent/subtask state.
+Preserve unknown-state warnings, required/excluded reference checks and count/section conflicts;
+preferences do not prove evidence sufficiency or one-page feasibility. No private migration or
+content selection is implemented. See `docs/PROFILE_FORMAT.md` and ADR-010.
 Job analysis accepts no candidate profile. Keep trusted instructions separate from job data.
 Response text and its quote must be literal source substrings; that is provenance, not proof of
 classification/completeness. Preserve required/preferred distinctions and explicit unknowns.

@@ -4,7 +4,7 @@ An evidence-first resume tailoring application, built incrementally. The goal is
 a verified Markdown profile and a job description into a reviewable, one-page resume
 without inventing experience, technologies, or metrics.
 
-## Current status: Phase 2 — local Ollama job analysis
+## Current status: Phase 3 prerequisite — typed profile constraints
 
 Implemented: an installable Typer CLI with help/version output, unit and installed-entry-point
 tests, privacy-ignore regression coverage, linting, formatting, strict typing, packaging checks,
@@ -20,6 +20,10 @@ category/tag omissions separately from schema validity. Run `python scripts/eval
 for **offline reference replay, not a model accuracy test**; see [docs/JOB_EVALUATION.md](docs/JOB_EVALUATION.md).
 The initial live six-case review found valid schema/quotes but incomplete tags and lost known
 metadata; see [results and limitations](docs/evaluations/qwen3-4b-v3.md). Human review remains necessary.
+
+Profile validation now also accepts explicit completion states and resume preferences, with
+checks for required/excluded references and contradictory count bounds. These are input contracts;
+matching, content selection and layout are still unimplemented.
 
 **Resume generation is not implemented.** There is no cloud provider, matching/planning engine,
 database, template renderer, PDF compiler, API, or browser extension yet.
@@ -93,7 +97,9 @@ Structurally valid but incomplete profiles exit 0 with warnings. A `verified` la
 your review; the application does not prove factual truth or check bullet entailment yet.
 For an existing narrative, follow the guide's import checklist: keep claims pending review,
 preserve unfinished-work caveats and conflicting dates, and never put real data in examples/tests.
-Completion state and resume preferences can be retained in notes, but are not active configuration.
+In 0.5.0, optional typed completion states and `resume_preferences` are validated in schema version 1.
+Old profiles remain valid, with unknown-state warnings; notes are never migrated automatically.
+Preferences do not approve facts or select content. See [the field reference](docs/PROFILE_FORMAT.md).
 
 ## Configuration and privacy
 

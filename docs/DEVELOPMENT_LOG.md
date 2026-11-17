@@ -266,3 +266,42 @@
   matching must use reviewed requirements or deterministic fixtures and verified candidate evidence,
   not missing taxonomy tags as proof of job absence. Extraction-quality improvements need a
   separate measured/held-out iteration, not automatic larger-model/cloud activation.
+
+## Session 009 — Typed profile completion and preference contracts
+
+- User requested the next prerequisite: explicit completion-state/resume-preference contracts.
+  Inspected a clean worktree and fetched origin. Main still pointed to `d549a1e`, so branched
+  `feat/profile-planning-contracts` from the unmerged local-review branch rather than dropping
+  its findings. The new branch includes that review; no history, remotes or main merge was changed.
+- Added exact lifecycle strings on both background entries and accomplishments, defaulting to
+  unknown. Status stays independent of verification, dates, notes and parent/subtask lifecycle;
+  a verified completed subtask does not finish its parent. Unknown states yield review warnings
+  without inventing dates, approving facts, excluding content or rewriting old profiles.
+- Added root `ResumePreferences`: required section/entry references, excluded entry references
+  and nullable strict integer project/per-entry bullet bounds. Local validation rejects duplicate
+  lists, required/excluded overlap, invalid types/ranges and reversed bounds; enclosing profile
+  validation resolves references, checks section content and rejects impossible project counts.
+  These are data contracts, not ranking, selection, evidence sufficiency or one-page feasibility.
+- Kept profile schema version 1 as an additive extension; application version is 0.5.0. Old valid
+  files require no migration. Revalidated the original historical sample unchanged: eight entries,
+  three accomplishments, new states unknown and preferences unspecified. New fields need the
+  upgraded application; older versions reject them. No dependency, provider or prompt changes.
+- Updated only the fictional sample with explicit states and illustrative preferences. Imported
+  private profiles/preferences remain untouched and unapproved; notes are not automatically
+  transferred to typed fields. New safe preference errors omit referenced input values; the
+  existing read-only CLI validates them without accessing providers or writing files.
+- Added strict schema/count/list, status-verification independence, legacy defaults, date/notes
+  non-inference, parent/subtask, dangling reference, exclusion/capacity, round-trip/source fidelity
+  and CLI privacy tests. Complete synthetic fixtures now explicitly state completion; legacy
+  fixtures still validate with review warnings. No new placeholder CLI commands were introduced.
+- Python 3.12.3 verification: 344 unit + 38 integration = 382 tests passed with GitHub-like
+  color settings, 99.90% branch-aware application coverage. Ruff lint/format, strict mypy
+  (37 files), editable install and dependency checks passed. Source/wheel builds, a fresh locked
+  editable installation and all 382 tests against the installed wheel outside the repository
+  passed; the wheel CLI validated the enhanced fictional sample. Staged/distribution path and
+  secret-pattern reviews excluded private/runtime data. Hosted CI is checked separately after push.
+- Updated the profile-format guide, README, architecture, ADR-010, roadmap and canonical agent
+  context. Next: a small deterministic evidence-eligibility/matching slice using reviewed job
+  requirements, verified source evidence and explicit constraints, with status/context caveats
+  and remaining conflicts surfaced. No resume plan, ranking, generation, PDF or live inference
+  was implemented or run in this iteration.

@@ -85,17 +85,26 @@ The subsequently requested single-pass local review is complete: **6/6 schema/qu
 lost known company/title. Tag omissions were widespread; a shortened SQL preferred span retained
 its modifier only in the quote. No preference promotion or injected employer was observed in this
 limited run. See `docs/evaluations/qwen3-4b-v3.md`. This is **not** approval for unattended ranking.
-Next development slice: typed completion-state/preferences, independent of model quality; later
+Typed completion-state/preferences can be developed independently of model quality; later
 matching uses reviewed requirements or deterministic fixtures, never model tag absence as proof.
 
-## Phase 3 — Matching and planning
+## Phase 3 — Matching and planning (typed input prerequisite implemented)
 
 Rank evidence beyond keywords, honor mandatory sections/experiences, produce structured plans
 with evidence references, space budgets and review flags. Gate: deterministic selection/ranking
 and contradictory-constraint tests; explanations correspond to actual decisions.
-Add explicit validated completion-state and user-preference contracts before content selection
-relies on them. Preserved Markdown notes are not automatically enforced constraints. Surface
-conflicts between mandatory content, desired bullet/project budgets and readable one-page layout.
+Implemented in 0.5.0: independent entry/accomplishment completion states (default unknown) and
+root typed resume preferences for required/excluded content and optional project/per-entry bullet
+bounds. Old version-1 profiles still validate; no dates, facts or preferences are inferred from
+notes. The profile boundary rejects bad references, empty/all-excluded required sections and
+contradictory ranges/project counts. Unknown states warn; completion does not imply verification.
+See `docs/PROFILE_FORMAT.md` and ADR-010. No private profile was migrated.
+
+**Next:** deterministic evidence eligibility/matching using reviewed job requirements, these
+constraints and verified source evidence. Ranking, selection and `ResumePlan` are not implemented
+yet. Preserved Markdown notes are not enforced constraints. Later planning must also surface
+insufficient evidence and mandatory-content/readable-one-page conflicts; validated counts alone
+cannot guarantee layout feasibility.
 
 ## Phase 4 — Bullets, claims and review
 

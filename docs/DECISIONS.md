@@ -158,3 +158,33 @@ The unchanged prompt-v3 Qwen3:4b single pass validated all six responses but exa
 of the references. Missing tags and known metadata remain review blockers for unattended ranking;
 see `docs/evaluations/qwen3-4b-v3.md`. Typed completion/preference work can proceed independently,
 but future matching must use reviewed requirements or deterministic fixtures and preserve context.
+
+## ADR-010 — Additive typed completion states and profile preferences before planning
+
+**Status:** Implemented as the first Phase 3 prerequisite; selection/ranking/layout remain deferred.
+
+Keep existing schema-version-1 profiles valid by adding optional `completion_status` to both
+entries and accomplishments, defaulting to `unknown`. Never infer completion from prose, dates
+or verification, and never propagate parent/subtask states. The exact lifecycle vocabulary is
+`unknown`, `planned`, `in_progress`, `completed`, `on_hold`, `cancelled`; retain detailed qualifiers
+in factual text. A verified statement of ongoing work is not proof of a completed achievement.
+Unknown states warn without silently excluding content or invalidating old reviewed graphs.
+
+Store a separate optional `ResumePreferences` object in profile front matter, not in evidence or
+unparsed notes. Accept required sections/entry IDs, excluded entry IDs and nullable 0–20 integer
+project/per-entry bullet bounds. Validate strict types, duplicates, min/max ordering, overlapping
+instructions and existing references. Reject required empty/all-excluded sections, impossible
+project minima and maxima conflicting with required project content. Standalone preference models
+cannot resolve profile references; those checks belong to `UserProfile`.
+
+Alternative: a new separate preferences file/loader or a breaking profile-version migration.
+For this small local slice, one optional root object reuses the bounded parser, evidence graph
+and existing read-only CLI without introducing another command or guessing private migration.
+Schema version 1 remains appropriate because old inputs/field meanings stay valid; older app
+versions reject added fields rather than misreading them. Application version is 0.5.0.
+
+These constraints do not prove verified-evidence sufficiency or readable one-page feasibility.
+Preferences must not approve claims, erase excluded source evidence, or override completion
+caveats. Later planning must honor exclusions transitively for claims, preserve required content
+or surface conflicts, and use reviewed job requirements. No model calls, ranking, generation,
+font/layout policy, automatic profile edits or new dependencies are part of this feature.

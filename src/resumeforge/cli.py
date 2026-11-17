@@ -61,7 +61,7 @@ def validate_profile(
         typer.Option("--profile", "-p", help="Path to a UTF-8 Markdown profile."),
     ] = Path("data/profile/user_information.md"),
 ) -> None:
-    """Validate profile structure and evidence references; report missing details."""
+    """Validate profile structure, evidence references and preferences; report gaps."""
     try:
         document = load_profile(profile)
     except ProfileError as error:

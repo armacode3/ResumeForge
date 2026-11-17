@@ -164,6 +164,7 @@ The run took about 475 seconds, with no retries. See the
 [full review and per-case results](evaluations/qwen3-4b-v3.md).
 
 This completes the initial broader review, **not** a quality approval for unattended ranking.
-Next: typed completion-state/preferences before Phase 3 matching/planning, with reviewed
+Typed completion-state/preferences are now validated profile contracts in 0.5.0; see
+[PROFILE_FORMAT.md](PROFILE_FORMAT.md). Next is deterministic evidence matching, with reviewed
 requirements or deterministic fixtures until extraction quality is improved separately. Do not
 rely on taxonomy tags alone or treat historical AI output as verified candidate evidence.

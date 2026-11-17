@@ -2,7 +2,9 @@
 
 ## Status and approach
 
-Phases 0–2 include profile validation and fake/local Ollama job analysis; no cloud provider is enabled.
+Phases 0–2 include profile validation and fake/local Ollama job analysis. The first Phase 3
+prerequisite adds typed completion states/preferences; matching/planning are not implemented.
+No cloud provider is enabled.
 Everything below labeled **planned** is a design boundary, not a
 working feature. Prefer a modular monolith: one Python package, with small components and
 explicit typed contracts, rather than services or unnecessary infrastructure.
@@ -61,9 +63,15 @@ dangling evidence references, and verified bullets citing unverified records. Ac
 default to unverified. Completeness warnings cover missing contact/education/background, dates,
 institutions/employers, and verified evidence. Parsing validates structure and provenance links,
 not whether claims are true or semantically supported by the cited statements.
-There are no typed completion-state or resume-preference contracts yet. Preserving these in
-entry details/notes does not make them active planning constraints; implement validated contracts
-before the matching/planning phases rely on them.
+The additive schema-version-1 extension in 0.5.0 records independent completion status on entries
+and accomplishments (`unknown` by default), without deriving it from dates/notes or changing
+verification. Unknown states yield review warnings. Root `ResumePreferences` records required
+sections/entries, excluded entries and optional project/per-entry bullet bounds. Local constraints
+validate in that model; `UserProfile` resolves references, checks available content and rejects
+contradictory project capacity. No preferences are inferred and no private profiles are migrated.
+These are validated input contracts, not selection/layout: a future planner must preserve status
+caveats, use verified evidence and report remaining evidence/space conflicts. Notes are still not
+enforced constraints. See `docs/PROFILE_FORMAT.md` for defaults, bounds and compatibility.
 
 The parser accepts a bounded regular UTF-8 file (1 MiB), uses a restricted SafeLoader with duplicate
 key rejection and explicit boolean behavior, and rejects anchors/aliases/tags and nesting beyond
