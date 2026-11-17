@@ -15,6 +15,10 @@ Job analysis includes local files, quoted structured requirements, provider inje
 fake-response replay and a local-only Ollama adapter. **The fake replays supplied JSON; Ollama
 performs inference, with results still subject to strict validation and human review.**
 
+A six-case synthetic evaluation tool now checks exact reference-text agreement, metadata and
+category/tag omissions separately from schema validity. Run `python scripts/evaluate_jobs.py`
+for **offline reference replay, not a model accuracy test**; see [docs/JOB_EVALUATION.md](docs/JOB_EVALUATION.md).
+
 **Resume generation is not implemented.** There is no cloud provider, matching/planning engine,
 database, template renderer, PDF compiler, API, or browser extension yet.
 Local verification and hosted CI results are reported separately.

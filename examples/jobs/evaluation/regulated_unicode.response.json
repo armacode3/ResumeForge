@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "company": {"text": "Exemple Médical", "source_quote": "Company: Exemple Médical"},
+  "job_title": {"text": "Quality Records Assistant", "source_quote": "Job title: Quality Records Assistant"},
+  "responsibilities": [
+    {"id": "job_resp_1", "text": "Reconcile batch records.", "source_quote": "Responsibilities: Reconcile batch records."}
+  ],
+  "required_qualifications": [
+    {"id": "job_req_1", "text": "Experience with batch records.", "source_quote": "Required: Experience with batch records."}
+  ],
+  "preferred_qualifications": [
+    {"id": "job_pref_1", "text": "Familiarity with ISO 13485.", "source_quote": "Preferred: Familiarity with ISO 13485."}
+  ],
+  "programming_languages": [],
+  "frameworks": [],
+  "technical_concepts": [],
+  "domain_terms": [
+    {"id": "job_domain_1", "text": "medical devices", "source_quote": "Industry: medical devices"},
+    {"id": "job_domain_2", "text": "batch records", "source_quote": "Required: Experience with batch records."},
+    {"id": "job_domain_3", "text": "ISO 13485", "source_quote": "Preferred: Familiarity with ISO 13485."}
+  ],
+  "evidence_sought": [
+    {"id": "job_evidence_1", "text": "An example of a completed audit checklist.", "source_quote": "Evidence sought: An example of a completed audit checklist."}
+  ]
+}

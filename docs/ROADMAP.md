@@ -73,6 +73,13 @@ use only mocks or synthetic loopback HTTP. Separately, two fictional live exampl
 schema/quote/basic-metadata checks with Qwen3:4b and prompt v3 after earlier failures were caught;
 manual review still found incomplete taxonomy tags. This is not a general accuracy certification.
 
+Added in 0.4.1: exact-reference evaluation and a six-case synthetic corpus, with offline replay
+as the default and explicit validation/mismatch counts. Saved Qwen3:4b outputs agree on 9/10 and
+5/6 annotated items, exposing the known testing/SQL tag omissions. The four new cases have no
+live results yet; the broader model-quality gate is **not closed** by successful reference replay.
+See `docs/JOB_EVALUATION.md`. The help-assertion repair passed hosted Python 3.12/3.13 CI before
+the user merged Phase 2 into main; local and hosted results for this evaluation slice are separate.
+
 ## Phase 3 — Matching and planning
 
 Rank evidence beyond keywords, honor mandatory sections/experiences, produce structured plans

@@ -21,11 +21,12 @@ cloud inference, resume generation, semantic claim proof, PDFs or history alread
 - Python 3.12+, Typer, Pydantic, PyYAML, HTTPX, pytest, Ruff, strict mypy; locked dependencies.
 - `src/resumeforge/`: installed application; `cli.py` is the presentation boundary.
 - `src/resumeforge/profile/`: schemas, bounded safe parser, source preservation, completeness flags.
-- `src/resumeforge/jobs/`: source identity, extraction schemas and response/quotation validation.
+- `src/resumeforge/jobs/`: source identity, extraction/quotation validation and exact-reference evaluation.
 - `src/resumeforge/providers/`: Protocol, fake replay and local-only Ollama HTTP adapter.
 - `src/resumeforge/inputs.py`: bounded local text input for job/response files.
 - `examples/profiles/sample.md`: fictional fixture used by `tests/` and the CI smoke test.
 - `examples/jobs/`: fictional job and manually authored JSON response, not real application data.
+- `scripts/evaluate_jobs.py`: repository-only six-case synthetic benchmark; defaults to reference replay.
 - `tests/unit/`, `tests/integration/`: deterministic schema/parser/CLI/privacy checks.
 - `config/resume_rules.md`: policy only, not currently loaded by code.
 - `docs/`: decisions, roadmap, development log; `.github/workflows/ci.yml`: checks.
@@ -58,6 +59,9 @@ metadata guards, input/output/deadline limits, and strict engine validation. Tru
 messages must be static/safe; never wrap raw server bodies or transport errors for CLI display.
 Normal tests use HTTP mocks/local synthetic stubs, never actual model downloads or inference.
 Do not loosen quotation checks to conceal model failures; document quality limits and review results.
+Evaluation compares literal reference-text agreement, not semantic truth. Keep validation failures
+in case totals, undefined precision/recall null, and metadata separate. Reference replay is not a
+model-quality result. See `docs/JOB_EVALUATION.md`; no live benchmark runs without explicit opt-in.
 
 ## Feature workflow
 
