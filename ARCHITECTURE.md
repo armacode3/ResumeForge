@@ -2,8 +2,9 @@
 
 ## Status and approach
 
-Phases 0–2 include profile validation and fake/local Ollama job analysis. The first Phase 3
-prerequisite adds typed completion states/preferences; matching/planning are not implemented.
+Phases 0–2 include profile validation and fake/local Ollama job analysis. Phase 3 now has typed
+completion states/preferences and offline evidence eligibility/lexical retrieval. Ranking,
+resume planning and semantic qualification checks are not implemented.
 No cloud provider is enabled.
 Everything below labeled **planned** is a design boundary, not a
 working feature. Prefer a modular monolith: one Python package, with small components and
@@ -15,7 +16,7 @@ explicit typed contracts, rather than services or unnecessary infrastructure.
 src/resumeforge/
   __init__.py       installed distribution version
   __main__.py       python -m entry point
-  cli.py            Typer help/version, validate-profile and fake/local analyze-job
+  cli.py            Typer help/version, profile/job validation and offline match-evidence
   inputs.py         bounded local UTF-8 loading for jobs and fake response fixtures
   py.typed          typed-package marker
   profile/
@@ -32,6 +33,9 @@ src/resumeforge/
     base.py         structured-output Protocol and separate instructions/input/schema request
     fake.py         explicit offline JSON replay, not language-model extraction
     ollama.py       guarded loopback-only structured inference via HTTPX
+  matching/
+    models.py       immutable retrieval decisions, overlaps and review findings
+    engine.py       explicit review gate, eligibility and literal candidate retrieval
 tests/
   unit/             CLI/schema/parser/gap contracts and invalid inputs
   integration/      installed entry points, profile validation, privacy safeguards
@@ -117,6 +121,22 @@ The repository-only `scripts/evaluate_jobs.py` runs six fixed fictional sources 
 failure denominators. Default reference replay tests the harness, not extraction; real local
 evaluation requires explicit opt-in and existing guards. See `docs/JOB_EVALUATION.md`.
 
+## Implemented evidence retrieval boundary
+
+`matching.match_evidence` accepts a validated profile, exact job and manually reviewed structured
+requirements, not a provider or notes. Explicit review acknowledgement and schema/source
+revalidation precede retrieval. Excluded/unverified/uncertain or unfinished evidence cannot
+produce candidates. Verified completed subtasks may be retrieved from in-progress parents with
+explicit caveats. Only scoped accomplishment statements/technologies participate, not unscoped
+skills/entry metadata or bullet wording. Literal technology mentions and full job phrases produce
+review candidates, never satisfaction/entailment verdicts. No ranking or content selection occurs.
+
+The read-only `match-evidence` CLI requires explicit profile/job/requirements paths and confirmation,
+performs no inference, and emits private source-derived JSON with IDs, statuses, preserved job
+context and canonical model/source hashes. Findings expose required-content eligibility gaps;
+allocation/layout remain deferred. A comparison-count cap fails without truncation. See
+`docs/MATCHING.md` for the versioned policy and limitations.
+
 ## Planned module responsibilities
 
 Create these modules only as their features are implemented:
@@ -124,7 +144,7 @@ Create these modules only as their features are implemented:
 | Component | Responsibility and contract |
 | --- | --- |
 | Other provider adapters | Add only when explicitly approved; retain structured interface, data disclosure, limits and safe failure policy. No automatic fallback. |
-| `matching/` | Rank evidence by technical relevance, demonstrated responsibility, specificity and constraints, not keyword counts alone. |
+| Matching ranking | Add relevance signals beyond the implemented literal retrieval; never rank by keyword counts alone. |
 | `planning/` | Produce `ResumePlan`: selected evidence, mandatory content, space budgets, review flags and concise decision explanations. |
 | `generation/` | Produce structured `ResumeDocument` and bullets with supporting accomplishment IDs; never raw model-authored LaTeX. |
 | `validation/` | Validate references and factual claims; produce `ValidationResult` and blocking/review flags. Later inspect PDFs. |

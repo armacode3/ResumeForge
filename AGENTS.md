@@ -12,8 +12,9 @@ do not create conflicting duplicate instructions.
 Build truthful, evidence-linked resumes from a verified Markdown profile and a job description.
 Phases 0–2 include profile validation, local job loading, provider Protocol, fake JSON replay,
 guarded local Ollama inference, structured requirements, quotation checks and `analyze-job`.
-The first Phase 3 prerequisite adds optional completion states/preferences to profile validation,
-not matching/planning. Omitted states stay unknown; existing version-1 files need no rewrite.
+Phase 3 includes optional completion states/preferences and offline evidence eligibility/lexical
+retrieval, not relevance ranking or resume planning. Omitted states stay unknown; version-1 files
+need no rewrite. Read `docs/MATCHING.md` for the retrieval boundary.
 Read `docs/PROFILE_FORMAT.md`, `docs/JOB_ANALYSIS.md`, and `docs/OLLAMA.md` as applicable.
 The fake is not extraction; local model results may fail validation or be incomplete. Do not imply
 cloud inference, resume generation, semantic claim proof, PDFs or history already work.
@@ -25,6 +26,7 @@ cloud inference, resume generation, semantic claim proof, PDFs or history alread
 - `src/resumeforge/profile/`: schemas, bounded safe parser, source preservation, completeness flags.
 - `src/resumeforge/jobs/`: source identity, extraction/quotation validation and exact-reference evaluation.
 - `src/resumeforge/providers/`: Protocol, fake replay and local-only Ollama HTTP adapter.
+- `src/resumeforge/matching/`: reviewed-input gate, eligibility, lexical candidates and review findings.
 - `src/resumeforge/inputs.py`: bounded local text input for job/response files.
 - `examples/profiles/sample.md`: fictional fixture used by `tests/` and the CI smoke test.
 - `examples/jobs/`: fictional job and manually authored JSON response, not real application data.
@@ -33,7 +35,7 @@ cloud inference, resume generation, semantic claim proof, PDFs or history alread
 - `config/resume_rules.md`: policy only, not currently loaded by code.
 - `docs/`: decisions, roadmap, development log; `.github/workflows/ci.yml`: checks.
 - `data/profile/user_information.md`: default private input, ignored; never create real data in Git.
-- Planned only: matching/planning, Jinja2, LaTeX/PyMuPDF, SQLite,
+- Planned only: relevance ranking/resume planning, Jinja2, LaTeX/PyMuPDF, SQLite,
   then Docker, FastAPI, and a Manifest V3 extension. Add dependencies when needed.
 
 ## Architecture and truthfulness
@@ -54,7 +56,12 @@ schemas validate optional completion states and root resume preferences; notes a
 planning constraints. Completion is independent of verification, dates and parent/subtask state.
 Preserve unknown-state warnings, required/excluded reference checks and count/section conflicts;
 preferences do not prove evidence sufficiency or one-page feasibility. No private migration or
-content selection is implemented. See `docs/PROFILE_FORMAT.md` and ADR-010.
+resume content selection is implemented. See `docs/PROFILE_FORMAT.md` and ADR-010.
+Matching is offline candidate retrieval, not qualification proof. Keep explicit job-review
+acknowledgement, schema/quote revalidation, scoped verified/completed evidence, exclusions and
+status caveats. Do not inherit evidence from skills, parent technology lists, notes or bullet
+wording. Preserve full job items and required/preferred distinctions; no candidate is not proof
+of missing experience or absent requirements. No ranking/selection/claim approval is implemented.
 Job analysis accepts no candidate profile. Keep trusted instructions separate from job data.
 Response text and its quote must be literal source substrings; that is provenance, not proof of
 classification/completeness. Preserve required/preferred distinctions and explicit unknowns.

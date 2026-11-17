@@ -45,6 +45,7 @@ def test_installed_entrypoints_are_read_only(entrypoint: str, tmp_path: Path) ->
         (["-h"], ["--version"]),
         (["validate-profile", "--help"], ["--profile"]),
         (["analyze-job", "--help"], ["--mock-response", "--provider"]),
+        (["match-evidence", "--help"], ["--profile", "--requirements", "--confirm-review"]),
     ],
 )
 def test_help_options_survive_terminal_styling(

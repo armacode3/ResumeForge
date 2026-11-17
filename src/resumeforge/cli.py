@@ -1,5 +1,7 @@
 """Command-line boundary; future domain logic belongs outside this module."""
 
+import json
+from dataclasses import asdict
 from enum import StrEnum
 from pathlib import Path
 from typing import Annotated
@@ -9,6 +11,7 @@ import typer
 from resumeforge import __version__
 from resumeforge.inputs import InputError
 from resumeforge.jobs import JobAnalysisError, analyze_job, load_job
+from resumeforge.matching import MatchingError, match_evidence
 from resumeforge.profile import ProfileError, find_profile_gaps, load_profile
 from resumeforge.providers import (
     FakeProvider,
@@ -30,7 +33,8 @@ class ProviderChoice(StrEnum):
 
 
 app = typer.Typer(
-    help="ResumeForge: evidence-first resumes. Profile validation and local/offline job analysis.",
+    help="ResumeForge: evidence-first resumes. Profile validation, job analysis "
+    "and offline evidence retrieval.",
     add_completion=False,
     invoke_without_command=True,
     pretty_exceptions_enable=False,
@@ -128,3 +132,44 @@ def analyze_job_command(
     if provider == ProviderChoice.FAKE:
         typer.echo("Offline fake response replay; no live AI extraction was performed.", err=True)
     typer.echo(analysis.model_dump_json(indent=2))
+
+
+@app.command("match-evidence")
+def match_evidence_command(
+    profile: Annotated[Path, typer.Option("--profile", help="Explicit local Markdown profile.")],
+    job: Annotated[
+        Path, typer.Option("--job", help="Exact local job source used for requirements.")
+    ],
+    requirements: Annotated[
+        Path,
+        typer.Option(
+            "--requirements", help="Manually reviewed JobRequirements JSON; no inference."
+        ),
+    ],
+    confirm_review: Annotated[
+        bool,
+        typer.Option(
+            "--confirm-review", help="Acknowledge review of requirements against the full job."
+        ),
+    ] = False,
+) -> None:
+    """Find offline lexical evidence candidates, not qualification verdicts or a resume plan."""
+    if not confirm_review:
+        raise typer.BadParameter(
+            "Review requirements against the full job, then pass --confirm-review."
+        )
+    try:
+        document = load_job(job)
+        analysis = analyze_job(document, FakeProvider.from_file(requirements))
+        candidate = load_profile(profile)
+        report = match_evidence(
+            candidate.profile, document, analysis.requirements, requirements_reviewed=True
+        )
+    except (ProfileError, InputError, JobAnalysisError, MatchingError) as error:
+        typer.echo(f"Evidence matching failed:\n{error}", err=True)
+        raise typer.Exit(code=1) from None
+    typer.echo(
+        "Offline lexical candidates only; no inference or qualification approval performed.",
+        err=True,
+    )
+    typer.echo(json.dumps(asdict(report), ensure_ascii=False, indent=2))
