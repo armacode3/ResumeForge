@@ -88,3 +88,17 @@ def test_collections_types_and_limits(empty_job_payload: dict[str, Any]) -> None
     ]
     with pytest.raises(ValidationError, match="at most 200"):
         JobRequirements.model_validate(empty_job_payload)
+
+
+def test_case_normalized_live_output_is_still_rejected() -> None:
+    with pytest.raises(ValidationError, match="appear exactly"):
+        QuotedFact(text="Automated tests", source_quote="automated tests")
+
+
+@pytest.mark.parametrize("field", ["company", "job_title"])
+def test_empty_metadata_live_output_must_not_replace_null(
+    empty_job_payload: dict[str, Any], field: str
+) -> None:
+    empty_job_payload[field] = {"text": "", "source_quote": ""}
+    with pytest.raises(ValidationError):
+        JobRequirements.model_validate(empty_job_payload)

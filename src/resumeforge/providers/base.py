@@ -4,6 +4,10 @@ from dataclasses import dataclass
 from typing import Protocol
 
 
+class ProviderError(ValueError):
+    """An adapter failure whose message is explicitly safe for display to the user."""
+
+
 @dataclass(frozen=True)
 class StructuredRequest:
     instructions: str

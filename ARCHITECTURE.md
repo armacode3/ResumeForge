@@ -2,7 +2,7 @@
 
 ## Status and approach
 
-Phases 0–1 and the offline Phase 2 contracts are implemented; live extraction is not enabled.
+Phases 0–2 include profile validation and fake/local Ollama job analysis; no cloud provider is enabled.
 Everything below labeled **planned** is a design boundary, not a
 working feature. Prefer a modular monolith: one Python package, with small components and
 explicit typed contracts, rather than services or unnecessary infrastructure.
@@ -13,7 +13,7 @@ explicit typed contracts, rather than services or unnecessary infrastructure.
 src/resumeforge/
   __init__.py       installed distribution version
   __main__.py       python -m entry point
-  cli.py            Typer help/version, validate-profile and offline analyze-job
+  cli.py            Typer help/version, validate-profile and fake/local analyze-job
   inputs.py         bounded local UTF-8 loading for jobs and fake response fixtures
   py.typed          typed-package marker
   profile/
@@ -27,6 +27,7 @@ src/resumeforge/
   providers/
     base.py         structured-output Protocol and separate instructions/input/schema request
     fake.py         explicit offline JSON replay, not language-model extraction
+    ollama.py       guarded loopback-only structured inference via HTTPX
 tests/
   unit/             CLI/schema/parser/gap contracts and invalid inputs
   integration/      installed entry points, profile validation, privacy safeguards
@@ -66,12 +67,13 @@ key rejection and explicit boolean behavior, and rejects anchors/aliases/tags an
 32 collections. Errors shown by the CLI omit private input values/YAML snippets. Private source
 text and models are available in memory to callers, which must not log them indiscriminately.
 
-## Implemented offline job-analysis boundary
+## Implemented job-analysis boundary
 
 `JobDocument` preserves source text and hashes its exact UTF-8 bytes. `analyze_job` constructs
 versioned instructions separately from untrusted job text and injects a `StructuredOutputProvider`.
-Only `FakeProvider` exists: it returns supplied JSON unchanged, not extracted facts inferred from
-the job. The CLI requires an explicit `--mock-response` path; no provider is silently activated.
+`FakeProvider` returns supplied JSON unchanged, not extracted facts inferred from the job.
+`OllamaProvider` performs real local inference when explicitly selected. Fake remains default,
+requiring `--mock-response`; local mode requires `--provider ollama` and cannot take that fixture.
 
 `JobRequirements` separates responsibilities, required/preferred qualifications, languages,
 frameworks, concepts, domain terms and evidence sought, with nullable company/title. All fields
@@ -81,10 +83,20 @@ source-quotation checks. `JobAnalysis` records source hash, provider/model and p
 Unknown/missing metadata and empty results produce review warnings, not invented values.
 
 Literal quotation checks do not establish semantic interpretation or complete extraction. The
-offline feature does not analyze arbitrary job descriptions without a hand-authored response;
-real provider selection and external-call approval remain pending. The service has no profile
+fake does not analyze arbitrary jobs; local results are interpretations requiring review.
+The user selected local-only Ollama/Qwen3:4b, not a paid/cloud adapter. The service has no profile
 dependency or tool registry. Errors omit input/provider exception dumps; stdout JSON deliberately
 contains selected job content. See `docs/JOB_ANALYSIS.md` for schemas, limits and safety boundaries.
+
+The Ollama adapter uses HTTPX with a fixed literal loopback host, disabled environment proxies
+and redirects, and validated CLI model/port/time/output settings. Before transmitting job text,
+it requires `/api/status` to report cloud disabled and `/api/show` to identify a non-remote GGUF
+completion model. It sends separate system/schema and job messages, `think: false`, no tools,
+temperature/seed 0, context/output limits and unload-after-request. Context budget, shared client
+deadline, per-I/O timeouts, bounded API envelopes and complete-assistant-response checks fail
+closed. Static safe adapter errors remain actionable; raw server/transport bodies are not echoed.
+These guards trust the local server/OS, not cryptographic attestation or process isolation.
+See `docs/OLLAMA.md`; runtime installation/model pulls remain separate operator actions.
 
 ## Planned module responsibilities
 
@@ -92,7 +104,7 @@ Create these modules only as their features are implemented:
 
 | Component | Responsibility and contract |
 | --- | --- |
-| Live provider adapter | Implement explicitly chosen SDK/model, credentials, timeouts, cost/response limits and failure policy through the existing provider interface. |
+| Other provider adapters | Add only when explicitly approved; retain structured interface, data disclosure, limits and safe failure policy. No automatic fallback. |
 | `matching/` | Rank evidence by technical relevance, demonstrated responsibility, specificity and constraints, not keyword counts alone. |
 | `planning/` | Produce `ResumePlan`: selected evidence, mandatory content, space budgets, review flags and concise decision explanations. |
 | `generation/` | Produce structured `ResumeDocument` and bullets with supporting accomplishment IDs; never raw model-authored LaTeX. |
@@ -140,9 +152,9 @@ trusted versioned template, escape all dynamic LaTeX content, and keep an editab
 export. Use `latexmk` and a compatible TeX distribution, with PyMuPDF for inspection.
 Page count alone cannot prove readable layout or ATS compatibility.
 
-An eventual real provider adapter may use OpenAI structured JSON outputs. No live adapter, SDK,
-network call, API key configuration or paid service is enabled now. The existing fake adapter
-is deterministic replay; it does not extract requirements. Tests must remain independent of live APIs.
+Local Ollama inference uses HTTPX, not a paid SDK/API key. A future cloud adapter needs a separate
+provider/data/cost decision. Fake replay remains deterministic and does not extract requirements.
+Normal tests use mocked HTTP or a synthetic loopback server, not live models or remote APIs.
 
 ## Security boundaries
 
@@ -159,7 +171,7 @@ is deterministic replay; it does not extract requirements. Tests must remain ind
 
 FastAPI will call the same engine and validated request/response contracts. Before exposing it,
 choose authentication, authorization, artifact access, request limits, origin policy, and long-job
-handling. No network service or deployment is configured in offline Phase 2.
+handling. No application API/deployment is configured in Phase 2; local Ollama is a separate runtime.
 
 The Manifest V3 extension will extract a job only on user invocation using minimal permissions
 (such as `activeTab` and `scripting` if sufficient), let the user edit it, then call the secured

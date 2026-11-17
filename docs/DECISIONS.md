@@ -83,14 +83,14 @@ No generic Markdown parser, email-validation dependency or provider SDK is neede
 
 ## ADR-007 — Provider-neutral job contracts with explicit offline replay first
 
-**Status:** Offline contracts implemented in Phase 2; live extraction deferred pending approval.
+**Status:** Offline contracts implemented first in Phase 2; local inference added under ADR-008.
 
 Use a small Python Protocol and dependency injection for structured JSON completion, not a
 framework, a hard-coded remote SDK or model-generated executable tools. Requests separate
 versioned trusted instructions, untrusted job text and a JSON schema. The job service has no
 candidate-profile input. This tests the integration boundary without data disclosure or API costs.
 
-The sole shipped adapter is a fake returning an explicitly supplied fixture. Alternative:
+The initial adapter was a fake returning an explicitly supplied fixture. Alternative:
 pretend a fixed/keyword-based fake is useful semantic extraction for arbitrary jobs. Reject that
 ambiguity: `analyze-job` requires `--mock-response`, identifies fake provider/model, and prints an
 offline notice. Structured extraction by a real provider remains a distinct authorized feature.
@@ -106,4 +106,31 @@ Fail on duplicate/nonstandard/malformed JSON and bounded size/depth violations; 
 including provider exceptions. Call once, with no implicit retry/provider fallback. A live adapter
 will need explicit network timeouts/limits and structured-output compatibility decisions.
 Keep stdout machine-readable; diagnostic/mock notices go to stderr. Do not add paid dependencies
-or claim Phase 2 live extraction is complete until a real adapter is selected, approved and tested.
+or claim live extraction is complete until an adapter is selected, approved and tested.
+
+## ADR-008 — Explicit local-only Ollama with fail-closed inference
+
+**Status:** Implemented following user selection of Ollama; model quality remains review-dependent.
+
+Use Qwen3:4b initially through Ollama's HTTP API and the existing provider Protocol. The user
+preferred free/local inference and approved this local setup. Alternatives: a free cloud tier
+(quotas/data-use constraints, private data leaves the machine) or a larger local model (more
+memory/download/latency). Do not activate a cloud fallback or pull another model automatically.
+
+Use HTTPX rather than a provider-specific SDK so loopback address, disabled environment proxies,
+no redirects, bounded response reads and timeouts are explicit and mockable. A separate server
+process must report cloud disabled via `/api/status`; `/api/show` must identify a local GGUF
+completion model with no remote host/model. Only then transmit job text. A trusted local server
+is still required; its metadata is not cryptographic attestation or OS isolation.
+
+Keep fake mode the default for compatibility and zero implicit inference. Ollama mode is explicit,
+mutually exclusive with mock input, and uses validated model/port/time/output flags, schema-guided
+non-thinking generation, no tools, conservative context budgeting, no retry and unload-on-finish.
+Client cancellation does not guarantee server computation stopped; model tags are not pinned
+weight digests. Runtime installation/pulls and opt-in evaluations are separate operator actions.
+
+Map adapter failures to explicitly safe `ProviderError` messages; preserve them through the engine
+without exposing server bodies. All model content still passes existing strict schema, provenance
+and quotation checks. Early live trials exposed casing, absent-metadata and duplicate-ID failures;
+add regression tests and refine prompt/schema descriptions rather than silently repairing facts
+or weakening validators. Structured JSON and two passing examples would not prove general accuracy.

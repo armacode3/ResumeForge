@@ -10,19 +10,19 @@ do not create conflicting duplicate instructions.
 ## Purpose and current state
 
 Build truthful, evidence-linked resumes from a verified Markdown profile and a job description.
-Phases 0–1 and offline Phase 2 contracts are implemented: profile validation plus local job
-loading, provider Protocol, fake JSON replay, structured requirements, source-quote checks and
-`analyze-job`. Read `docs/PROFILE_FORMAT.md` / `docs/JOB_ANALYSIS.md` for the corresponding features.
-The fake is not extraction of arbitrary jobs. Do not imply live AI analysis, resume generation,
-semantic claim proof, PDFs or history already work.
+Phases 0–2 include profile validation, local job loading, provider Protocol, fake JSON replay,
+guarded local Ollama inference, structured requirements, quotation checks and `analyze-job`.
+Read `docs/PROFILE_FORMAT.md`, `docs/JOB_ANALYSIS.md`, and `docs/OLLAMA.md` as applicable.
+The fake is not extraction; local model results may fail validation or be incomplete. Do not imply
+cloud inference, resume generation, semantic claim proof, PDFs or history already work.
 
 ## Stack and repository map
 
-- Python 3.12+, Typer, Pydantic, PyYAML, pytest, Ruff, strict mypy; dependencies pinned in the lock.
+- Python 3.12+, Typer, Pydantic, PyYAML, HTTPX, pytest, Ruff, strict mypy; locked dependencies.
 - `src/resumeforge/`: installed application; `cli.py` is the presentation boundary.
 - `src/resumeforge/profile/`: schemas, bounded safe parser, source preservation, completeness flags.
 - `src/resumeforge/jobs/`: source identity, extraction schemas and response/quotation validation.
-- `src/resumeforge/providers/`: structured-output Protocol and explicit fake replay; no live SDK.
+- `src/resumeforge/providers/`: Protocol, fake replay and local-only Ollama HTTP adapter.
 - `src/resumeforge/inputs.py`: bounded local text input for job/response files.
 - `examples/profiles/sample.md`: fictional fixture used by `tests/` and the CI smoke test.
 - `examples/jobs/`: fictional job and manually authored JSON response, not real application data.
@@ -30,7 +30,7 @@ semantic claim proof, PDFs or history already work.
 - `config/resume_rules.md`: policy only, not currently loaded by code.
 - `docs/`: decisions, roadmap, development log; `.github/workflows/ci.yml`: checks.
 - `data/profile/user_information.md`: default private input, ignored; never create real data in Git.
-- Planned only: live provider integration, matching/planning, Jinja2, LaTeX/PyMuPDF, SQLite,
+- Planned only: matching/planning, Jinja2, LaTeX/PyMuPDF, SQLite,
   then Docker, FastAPI, and a Manifest V3 extension. Add dependencies when needed.
 
 ## Architecture and truthfulness
@@ -52,6 +52,12 @@ Job analysis accepts no candidate profile. Keep trusted instructions separate fr
 Response text and its quote must be literal source substrings; that is provenance, not proof of
 classification/completeness. Preserve required/preferred distinctions and explicit unknowns.
 Never enable a live provider just because credentials exist; discuss provider/data/cost policy first.
+The user approved local-only Ollama/Qwen3:4b, not cloud inference or automatic model downloads.
+Keep the fixed loopback host, no proxies/redirects/fallbacks, server cloud-disabled and local-model
+metadata guards, input/output/deadline limits, and strict engine validation. Trusted `ProviderError`
+messages must be static/safe; never wrap raw server bodies or transport errors for CLI display.
+Normal tests use HTTP mocks/local synthetic stubs, never actual model downloads or inference.
+Do not loosen quotation checks to conceal model failures; document quality limits and review results.
 
 ## Feature workflow
 
@@ -86,6 +92,10 @@ python -m mypy
 python -m pytest --cov=resumeforge --cov-report=term-missing
 python -m build --no-isolation
 ```
+
+For explicitly requested live evaluation only, start the separate local-only Ollama runtime
+as documented in `docs/OLLAMA.md`, then select `--provider ollama`. Runtime installation and
+model pulls are operator actions, not application or CI side effects.
 
 Use type hints, descriptive names, small functions, Ruff formatting, and strict mypy.
 Normal tests must not call live LLMs or require credentials. Use fake providers when introduced.

@@ -1,0 +1,8 @@
+Responsibilities:
+Build Python services.
+Required:
+Python programming.
+Preferred:
+SQL knowledge.
+Evidence: A tested command-line project.
+Location: Montréal.

@@ -113,3 +113,46 @@
 - Next Phase 2 gate: agree on a real provider/model and job-data/cost/credential/timeout policy,
   then implement its adapter with mocked normal tests. Offline contract work is complete;
   live semantic extraction is deliberately not advertised as implemented.
+
+## Session 005 — Guarded local Ollama provider
+
+- Read the current context, inspected a clean tracked worktree and branched
+  `feat/ollama-job-analysis` from the existing offline feature. Prior branches/main were not
+  merged or rewritten. User approved local-only Ollama with an initial Qwen3:4b evaluation.
+- Added HTTPX and its pinned transitive dependencies, no provider-specific SDK or API key.
+  Implemented `OllamaProvider` through the existing Protocol; fake mode remains the default.
+  Explicit CLI provider/model/port/timeout/output options preserve the previous fake command.
+- Enforce fixed literal loopback addressing, no proxies/redirects, cloud-disabled server status,
+  local GGUF/completion metadata and no remote aliases before sending job text. Added bounded
+  API envelopes/context/output, per-I/O timeouts/shared deadline, non-thinking/no-tool generation,
+  completion/role/model checks, no retries/pulls/fallbacks and unload-after-request. The local
+  server/OS remain trusted; these checks are not attestation or hard process isolation.
+- Introduced safe `ProviderError` propagation for actionable failures without exposing server
+  bodies. Kept the existing strict job schema, duplicate-ID and quotation validators unchanged.
+  Added HTTP mocks and a real loopback synthetic-server integration test, not live CI inference.
+- Installed an isolated user-owned evaluation runtime under approved temporary storage, not a
+  global service: Ollama v0.40.16 Linux archive SHA-256 verified against official release metadata;
+  pulled only Qwen3:4b (digest prefix `359d7dd4bcda`). The server binds 127.0.0.1:11435 and
+  reports cloud disabled. No system-service configuration or private profile was changed/sent.
+  Private restart/setup notes are in ignored `data/local_ollama.md`; temporary caches may expire.
+- Early live prompt iterations were correctly rejected for casing/quotation mismatches, empty
+  metadata in place of null, and reused IDs. Refined prompt and schema descriptions to v3 and
+  added synthetic regressions rather than normalizing or silently accepting unsupported output.
+- Prompt-v3 live checks passed for the fictional backend posting (9 items, about 80 seconds)
+  and a missing-metadata/plain-text/Unicode posting (5 items, about 59 seconds). Company/title
+  handling and main required/preferred clauses were manually checked. Taxonomy tagging remained
+  incomplete: testing/SQL tags were omitted despite retained qualification text. Results do not
+  establish general recall, classification quality or factual infallibility. Added public
+  source/hand-authored replay fixtures to keep evaluation inputs reproducible without live tests.
+- Application version 0.4.0. On Python 3.12.3, 212 unit + 20 integration = 232 tests passed with
+  99.87% branch-aware coverage. Ruff lint/format, strict mypy (30 source files), `pip check`,
+  source/wheel builds, fresh locked editable installation and all tests against the installed
+  wheel outside the repository passed. Runtime-only fake-mode smoke also passed. The installed-wheel
+  CLI additionally passed a live backend-job smoke from outside the repository (Qwen3:4b, 9 items,
+  prompt v3), using only the fictional job and the same guarded local server.
+- Updated README, architecture, decision ADR-008, setup/analysis guides and agent context to
+  distinguish local inference, fake replay, opt-in evaluation and future cloud support. Normal
+  CI never downloads models or requires Ollama. Hosted CI/Python 3.13 remain unverified locally.
+- Next: broaden local extraction-quality evaluation before relying on tags for ranking; retain
+  human review of provisional profile facts. Matching/planning requires explicit completion and
+  preference contracts. No resume generation, PDF, history, cloud adapter or deployment was added.

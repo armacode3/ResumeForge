@@ -13,8 +13,13 @@ class JobModel(BaseModel):
 
 
 class QuotedFact(JobModel):
-    text: Text
-    source_quote: Text
+    text: Text = Field(
+        description="Copy an exact source span, preserving capitalization; "
+        "never title-case or paraphrase."
+    )
+    source_quote: Text = Field(
+        description="Verbatim source span containing text with exactly the same capitalization."
+    )
 
     @model_validator(mode="after")
     def check_literal_text(self) -> Self:
@@ -32,8 +37,14 @@ JobItems = Annotated[list[JobItem], Field(max_length=200)]
 
 class JobRequirements(JobModel):
     schema_version: Annotated[int, Field(ge=1, le=1)]
-    company: QuotedFact | None
-    job_title: QuotedFact | None
+    company: QuotedFact | None = Field(
+        description="Explicit employer name, or JSON null if absent; "
+        "never empty strings or an empty object."
+    )
+    job_title: QuotedFact | None = Field(
+        description="Explicit role title, or JSON null if absent; "
+        "do not infer a title from responsibilities."
+    )
     responsibilities: JobItems
     required_qualifications: JobItems
     preferred_qualifications: JobItems

@@ -1,16 +1,17 @@
 """Provider injection, response failures, source grounding and privacy contracts."""
 
 import json
+from pathlib import Path
 from typing import Any, cast
 from unittest.mock import patch
 
 import pytest
 
 from resumeforge.inputs import MAX_INPUT_BYTES
-from resumeforge.jobs import JobAnalysis, JobAnalysisError, JobDocument, analyze_job
+from resumeforge.jobs import JobAnalysis, JobAnalysisError, JobDocument, analyze_job, load_job
 from resumeforge.jobs.analysis import JOB_ANALYSIS_INSTRUCTIONS, JOB_ANALYSIS_PROMPT_VERSION
 from resumeforge.jobs.models import JobRequirements
-from resumeforge.providers import FakeProvider, StructuredRequest
+from resumeforge.providers import FakeProvider, ProviderError, StructuredRequest
 
 
 class RecordingProvider:
@@ -200,3 +201,23 @@ def test_provider_exception_is_sanitized_and_not_retried() -> None:
 
     assert len(provider.requests) == 1
     assert "fictional-private-token" not in str(error.value)
+
+
+def test_safe_provider_error_keeps_actionable_message() -> None:
+    class UnavailableProvider(RecordingProvider):
+        def complete(self, request: StructuredRequest) -> str:
+            self.requests.append(request)
+            raise ProviderError("Start the local Ollama server with cloud disabled.")
+
+    provider = UnavailableProvider("")
+    with pytest.raises(JobAnalysisError, match="Start the local Ollama server"):
+        analyze_job(JobDocument("Example job"), provider)
+    assert len(provider.requests) == 1
+
+
+@pytest.mark.parametrize("filename", ["backend_intern.md", "missing_metadata.txt"])
+def test_public_evaluation_sources_and_hand_authored_fixtures_are_valid(filename: str) -> None:
+    path = Path(__file__).resolve().parents[2] / "examples/jobs" / filename
+    result = analyze_job(load_job(path), FakeProvider.from_file(path.with_suffix(".response.json")))
+    assert result.requirements.items()
+    assert result.provider == "fake"

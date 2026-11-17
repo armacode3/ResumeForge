@@ -1,15 +1,15 @@
-# Offline job analysis — Phase 2 contracts
+# Job analysis — Phase 2 contracts
 
-## Status: offline flow implemented, live extraction not enabled
+## Status: fake replay and explicitly selected local Ollama
 
 ResumeForge loads a local job description, builds a provider-neutral structured request,
 validates the returned requirements, and checks literal quotations against that exact job.
-The only supplied adapter is **FakeProvider**, which replays a JSON response you supply.
-It does not infer requirements, use keyword extraction, or call a language model. This lets
-us test data contracts, prompts, errors and integration before adding a paid/external dependency.
+**FakeProvider** replays a JSON response you supply; it does not extract requirements.
+**OllamaProvider** performs real local inference through a guarded loopback server. See
+[OLLAMA.md](OLLAMA.md) for installation, local-only policy, limits and opt-in evaluation.
 
-Analysis of arbitrary jobs by a real model remains a separate, explicitly authorized feature.
-There is no SDK, API key, remote provider selector, URL ingestion, resume matching or generation.
+There is no paid/cloud provider, API key, remote-base-URL setting, URL ingestion, resume matching
+or generation. Local analysis is a model interpretation, not proof of correct/complete extraction.
 No candidate/profile input is needed. Existing provisional profile facts remain unchanged.
 
 ## Run the fictional example
@@ -27,7 +27,8 @@ between two jobs do not establish that replayed categories are correct or comple
 Success writes one JSON document to **stdout**, and an explicit offline/fake notice to **stderr**.
 Failures emit an actionable error to stderr and no partial JSON to stdout. Exit codes:
 0 = validated result; 1 = file/provider/JSON/schema/quotation failure; 2 = CLI usage error.
-Both `--job` and `--mock-response` are required; there is no implicit fake or live-provider fallback.
+`--job` is required. Default fake mode requires `--mock-response`; local inference requires
+`--provider ollama` instead, and cannot be combined with a mock response. There is no fallback.
 
 The command itself creates no files. To retain a result, use private ignored storage:
 
@@ -96,8 +97,8 @@ Review every analysis, including fake/previously approved responses.
 The stdout `JobAnalysis` contains:
 
 - `schema_version: 1` and `source_sha256`.
-- `provider`/`model` (`fake` / `fixture-v1` for the supplied adapter).
-- `prompt_version` (`job-analysis-v1`).
+- `provider`/`model` (`fake` / `fixture-v1` for replay; `ollama` / requested tag for local inference).
+- `prompt_version` (`job-analysis-v3`).
 - `requirements`: the validated extraction described above.
 - `warnings`: always a review reminder, plus flags for unidentified company/title and no items.
 
@@ -117,19 +118,21 @@ analysis = analyze_job(document, provider)
 ```
 
 `JobDocument(text)` supports callers without file I/O. Loading raises `InputError`; analysis
-failures raise `JobAnalysisError`. `StructuredOutputProvider` is a Python `Protocol`: any trusted
+failures raise `JobAnalysisError`. Ollama configuration/adapter failures raise safe `ProviderError`
+messages, preserved by the engine as actionable analysis errors. `StructuredOutputProvider` is a
+Python `Protocol`: any trusted
 adapter implementing `name`, `model` and `complete(request) -> str` can be injected. The request
 separates trusted versioned instructions, untrusted job text, and a Pydantic-generated JSON schema.
 No candidate data or tool registry is included. Engine validation applies to every adapter response.
 
 One provider call is made per analysis, without automatic retry. Provider exceptions are sanitized;
 bad JSON/schema/quotes fail closed. The supplied fake completes immediately and performs no network
-I/O. A future live adapter must define timeouts, response limits, credential handling and failure
-policy before use; this synchronous protocol alone does not enforce a network timeout.
+I/O. The Ollama adapter has explicit local-only guards, time/output/context/response limits and
+no cloud fallback; this synchronous provider protocol alone does not impose those protections.
 
-## Next gate: real provider selection
+## Local inference and next gates
 
-Before enabling a live adapter, agree on provider/model, credentials kept server-side, job-data
-disclosure, API costs and limits, structured-output compatibility, timeouts and retry behavior.
-Do not infer authorization from the presence of an API key. Normal tests will keep using fakes,
-including failure fixtures and multiple source layouts, with no live API dependency.
+The user selected local-only Ollama with Qwen3:4b. Normal tests remain mocked, including failures
+and multiple layouts. Model evaluation must be explicit and distinguish syntax/source grounding
+from semantic accuracy and completeness. Before any future cloud adapter, agree on provider,
+data disclosure, credentials, costs and time/failure policy; never infer authorization from a key.

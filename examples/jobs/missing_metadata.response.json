@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "company": null,
+  "job_title": null,
+  "responsibilities": [
+    {"id": "job_responsibilities_1", "text": "Build Python services.", "source_quote": "Build Python services."}
+  ],
+  "required_qualifications": [
+    {"id": "job_required_qualifications_1", "text": "Python programming.", "source_quote": "Python programming."}
+  ],
+  "preferred_qualifications": [
+    {"id": "job_preferred_qualifications_1", "text": "SQL knowledge.", "source_quote": "SQL knowledge."}
+  ],
+  "programming_languages": [
+    {"id": "job_programming_languages_1", "text": "Python", "source_quote": "Python programming."},
+    {"id": "job_programming_languages_2", "text": "SQL", "source_quote": "SQL knowledge."}
+  ],
+  "frameworks": [],
+  "technical_concepts": [],
+  "domain_terms": [],
+  "evidence_sought": [
+    {"id": "job_evidence_sought_1", "text": "A tested command-line project.", "source_quote": "Evidence: A tested command-line project."}
+  ]
+}

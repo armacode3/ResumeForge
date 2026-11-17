@@ -99,7 +99,7 @@ def test_invalid_response_does_not_emit_partial_json(job_path: Path, tmp_path: P
     assert "private-value" not in result.output
 
 
-def test_fake_fixture_is_mandatory_and_live_provider_is_not_available(job_path: Path) -> None:
+def test_fake_fixture_is_mandatory_and_cloud_provider_is_not_available(job_path: Path) -> None:
     for arguments in [
         ["analyze-job", "--job", str(job_path)],
         ["analyze-job", "--job", str(job_path), "--provider", "openai"],
@@ -108,8 +108,31 @@ def test_fake_fixture_is_mandatory_and_live_provider_is_not_available(job_path: 
         assert result.exit_code == 2
 
 
-def test_analyze_help_describes_offline_mode() -> None:
+def test_analyze_help_describes_modes() -> None:
     result = runner.invoke(app, ["analyze-job", "--help"])
     assert result.exit_code == 0
     assert "--mock-response" in result.stdout
-    assert "offline replay" in result.stdout.lower()
+    assert "--provider" in result.stdout
+    assert "loopback-only" in result.stdout.lower()
+
+
+@pytest.mark.parametrize(
+    "options",
+    [
+        ["--provider", "ollama", "--mock-response", "unused.json"],
+        ["--mock-response", "unused.json", "--model", "other-model"],
+    ],
+)
+def test_incompatible_provider_options_fail_before_io(job_path: Path, options: list[str]) -> None:
+    result = runner.invoke(app, ["analyze-job", "--job", str(job_path), *options])
+    assert result.exit_code == 2
+    assert result.stdout == ""
+
+
+def test_invalid_local_model_has_actionable_error_without_partial_output(job_path: Path) -> None:
+    result = runner.invoke(
+        app, ["analyze-job", "--job", str(job_path), "--provider", "ollama", "--model", "x:cloud"]
+    )
+    assert result.exit_code == 1
+    assert result.stdout == ""
+    assert "Cloud model names are not allowed" in result.stderr

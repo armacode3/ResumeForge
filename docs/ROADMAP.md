@@ -45,7 +45,7 @@ lint/format, strict mypy, dependency checks, source/wheel builds, fresh locked e
 all tests against the installed wheel outside the repository, and a runtime-only wheel/profile
 smoke test. No live services or private profile data were used. Hosted CI is not locally verified.
 
-## Phase 2 — Local jobs and structured analysis (offline slice implemented)
+## Phase 2 — Local jobs and structured analysis (local adapter implemented)
 
 Accept local text/Markdown, introduce provider contracts and deterministic fakes, validate job
 requirements and malformed responses, separate required/preferred qualifications. Decide on
@@ -54,14 +54,24 @@ a real provider before enabling external calls. Gate: unit/integration tests wit
 Implemented: bounded local UTF-8 job/response inputs, source hashes, strict quoted requirement
 schemas and IDs, provider Protocol, deterministic explicit fake replay, malformed-response and
 quotation checks, `analyze-job`, fictional fixtures, and installed-CLI tests. See `docs/JOB_ANALYSIS.md`.
-The fake does not extract requirements from arbitrary jobs. **Next Phase 2 gate:** choose and
-authorize a live provider/model with data-disclosure, credentials, cost, timeout and retry policy;
-then implement its adapter without making normal tests depend on external APIs.
+The fake does not extract requirements from arbitrary jobs. The user selected local-only Ollama
+with Qwen3:4b. Its adapter now enforces loopback/no-proxy/no-redirect operation, server cloud
+disablement, local-model checks, bounded context/response/time/output and complete-message checks.
+See `docs/OLLAMA.md`. No cloud adapter, automatic install/pull, retry or inference fallback exists.
+**Next quality gate:** evaluate local extraction on varied synthetic jobs and review classification,
+coverage and failures without weakening fact validation. Larger/different models or cloud use
+require deliberate resource/data decisions; normal tests must stay independent of real models.
 
 Offline-slice verification on Python 3.12.3: 151 unit + 16 integration = 167 tests passed,
 99.83% branch-aware coverage, Ruff lint/format, strict mypy, dependency checks and package builds.
 Fresh locked editable installation, all tests against the installed wheel outside the repository,
 and runtime-only help/profile/job smoke tests passed. Hosted CI/Python 3.13 are not locally verified.
+
+Local-adapter verification on Python 3.12.3: 212 unit + 20 integration = 232 tests passed,
+99.87% branch-aware coverage, lint/format/types/dependency checks and package builds. Normal tests
+use only mocks or synthetic loopback HTTP. Separately, two fictional live examples passed strict
+schema/quote/basic-metadata checks with Qwen3:4b and prompt v3 after earlier failures were caught;
+manual review still found incomplete taxonomy tags. This is not a general accuracy certification.
 
 ## Phase 3 — Matching and planning
 
