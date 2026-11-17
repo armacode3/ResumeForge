@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from rich.text import Text
 from typer.testing import CliRunner
 
 from resumeforge.cli import app
@@ -110,10 +111,12 @@ def test_fake_fixture_is_mandatory_and_cloud_provider_is_not_available(job_path:
 
 def test_analyze_help_describes_modes() -> None:
     result = runner.invoke(app, ["analyze-job", "--help"])
+    help_text = Text.from_ansi(result.stdout).plain
+
     assert result.exit_code == 0
-    assert "--mock-response" in result.stdout
-    assert "--provider" in result.stdout
-    assert "loopback-only" in result.stdout.lower()
+    assert "--mock-response" in help_text
+    assert "--provider" in help_text
+    assert "loopback-only" in help_text.lower()
 
 
 @pytest.mark.parametrize(

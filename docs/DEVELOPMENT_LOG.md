@@ -156,3 +156,30 @@
 - Next: broaden local extraction-quality evaluation before relying on tags for ranking; retain
   human review of provisional profile facts. Matching/planning requires explicit completion and
   preference contracts. No resume generation, PDF, history, cloud adapter or deployment was added.
+
+## Session 006 — Repair GitHub Actions help assertions
+
+- User reported failed checks on all published commits. Public GitHub Actions metadata confirmed
+  failed runs on each branch, with the latest Python 3.12/3.13 jobs stopping at unit tests.
+  Reproduced the reported assertion locally with GitHub/forced-color terminal settings; also
+  exposed the same issue in both subcommand-help integration tests.
+- Root cause: Typer/Rich enables terminal styling on GitHub Actions and can place ANSI sequences
+  between the hyphens in an option name. The visible `--version` was present, but raw-byte
+  substring assertions treated the styling as missing command content. Prior plain local runs
+  did not exercise this environment; their success did not establish hosted CI success.
+- Decode help output with Rich's public ANSI-to-text API before asserting the same visible
+  commands/options. No application behavior, dependency pins, validators or CI gates were relaxed;
+  colored output remains enabled. Added 12 installed-process regressions covering root help aliases
+  and both subcommands in plain, GitHub Actions and forced-color environments, explicitly checking
+  that colored modes actually emit ANSI sequences. Fresh processes cover import-time settings.
+- All previous feature branches are ancestors of `feat/ollama-job-analysis`. Apply this repair
+  there so a single merge into `main` includes all prior features and the fix. No historical
+  commits were rewritten, other branches changed, or main merge performed; old failed run badges
+  remain historical records, not evidence that the repaired branch tip is failing.
+- Python 3.12.3: 212 unit + 32 integration = 244 tests passed with `GITHUB_ACTIONS=true`, including
+  the full suite at 99.87% branch-aware coverage. Ruff lint/format, strict mypy and dependency
+  checks passed. A plain-environment full run, forced-color help tests, source/wheel builds and
+  all 244 tests against the installed wheel outside the repository also passed.
+  Python 3.13/hosted outcomes must be checked on the new pushed run,
+  not inferred from local tests. No model inference, private data or external service was needed.
+- Next feature remains broader synthetic extraction-quality evaluation, not another pipeline phase.

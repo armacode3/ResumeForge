@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 import pytest
+from rich.text import Text
 from typer.testing import CliRunner
 
 from resumeforge.cli import app
@@ -74,6 +75,7 @@ def test_missing_profile_has_actionable_error(tmp_path: Path) -> None:
 
 def test_validate_profile_help_is_available() -> None:
     result = runner.invoke(app, ["validate-profile", "--help"])
+    help_text = Text.from_ansi(result.stdout).plain
 
     assert result.exit_code == 0
-    assert "--profile" in result.stdout
+    assert "--profile" in help_text

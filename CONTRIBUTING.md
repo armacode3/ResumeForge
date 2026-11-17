@@ -16,6 +16,7 @@ python -m ruff check .
 python -m ruff format --check .
 python -m mypy
 python -m pytest --cov=resumeforge --cov-report=term-missing
+GITHUB_ACTIONS=true python -m pytest tests/unit tests/integration
 python -m build --no-isolation
 python -m pip check
 ```
@@ -23,6 +24,9 @@ python -m pip check
 Use `python -m ruff format .` to apply formatting. Keep tests deterministic and independent
 of live LLM APIs, credentials and private data. Use `pytest -m integration` for installed CLI
 checks; resume/PDF integration tests will be introduced with those implementations.
+The GitHub-like test run exercises Typer/Rich's automatic colored output. Help assertions must
+compare visible text after ANSI decoding, not assume option names are contiguous in styled bytes.
+Do not disable CI colors or weaken option-presence checks to hide rendering-dependent failures.
 
 5. Update relevant docs and `docs/DEVELOPMENT_LOG.md`. State what actually ran, including skips.
 6. Review `git diff` and `git diff --cached`, especially for private data and secrets. Stage

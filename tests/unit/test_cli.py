@@ -3,6 +3,7 @@
 from importlib.metadata import version
 
 import pytest
+from rich.text import Text
 from typer.testing import CliRunner
 
 from resumeforge import __version__
@@ -14,13 +15,14 @@ runner = CliRunner()
 @pytest.mark.parametrize("option", ["--help", "-h"])
 def test_help_describes_only_implemented_commands(option: str) -> None:
     result = runner.invoke(app, [option])
+    help_text = Text.from_ansi(result.stdout).plain
 
     assert result.exit_code == 0
-    assert "ResumeForge" in result.output
-    assert "validate-profile" in result.output
-    assert "analyze-job" in result.output
-    assert "--version" in result.output
-    assert "generate" not in result.output
+    assert "ResumeForge" in help_text
+    assert "validate-profile" in help_text
+    assert "analyze-job" in help_text
+    assert "--version" in help_text
+    assert "generate" not in help_text
 
 
 @pytest.mark.parametrize("option", ["--version", "-V"])
