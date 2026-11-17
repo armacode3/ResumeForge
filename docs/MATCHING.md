@@ -1,10 +1,12 @@
-# Offline evidence eligibility and lexical matching — 0.6.0
+# Offline evidence retrieval and source-backed signals — 0.7.0
 
 ## What this slice does
 
 `match-evidence` retrieves review candidates from verified, explicitly completed accomplishments
 against **manually reviewed** job requirements. It is deterministic and offline: no LLM, network,
 embeddings, automatic inference, ranking, resume selection or generation is involved.
+Version 0.7.0 adds unweighted source-backed review signals to existing candidates, without
+changing eligibility, retrieval or candidate ordering.
 
 **A lexical candidate is not a qualification verdict or proof of entailment.** A shared technology
 can be incidental, negated or refer to a different responsibility. An unmatched item may reflect
@@ -35,8 +37,9 @@ validated; confirming review cannot bypass schema/source checks or approve candi
 
 Success emits one JSON report to stdout and an offline/review notice to stderr, without writing
 files. Store real reports under ignored `artifacts/` if needed. They deliberately contain eligible
-profile statements and job text/quotes; they are private output, not safe public logs. The person/
-contact fields, Markdown notes and statements of ineligible accomplishments are not included.
+profile statements, candidate metric records and job text/quotes; they are private output, not safe
+public logs. The person/contact fields, Markdown notes and statements of ineligible accomplishments
+are not included.
 Hashes do not anonymize personal data. Normal application logging remains unchanged.
 
 Exit codes: **0** = report produced (including unmatched items/review findings); **1** = invalid
@@ -100,6 +103,43 @@ lexical candidate. They remain single, unchanged contextual items—not split in
 or declared satisfied. Required/preferred distinctions are never upgraded by a tag or overlap.
 Interpretation and claim support remain human-review/Phase 4 responsibilities.
 
+## Explainable signals (`evidence-signals-v1`)
+
+Each candidate now contains immutable `signals` derived only from its revalidated, eligible
+accomplishment and existing overlaps. These are **observations for review, not a relevance
+score, demonstrated responsibility, semantic support or approval**:
+
+| Field | Source and interpretation |
+| --- | --- |
+| `job_phrase_in_statement` | True exactly when the existing full-item phrase overlap exists. Its literal spans remain in `overlaps`. |
+| `technologies` | One record per existing technology overlap, preserving its scoped `technology` label and literal `job_span`. `statement_span` is the first bounded case-insensitive literal mention in the accomplishment statement, or null. |
+| `metrics` | Every explicit `accomplishments[].metrics` record on this candidate, with unchanged `text` and its first literal `statement_span`, or null. Source order and duplicates are preserved, not counted toward a score. |
+
+For example, a Python candidate with `statement_span: "PYTHON"` has that literal mention in its
+statement. With `statement_span: null`, the technology overlap is metadata-only under this
+literal policy. Neither case proves technology use or responsibility: `Did not use Python` also
+contains a mention, while a null span may simply mean different wording. Only retrieved scoped
+technology labels are annotated; technology names mentioned in prose are not inferred into
+metadata or newly retrieved. Existing Java/JavaScript and C/C++/C# boundaries still apply.
+
+Metrics are recorded context, not inferred quantities or necessarily numeric, job-relevant,
+causal or supported by the statement. A null metric span is explicit non-alignment under the
+literal policy, not invalidation or permission to rewrite the record. Numbers in prose are not
+automatically extracted. No scale, ownership, impact, specificity grade, threshold satisfaction,
+or comparative quality is inferred. Review the full statement, its qualifiers and source profile.
+
+The candidate's stable accomplishment ID links all signal records to that accomplishment's
+fields; technology/job spans also link to the existing overlap and unchanged job item. Signals
+never read parent technology lists/details, skills, notes, verified bullet wording or other
+accomplishments' metrics. Excluded, unverified, unfinished and unknown-state records still cannot
+produce candidates or signals. Eligible records with no lexical match are not annotated.
+
+These additions do **not** rank evidence: ID ordering remains unchanged even if one candidate has
+many mentions or metrics and another has none. Empty signals mean no observations under this
+policy, not missing experience or lower relevance. Required/preferred categories, alternatives,
+negation, source quotes, constraints and in-progress caveats are preserved. Tests establish
+literal provenance and these invariants, not measured semantic accuracy or ranking quality.
+
 ## Review findings and remaining planning work
 
 The report flags required entries/sections with no eligible accomplishment evidence, required
@@ -127,16 +167,21 @@ The API accepts no provider, file paths or Markdown notes. It revalidates input 
 quote grounding rather than trusting mutated Pydantic objects. Review acknowledgement must be
 boolean true, not a truthy string/integer. Failures raise static, safe `MatchingError` messages.
 
-`MatchingReport` contains algorithm version, source identity, evidence decisions, per-item
+`MatchingReport` contains algorithm versions, source identity, evidence decisions, per-item
 candidates and constraint findings. `job_source_sha256` hashes exact job UTF-8 bytes.
 `profile_model_sha256` and `requirements_model_sha256` hash the validated models' JSON (including
 profile preferences), **not** original file bytes or proof of review; ordering can change those
 model hashes. Outputs are immutable dataclass/tuple snapshots, not references to mutable inputs.
+The 0.7.0 JSON additions are root `signals_version` and per-candidate `signals`, plus a signal
+limitations warning. `matching_version` remains `evidence-matching-v1` because retrieval did not
+change; `signals_version` independently identifies `evidence-signals-v1`. No profile schema
+change or input rewrite is needed. This output is not accepted as reviewed requirements input.
 
 At most **20,000 eligible-accomplishment/job-item pairs** are compared. Larger requests fail
 before retrieval instead of truncating evidence or job content. This is a comparison-count
 guard, not a hard CPU/process sandbox. Existing bounded file/schema loaders still apply to CLI
 inputs. Normal tests use fictional inputs and fake JSON only, never a model or private profile.
 
-Next: measured, explainable relevance signals and constrained resume planning as separate slices;
-never use lexical-count ranking alone or promote a retrieval candidate into an approved claim.
+Next: constrained resume planning as a separate slice, with explicit review needs and evidence
+references. Relevance ordering/weights still need a justified policy and evaluation; never use
+lexical/metric counts alone or promote a retrieval candidate into an approved claim.

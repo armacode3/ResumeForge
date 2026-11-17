@@ -88,7 +88,7 @@ limited run. See `docs/evaluations/qwen3-4b-v3.md`. This is **not** approval for
 Typed completion-state/preferences can be developed independently of model quality; later
 matching uses reviewed requirements or deterministic fixtures, never model tag absence as proof.
 
-## Phase 3 — Matching and planning (typed inputs and lexical retrieval implemented)
+## Phase 3 — Matching and planning (typed inputs, retrieval and review signals implemented)
 
 Rank evidence beyond keywords, honor mandatory sections/experiences, produce structured plans
 with evidence references, space budgets and review flags. Gate: deterministic selection/ranking
@@ -105,8 +105,14 @@ and offline literal candidate retrieval, with required-content review findings a
 job context. `match-evidence` never calls a model, uses unverified/excluded claims, declares a
 qualification satisfied or loads a default private profile. See `docs/MATCHING.md` and ADR-011.
 
-**Next:** explainable relevance signals beyond literal overlap, then constrained `ResumePlan`
-selection as a separate slice. Ranking, resume selection and planning are not implemented yet.
+Implemented in 0.7.0: source-backed candidate review signals distinguishing literal technology
+mentions in statements from metadata-only overlaps, preserving full-phrase anchors and explicit
+scoped metric records with nullable statement spans. Signals are unweighted observations, not
+inferred impact, responsibility or semantic relevance. Eligibility and ID ordering are unchanged.
+
+**Next:** constrained `ResumePlan` selection as a separate slice, with explicit review findings.
+Relevance ordering/weights still require justified policy and evaluation; ranking, resume selection
+and planning are not implemented yet.
 Preserved Markdown notes are not enforced constraints. Later planning must also surface
 insufficient evidence and mandatory-content/readable-one-page conflicts; validated counts and
 lexical candidates alone cannot guarantee feasibility or truthful generated claims.

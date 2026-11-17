@@ -1,11 +1,11 @@
 """Offline evidence eligibility and conservative literal candidate retrieval; no ranking."""
 
-import re
 from hashlib import sha256
 
 from pydantic import ValidationError
 
 from resumeforge.jobs import JobDocument, JobRequirements
+from resumeforge.matching.literals import literal_span
 from resumeforge.matching.models import (
     ConstraintFinding,
     Eligibility,
@@ -16,6 +16,7 @@ from resumeforge.matching.models import (
     MatchingReport,
     Reason,
 )
+from resumeforge.matching.signals import SIGNALS_VERSION, relevance_signals
 from resumeforge.profile import UserProfile
 from resumeforge.profile.models import Accomplishment, ProfileEntry
 
@@ -65,14 +66,6 @@ def _assess_evidence(
     )
 
 
-def _literal_span(needle: str, haystack: str) -> str | None:
-    # Keep +/# attached to technology names: C is not C++/C#, Java is not JavaScript.
-    if len(needle) > len(haystack):
-        return None
-    found = re.search(r"(?<![\w+#])" + re.escape(needle) + r"(?![\w+#])", haystack, re.IGNORECASE)
-    return found.group() if found else None
-
-
 def _overlaps(evidence: EvidenceDecision, job_text: str) -> tuple[LexicalOverlap, ...]:
     matches = []
     seen: set[str] = set()
@@ -80,11 +73,11 @@ def _overlaps(evidence: EvidenceDecision, job_text: str) -> tuple[LexicalOverlap
         if technology.casefold() in seen:
             continue
         seen.add(technology.casefold())
-        span = _literal_span(technology, job_text)
+        span = literal_span(technology, job_text)
         if span is not None:
             matches.append(LexicalOverlap("technology_mention", technology, span))
     assert evidence.statement is not None
-    span = _literal_span(job_text, evidence.statement)
+    span = literal_span(job_text, evidence.statement)
     if span is not None:
         matches.append(LexicalOverlap("job_phrase_in_statement", span, job_text))
     return tuple(matches)
@@ -151,6 +144,7 @@ def match_evidence(
     eligible = [item for item in evidence if item.eligibility == "eligible_for_matching"]
     if len(eligible) * len(requirements.items()) > MAX_MATCH_PAIRS:
         raise MatchingError("Matching comparison budget exceeded; reduce job items or evidence.")
+    accomplishments = {item.id: item for item in profile.accomplishments}
     items = []
     for section in requirements.ITEM_FIELDS:
         for item in getattr(requirements, section):
@@ -165,7 +159,11 @@ def match_evidence(
                     )
                     candidates.append(
                         EvidenceCandidate(
-                            record.accomplishment_id, record.entry_id, overlaps, caveats
+                            record.accomplishment_id,
+                            record.entry_id,
+                            overlaps,
+                            caveats,
+                            relevance_signals(accomplishments[record.accomplishment_id], overlaps),
                         )
                     )
             items.append(
@@ -180,6 +178,7 @@ def match_evidence(
             )
     return MatchingReport(
         matching_version=MATCHING_VERSION,
+        signals_version=SIGNALS_VERSION,
         profile_model_sha256=sha256(profile.model_dump_json().encode("utf-8")).hexdigest(),
         job_source_sha256=document.sha256,
         requirements_model_sha256=sha256(
@@ -196,5 +195,7 @@ def match_evidence(
             "or absence from the original job.",
             "No ranking, content selection, bullet-budget allocation "
             "or layout feasibility check was performed.",
+            "Signals are source observations, not semantic support or comparative quality; "
+            "recorded metrics need separate context and job-relevance review.",
         ),
     )

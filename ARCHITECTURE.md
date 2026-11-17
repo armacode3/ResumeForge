@@ -3,8 +3,9 @@
 ## Status and approach
 
 Phases 0–2 include profile validation and fake/local Ollama job analysis. Phase 3 now has typed
-completion states/preferences and offline evidence eligibility/lexical retrieval. Ranking,
-resume planning and semantic qualification checks are not implemented.
+completion states/preferences, offline evidence eligibility/lexical retrieval and source-backed
+candidate review signals. Ranking, resume planning and semantic qualification checks are not
+implemented.
 No cloud provider is enabled.
 Everything below labeled **planned** is a design boundary, not a
 working feature. Prefer a modular monolith: one Python package, with small components and
@@ -36,6 +37,8 @@ src/resumeforge/
   matching/
     models.py       immutable retrieval decisions, overlaps and review findings
     engine.py       explicit review gate, eligibility and literal candidate retrieval
+    literals.py     shared bounded case-insensitive literal-span policy
+    signals.py      unweighted statement-mention and scoped metric observations
 tests/
   unit/             CLI/schema/parser/gap contracts and invalid inputs
   integration/      installed entry points, profile validation, privacy safeguards
@@ -130,6 +133,10 @@ produce candidates. Verified completed subtasks may be retrieved from in-progres
 explicit caveats. Only scoped accomplishment statements/technologies participate, not unscoped
 skills/entry metadata or bullet wording. Literal technology mentions and full job phrases produce
 review candidates, never satisfaction/entailment verdicts. No ranking or content selection occurs.
+Versioned candidate signals annotate existing overlaps with literal statement spans and explicit
+scoped metric records. They are not inferred responsibility, semantic support or weighted scores;
+absence is unknown, not a quality judgment. Signal construction occurs only for retrieved eligible
+records after the pair-budget gate. It cannot change retrieval, ordering or caveats.
 
 The read-only `match-evidence` CLI requires explicit profile/job/requirements paths and confirmation,
 performs no inference, and emits private source-derived JSON with IDs, statuses, preserved job
@@ -144,7 +151,7 @@ Create these modules only as their features are implemented:
 | Component | Responsibility and contract |
 | --- | --- |
 | Other provider adapters | Add only when explicitly approved; retain structured interface, data disclosure, limits and safe failure policy. No automatic fallback. |
-| Matching ranking | Add relevance signals beyond the implemented literal retrieval; never rank by keyword counts alone. |
+| Matching ranking | Evaluate relevance ordering beyond the implemented source observations; never rank by keyword/metric counts alone. |
 | `planning/` | Produce `ResumePlan`: selected evidence, mandatory content, space budgets, review flags and concise decision explanations. |
 | `generation/` | Produce structured `ResumeDocument` and bullets with supporting accomplishment IDs; never raw model-authored LaTeX. |
 | `validation/` | Validate references and factual claims; produce `ValidationResult` and blocking/review flags. Later inspect PDFs. |

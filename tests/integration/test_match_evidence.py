@@ -48,12 +48,25 @@ def test_installed_matching_is_offline_read_only_and_not_a_qualification_verdict
     assert result.returncode == 0, result.stderr
     report = json.loads(result.stdout)
     assert report["matching_version"] == "evidence-matching-v1"
+    assert report["signals_version"] == "evidence-signals-v1"
     assert report["requirements_reviewed"] is True
     python = next(item for item in report["items"] if item["job_item_id"] == "job_python_required")
     assert [candidate["accomplishment_id"] for candidate in python["candidates"]] == [
         "acc_api",
         "acc_queue",
     ]
+    # Both Python mentions are scoped metadata, not wording inherited from verified bullets.
+    assert python["candidates"][0]["signals"] == {
+        "job_phrase_in_statement": False,
+        "technologies": [{"technology": "Python", "job_span": "Python", "statement_span": None}],
+        "metrics": [
+            {
+                "text": "12 existing internal API endpoints covered by the added tests.",
+                "statement_span": None,
+            }
+        ],
+    }
+    assert python["candidates"][1]["signals"]["metrics"] == []
     pending = next(
         record
         for record in report["evidence"]

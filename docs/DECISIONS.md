@@ -218,3 +218,26 @@ This remains a human-reviewed retrieval aid. False positives from negation/commo
 false negatives from wording are expected limits. Later ranking must use additional evidence
 signals and selection must honor required/excluded content, budgets and readable layout; candidate
 retrieval is not permission to author or approve claims. See `docs/MATCHING.md`.
+
+## ADR-012 — Source-backed observations before relevance scoring
+
+**Status:** Implemented in 0.7.0; relevance ordering/weights and resume planning remain deferred.
+
+Annotate only already-retrieved eligible candidates with immutable, independently versioned
+signals. Reuse existing full-phrase/technology overlaps and the same literal boundary policy;
+distinguish technology mentions in the scoped statement from metadata-only overlaps. Preserve
+explicit accomplishment metric records and show nullable literal statement spans. Stable IDs,
+exact labels/spans and complete statements provide inspectable provenance without inventing
+quantities, ownership, responsibility, scale, relevance or semantic proof.
+
+Do not introduce arbitrary weights, keyword/metric-count ranking, action-verb quality heuristics
+or LLM judging. Metrics need not be numeric or aligned with the statement/job; a negated mention
+still has a literal span. Nulls/empty fields are unknown, not penalties or proof of absent skills.
+Neither numbers in prose nor parent/bullet/skill metadata supply inferred facts. Signals cannot
+create candidates, bypass eligibility/review/budget gates, change ID order or approve claims.
+
+This small step exposes useful distinctions for manual review while keeping future scoring
+policy separate. Synthetic tests check source agreement and invariants, not semantic or ranking
+quality. `matching_version` stays v1 for unchanged retrieval; additive report fields identify
+`signals_version: evidence-signals-v1`. Profiles need no rewrite. Output gains scoped candidate
+metric text and remains private. See `docs/MATCHING.md` for the exact contract and limitations.
