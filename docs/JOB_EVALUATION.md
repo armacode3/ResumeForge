@@ -117,6 +117,29 @@ complete extraction. Review required/preferred interpretation, negation, alterna
 manually; do not tune validators to turn a red score green. Do not normalize facts silently.
 Prompt/model changes need held-out examples before any quality claim beyond this tiny corpus.
 
+### Single-pass live review protocol
+
+Freeze the corpus, reference texts, prompt and runtime settings for a review pass. Record the
+application Git revision, source/reference hashes, model weight digest, Ollama version and
+per-case wall time outside Git. Run each selected case once, with no retries or silent repairs;
+keep schema/quotation failures in the denominator and retain only deliberately captured
+synthetic responses in private storage for inspection. Default application logging stays unchanged.
+
+Review the source and response together, distinguishing:
+
+- **Annotation-span differences:** a valid shorter/longer literal span needs review, not automatic
+  semantic rejection or a changed reference merely to raise the score.
+- **Coverage gaps:** a clause or taxonomy tag is absent even though the response validates.
+- **Meaning/classification problems:** negation, alternatives, optional status or metadata are
+  interpreted incorrectly despite genuine source quotations.
+- **Validation failures:** invalid structure, IDs, casing or quotes are rejected, not usable analyses.
+
+Synthetic regression tests separately demonstrate that source-grounded output can still drop an
+alternative's qualifier, treat a negated technology as required, or copy an employer from an
+untrusted footer. These constructed mutations are not real model responses or a proof that the
+reference comparator detects every semantic problem. Quotation checks are not instruction-defense
+or classification guarantees, and this schema still has no typed negation/alternative groups.
+
 ## Recorded-response check (no new inference)
 
 Offline comparison of the two saved prompt-v3 Qwen3:4b development responses confirmed:
@@ -127,10 +150,20 @@ Offline comparison of the two saved prompt-v3 Qwen3:4b development responses con
 | `missing_metadata` | Passed | 5/6; precision 1.0, recall about 0.833 | `SQL` language |
 
 Both metadata checks matched. Main qualification text remained present, but both cases correctly
-reported `mismatch`. The four new cases have only been reference-replayed in this iteration;
-**no broader live-model result is claimed**. The recorded raw responses/reports remain in ignored
+reported `mismatch`. At the time of that offline check, the four new cases had only been
+reference-replayed; it was not a broader live-model result. The recorded responses remain in ignored
 temporary storage, not Git. Original live runtime/model/prompt details are in [OLLAMA.md](OLLAMA.md).
 
-Next: explicitly run/review the broader local corpus if desired, document failures, then add
-typed completion-state/preferences before Phase 3 matching/planning. Do not rely on taxonomy
-tags alone for ranking or treat historical AI output as verified candidate evidence.
+## Completed single-pass local review
+
+The subsequently requested six-case live pass used the unchanged prompt v3, corpus and validators:
+**6/6 schema/quote-valid responses, 0/6 exact reference matches**. Missing tags affected every
+case; the footer case also lost known company/title metadata. One SQL preference was shortened
+in item text while retaining its caveat in the quote and remaining in the preferred category.
+The run took about 475 seconds, with no retries. See the
+[full review and per-case results](evaluations/qwen3-4b-v3.md).
+
+This completes the initial broader review, **not** a quality approval for unattended ranking.
+Next: typed completion-state/preferences before Phase 3 matching/planning, with reviewed
+requirements or deterministic fixtures until extraction quality is improved separately. Do not
+rely on taxonomy tags alone or treat historical AI output as verified candidate evidence.

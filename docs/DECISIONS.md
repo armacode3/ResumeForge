@@ -137,7 +137,7 @@ or weakening validators. Structured JSON and two passing examples would not prov
 
 ## ADR-009 — Small exact-reference evaluation before relying on extraction tags
 
-**Status:** Implemented as a Phase 2 quality tool; broader live quality review remains pending.
+**Status:** Implemented; the initial six-case local review is complete, not a quality approval.
 
 Use six fictional sources and manually authored `JobRequirements` references, validated through
 the same engine as model output. Compare exact case-sensitive text sets per category, ignoring
@@ -153,3 +153,8 @@ identity is not inferred from the JSON. Local inference is explicit, synthetic-o
 by the existing Ollama adapter. No live run, model pull, profile access or cloud fallback is a test
 side effect. Unmatched alternate spans need review, not silent fact normalization or weaker
 quotation checks. This does not implement matching/planning or candidate-claim approval.
+
+The unchanged prompt-v3 Qwen3:4b single pass validated all six responses but exactly matched none
+of the references. Missing tags and known metadata remain review blockers for unattended ranking;
+see `docs/evaluations/qwen3-4b-v3.md`. Typed completion/preference work can proceed independently,
+but future matching must use reviewed requirements or deterministic fixtures and preserve context.

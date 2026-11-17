@@ -62,6 +62,9 @@ Do not loosen quotation checks to conceal model failures; document quality limit
 Evaluation compares literal reference-text agreement, not semantic truth. Keep validation failures
 in case totals, undefined precision/recall null, and metadata separate. Reference replay is not a
 model-quality result. See `docs/JOB_EVALUATION.md`; no live benchmark runs without explicit opt-in.
+The initial six-case live review is complete: all outputs validated but none exactly matched
+references. See `docs/evaluations/qwen3-4b-v3.md`; local output is not approved for unattended ranking.
+Future matching must use reviewed requirements or deterministic fixtures, not tag absence as proof.
 
 ## Feature workflow
 

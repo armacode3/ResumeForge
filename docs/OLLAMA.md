@@ -161,6 +161,10 @@ their qualification lists. Hand-authored `.response.json` fixtures are separate 
 not a claim that the local model reproduces them. Broader recall/classification evaluation is
 needed before relying on these tags for ranking. No additional model or cloud fallback was pulled.
 
+The later [six-case single-pass review](evaluations/qwen3-4b-v3.md) used the same model/prompt
+without retries: all six responses validated, none exactly matched the references. Incomplete
+tags and lost known metadata remain limits; local inference is not approved for unattended ranking.
+
 References: [structured outputs](https://docs.ollama.com/capabilities/structured-outputs),
 [local FAQ / disabling cloud](https://docs.ollama.com/faq),
 [Qwen3:4b](https://ollama.com/library/qwen3:4b).

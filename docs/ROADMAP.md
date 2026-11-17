@@ -58,7 +58,7 @@ The fake does not extract requirements from arbitrary jobs. The user selected lo
 with Qwen3:4b. Its adapter now enforces loopback/no-proxy/no-redirect operation, server cloud
 disablement, local-model checks, bounded context/response/time/output and complete-message checks.
 See `docs/OLLAMA.md`. No cloud adapter, automatic install/pull, retry or inference fallback exists.
-**Next quality gate:** evaluate local extraction on varied synthetic jobs and review classification,
+**Quality boundary:** evaluate local extraction on varied synthetic jobs and review classification,
 coverage and failures without weakening fact validation. Larger/different models or cloud use
 require deliberate resource/data decisions; normal tests must stay independent of real models.
 
@@ -75,10 +75,18 @@ manual review still found incomplete taxonomy tags. This is not a general accura
 
 Added in 0.4.1: exact-reference evaluation and a six-case synthetic corpus, with offline replay
 as the default and explicit validation/mismatch counts. Saved Qwen3:4b outputs agree on 9/10 and
-5/6 annotated items, exposing the known testing/SQL tag omissions. The four new cases have no
-live results yet; the broader model-quality gate is **not closed** by successful reference replay.
+5/6 annotated items, exposing the known testing/SQL tag omissions. Reference replay alone does
+not close the model-quality gate.
 See `docs/JOB_EVALUATION.md`. The help-assertion repair passed hosted Python 3.12/3.13 CI before
 the user merged Phase 2 into main; local and hosted results for this evaluation slice are separate.
+
+The subsequently requested single-pass local review is complete: **6/6 schema/quote-valid results,
+0/6 exact reference matches**; five cases had correct nullable metadata, while the footer case
+lost known company/title. Tag omissions were widespread; a shortened SQL preferred span retained
+its modifier only in the quote. No preference promotion or injected employer was observed in this
+limited run. See `docs/evaluations/qwen3-4b-v3.md`. This is **not** approval for unattended ranking.
+Next development slice: typed completion-state/preferences, independent of model quality; later
+matching uses reviewed requirements or deterministic fixtures, never model tag absence as proof.
 
 ## Phase 3 — Matching and planning
 
