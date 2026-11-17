@@ -165,6 +165,7 @@ The run took about 475 seconds, with no retries. See the
 
 This completes the initial broader review, **not** a quality approval for unattended ranking.
 Typed completion-state/preferences are now validated profile contracts in 0.5.0; see
-[PROFILE_FORMAT.md](PROFILE_FORMAT.md). Next is deterministic evidence matching, with reviewed
-requirements or deterministic fixtures until extraction quality is improved separately. Do not
+[PROFILE_FORMAT.md](PROFILE_FORMAT.md). Offline lexical evidence retrieval is available in 0.6.0;
+see [MATCHING.md](MATCHING.md). It requires reviewed requirements or deterministic fixtures until
+extraction quality is improved separately. Do not
 rely on taxonomy tags alone or treat historical AI output as verified candidate evidence.

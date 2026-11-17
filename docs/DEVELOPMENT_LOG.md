@@ -322,3 +322,47 @@
   Hosted mergeability/check results are verified after push. The next feature remains deterministic
   evidence eligibility/matching; this task
   only reconciles existing work and does not merge the pull request into main.
+
+## Session 011 — Offline evidence eligibility and lexical retrieval
+
+- User authorized continuing after the conflict repair. Fetched merged main at `38b710d`,
+  fast-forwarded the local main branch and started `feat/evidence-matching` from that base,
+  avoiding another stacked/squash-history conflict. Preserved the existing feature/review branches.
+- Defined a small Phase 3 retrieval boundary, not relevance ranking or claim approval. Explicit
+  manual requirements-review acknowledgement, schema revalidation and exact source grounding
+  precede matching. Review is a caller assertion, not software proof or authorization from job text.
+- Added immutable typed evidence decisions, per-job-item lexical candidates, reason/status
+  caveats and required-content review findings. Only scoped verified/completed accomplishments
+  with non-excluded completed/in-progress parents are retrieved. Unknown/unfinished/other parent
+  states remain review-required; completed subtasks never complete their in-progress parent.
+  Skills, parent technology lists, notes and bullet wording cannot supply scoped evidence, and
+  exclusions cannot be bypassed through verified bullets or required-content preferences.
+- Match explicit accomplishment technology mentions and complete job-item phrases in verified
+  statements with escaped case-insensitive literal boundaries. Preserve full qualification text,
+  quotes, category and stable IDs; no alternatives/preferences/negation are converted into
+  satisfaction verdicts. Missing candidates are not proof of missing experience or job absence.
+  Ordering is deterministic by evidence ID, not keyword-count ranking. Cap pair comparisons at
+  20,000 without truncating inputs. Return canonical model hashes and exact job-source identity.
+- Added working offline `match-evidence` with explicit profile/job/reviewed-requirements paths
+  and `--confirm-review`; no default private-profile read, provider option, inference or writes.
+  Existing bounded fake replay validates the input JSON without claiming model extraction.
+  Output intentionally includes eligible source-derived statements, while omitting contact fields,
+  notes and ineligible claim text. Safe failures emit no partial JSON or raw input-value dumps.
+- Added eligibility/status, exclusions/bullet bypass, required-content gaps, absent taxonomy,
+  negation/alternative preservation, literal term boundaries, duplicate anchors, immutable input
+  snapshots, malformed/mutated models, limits, offline/privacy and installed CLI tests. A GitHub-
+  color test caught ANSI styling inside a new usage-error option assertion; decode visible text
+  there just as in the existing help regressions, without disabling colors or weakening checks.
+- Application 0.6.0; no new dependency, private profile edits or live inference. The previously
+  running Ollama server was cancelled by an environment restart; it is not needed for matching
+  and was not restarted. Added the new command to CI's installed-wheel smoke test.
+- Local Python 3.12.3 verification: 389 unit + 48 integration = 437 tests passed with GitHub-like
+  colors; 99.92% branch-aware application coverage. Ruff lint/format, strict mypy (42 files) and
+  dependency checks passed. Source/wheel builds, fresh locked editable/runtime installations,
+  all 437 tests against the installed wheel outside the repository and the runtime-only matching
+  smoke passed. Distribution/staged path and secret-pattern reviews excluded private/runtime
+  artifacts. Hosted CI is checked after push; normal tests remain independent of real models.
+- Documented policies/limits in `docs/MATCHING.md`, ADR-011, README, architecture, roadmap and
+  canonical agent guidance. Next: explainable relevance signals beyond lexical overlap, followed
+  by constrained resume planning as a separate slice. No ranking, resume selection, bullet
+  generation, semantic entailment proof, rendering, PDF, history or cloud activation was added.

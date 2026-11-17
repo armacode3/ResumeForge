@@ -58,3 +58,9 @@ jobs:
             --mock-response "$GITHUB_WORKSPACE/examples/jobs/backend_intern.response.json" \
             > "$RUNNER_TEMP/offline-job-analysis.json"
           test -s "$RUNNER_TEMP/offline-job-analysis.json"
+          "$RUNNER_TEMP/resumeforge-smoke/bin/resumeforge" match-evidence \
+            --profile "$GITHUB_WORKSPACE/examples/profiles/sample.md" \
+            --job "$GITHUB_WORKSPACE/examples/jobs/backend_intern.md" \
+            --requirements "$GITHUB_WORKSPACE/examples/jobs/backend_intern.response.json" \
+            --confirm-review > "$RUNNER_TEMP/evidence-matching.json"
+          test -s "$RUNNER_TEMP/evidence-matching.json"

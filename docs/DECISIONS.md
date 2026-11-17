@@ -188,3 +188,33 @@ Preferences must not approve claims, erase excluded source evidence, or override
 caveats. Later planning must honor exclusions transitively for claims, preserve required content
 or surface conflicts, and use reviewed job requirements. No model calls, ranking, generation,
 font/layout policy, automatic profile edits or new dependencies are part of this feature.
+
+## ADR-011 — Offline candidate retrieval before ranking or claim approval
+
+**Status:** Implemented in 0.6.0; semantic qualification, ranking and resume planning remain deferred.
+
+Use explicit manual job-review acknowledgement, source/schema revalidation and versioned
+deterministic retrieval before selecting resume content. Only verified, completed accomplishments
+with non-excluded completed/in-progress parents are eligible; completed subtasks retain the
+parent's in-progress caveat. Other statuses require review rather than inferring completion from
+dates/prose. Required preferences cannot approve evidence, and excluded records cannot re-enter
+via independently matched bullet wording.
+
+Literal technology mentions from scoped accomplishment metadata and full job phrases found in
+verified statements yield **lexical candidates**, not satisfied qualifications. Keep all job
+categories, complete qualification text and quotes so preferences, alternatives and negation
+are not converted into mandatory skill lists. Do not inherit technologies from unscoped skills,
+parent entries or historical wording. No stemming, aliases, embeddings, LLM judging, numeric
+relevance score or keyword-count ranking is justified for this first retrieval boundary.
+
+Return immutable typed decisions, stable IDs, exact overlap spans, canonical input hashes and
+explicit required-content review findings. Missing lexical matches are not missing experience
+or proof of job absence. Preserve all inputs; enforce a pair-comparison guard without truncation.
+The offline CLI requires explicit file paths and acknowledgement, no default private-profile
+access and no provider selection. Existing JSON validation is reused with deterministic replay
+to ingest reviewed requirements, not to imply extraction or record an inferred model provenance.
+
+This remains a human-reviewed retrieval aid. False positives from negation/common words and
+false negatives from wording are expected limits. Later ranking must use additional evidence
+signals and selection must honor required/excluded content, budgets and readable layout; candidate
+retrieval is not permission to author or approve claims. See `docs/MATCHING.md`.

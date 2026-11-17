@@ -88,7 +88,7 @@ limited run. See `docs/evaluations/qwen3-4b-v3.md`. This is **not** approval for
 Typed completion-state/preferences can be developed independently of model quality; later
 matching uses reviewed requirements or deterministic fixtures, never model tag absence as proof.
 
-## Phase 3 — Matching and planning (typed input prerequisite implemented)
+## Phase 3 — Matching and planning (typed inputs and lexical retrieval implemented)
 
 Rank evidence beyond keywords, honor mandatory sections/experiences, produce structured plans
 with evidence references, space budgets and review flags. Gate: deterministic selection/ranking
@@ -100,11 +100,16 @@ notes. The profile boundary rejects bad references, empty/all-excluded required 
 contradictory ranges/project counts. Unknown states warn; completion does not imply verification.
 See `docs/PROFILE_FORMAT.md` and ADR-010. No private profile was migrated.
 
-**Next:** deterministic evidence eligibility/matching using reviewed job requirements, these
-constraints and verified source evidence. Ranking, selection and `ResumePlan` are not implemented
-yet. Preserved Markdown notes are not enforced constraints. Later planning must also surface
-insufficient evidence and mandatory-content/readable-one-page conflicts; validated counts alone
-cannot guarantee layout feasibility.
+Implemented in 0.6.0: explicit manual job-review acknowledgement, conservative evidence eligibility
+and offline literal candidate retrieval, with required-content review findings and unchanged
+job context. `match-evidence` never calls a model, uses unverified/excluded claims, declares a
+qualification satisfied or loads a default private profile. See `docs/MATCHING.md` and ADR-011.
+
+**Next:** explainable relevance signals beyond literal overlap, then constrained `ResumePlan`
+selection as a separate slice. Ranking, resume selection and planning are not implemented yet.
+Preserved Markdown notes are not enforced constraints. Later planning must also surface
+insufficient evidence and mandatory-content/readable-one-page conflicts; validated counts and
+lexical candidates alone cannot guarantee feasibility or truthful generated claims.
 
 ## Phase 4 — Bullets, claims and review
 

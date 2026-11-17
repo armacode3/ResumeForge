@@ -4,7 +4,7 @@ An evidence-first resume tailoring application, built incrementally. The goal is
 a verified Markdown profile and a job description into a reviewable, one-page resume
 without inventing experience, technologies, or metrics.
 
-## Current status: Phase 3 prerequisite — typed profile constraints
+## Current status: Phase 3 — offline evidence candidate retrieval
 
 Implemented: an installable Typer CLI with help/version output, unit and installed-entry-point
 tests, privacy-ignore regression coverage, linting, formatting, strict typing, packaging checks,
@@ -22,10 +22,11 @@ The initial live six-case review found valid schema/quotes but incomplete tags a
 metadata; see [results and limitations](docs/evaluations/qwen3-4b-v3.md). Human review remains necessary.
 
 Profile validation now also accepts explicit completion states and resume preferences, with
-checks for required/excluded references and contradictory count bounds. These are input contracts;
-matching, content selection and layout are still unimplemented.
+checks for required/excluded references and contradictory count bounds. Offline `match-evidence`
+now retrieves literal review candidates from eligible scoped accomplishments and reviewed job
+requirements. **It does not prove qualifications, rank evidence, select content or validate layout.**
 
-**Resume generation is not implemented.** There is no cloud provider, matching/planning engine,
+**Resume generation is not implemented.** There is no cloud provider, ranking/planning engine,
 database, template renderer, PDF compiler, API, or browser extension yet.
 Local verification and hosted CI results are reported separately.
 
@@ -59,6 +60,9 @@ python -m resumeforge --help
 resumeforge validate-profile --profile examples/profiles/sample.md
 resumeforge analyze-job --job examples/jobs/backend_intern.md \
   --mock-response examples/jobs/backend_intern.response.json
+resumeforge match-evidence --profile examples/profiles/sample.md \
+  --job examples/jobs/backend_intern.md \
+  --requirements examples/jobs/backend_intern.response.json --confirm-review
 ```
 
 Running `resumeforge` without arguments also displays help and exits successfully.
@@ -79,6 +83,11 @@ Local mode reads only the selected job, not a mock fixture or profile. It checks
 disablement and local model metadata before sending job text, uses only `127.0.0.1`, and has no
 cloud fallback, auto-pull, proxy or redirect support. See [docs/JOB_ANALYSIS.md](docs/JOB_ANALYSIS.md)
 for the schema and [docs/OLLAMA.md](docs/OLLAMA.md) for setup, guards and resource limits.
+
+`match-evidence` is always offline and requires all three explicit paths plus review confirmation.
+It never loads a default profile or starts inference. Its JSON includes private source-derived
+evidence, not a resume or qualification verdict; see [docs/MATCHING.md](docs/MATCHING.md) for
+eligibility, literal-match limits and review findings.
 
 ### Create your private profile
 
