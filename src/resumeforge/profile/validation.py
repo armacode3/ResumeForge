@@ -18,6 +18,10 @@ def find_profile_gaps(profile: UserProfile) -> list[str]:
         warnings.append("No verified accomplishments; review evidence before tailoring.")
     verified_entries = {item.entry_id for item in profile.accomplishments if item.verified}
     for entry in profile.entries():
+        if entry.completion_status == "unknown":
+            warnings.append(
+                f"{entry.id}: completion_status unknown; review before content selection."
+            )
         if entry.id.startswith(("edu_", "exp_")) and entry.organization is None:
             warnings.append(f"{entry.id}: missing institution or employer name.")
         if entry.start_date is None or entry.end_date is None:
@@ -27,6 +31,10 @@ def find_profile_gaps(profile: UserProfile) -> list[str]:
         if entry.id not in verified_entries:
             warnings.append(f"{entry.id}: no verified accomplishment evidence linked.")
     for item in profile.accomplishments:
+        if item.completion_status == "unknown":
+            warnings.append(
+                f"{item.id}: completion_status unknown; review before content selection."
+            )
         if not item.verified:
             warnings.append(f"{item.id}: unverified; user review required before use as evidence.")
     return warnings

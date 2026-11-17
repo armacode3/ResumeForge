@@ -133,3 +133,17 @@ def test_generic_yaml_failure_is_sanitized() -> None:
 def test_custom_yaml_rules_do_not_modify_global_safe_loader() -> None:
     assert yaml.safe_load("verified: yes")["verified"] is True
     assert parse_profile(MINIMAL.replace("Example", "yes")).profile.person.name == "yes"
+
+
+def test_typed_preferences_keep_bom_line_endings_and_notes_verbatim() -> None:
+    source = (
+        "\ufeff---\r\nschema_version: 1\r\nperson: {name: Zoë 示例}\r\n"
+        "projects: [{id: proj_demo, title: Demo, completion_status: on_hold}]\r\n"
+        "resume_preferences: {required_sections: [projects], max_projects: 1}\r\n"
+        "---\r\n# Notes\r\nPrefer different settings later.\r\n"
+    )
+    document = parse_profile(source)
+    assert document.source_text == source
+    assert document.markdown_notes == "# Notes\r\nPrefer different settings later.\r\n"
+    assert document.profile.projects[0].completion_status == "on_hold"
+    assert document.profile.resume_preferences.max_projects == 1

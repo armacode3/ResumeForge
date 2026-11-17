@@ -69,11 +69,17 @@ The first command should show the ignored path; the second should show no tracke
 Keep any saved validation report under ignored private storage too. Ignore rules are not
 encryption; review staged changes and restrict local file permissions where appropriate.
 
-### Completion state and preferences are not active configuration yet
+### Completion state and preferences (additive support in 0.5.0)
 
-Schema version 1 has no typed completion-status or resume-preference fields. Preserve this
-context in entry `details` and/or Markdown notes, but do not mistake it for enforced behavior.
-Future matching/planning needs explicit validated contracts for these constraints before use.
+Schema version 1 now accepts typed `completion_status` on background entries and accomplishments,
+plus an optional root `resume_preferences` object. Existing version-1 profiles remain valid:
+omitted states become `unknown`, preferences are unspecified, and nothing is inferred from dates,
+entry details, old "Present" labels or Markdown notes. Unknown states produce review warnings.
+The parser never rewrites an old file or migrates notes into structured facts automatically.
+
+These are **validated input contracts**, not implemented content selection or layout controls.
+Notes remain human context until deliberately transferred into the typed fields. `verified`
+still defaults false and means something different from completion; see the field reference below.
 
 Mandatory sections/entries, desired bullet counts and project counts may conflict with readable
 one-page output. A future planner must surface that conflict rather than silently omit required
@@ -127,6 +133,7 @@ Each section contains records with these fields:
 | `start_date`, `end_date` | Optional quoted `YYYY-MM` (years 1000–9999); `end_date` also accepts `present`. |
 | `details` | Optional list of user-supplied factual context, e.g. specialization or supervised scope. |
 | `technologies` | Optional list of documented tools/technologies used in this entry. |
+| `completion_status` | Optional exact status string, default `unknown`; independent of dates and verification. |
 
 | Section | ID prefix | Example |
 | --- | --- | --- |
@@ -165,7 +172,7 @@ accomplishments:
 ```
 
 Required: `id` (`acc_` prefix), `entry_id` pointing to an existing background entry, and
-nonblank `statement`. Optional: `technologies`, `metrics` (lists of strings), `verified`
+nonblank `statement`. Optional: `completion_status` (below), `technologies`, `metrics` (string lists), `verified`
 (boolean, **defaults to false**). Store scope, units and qualifiers in metric strings; quote
 purely numeric values to keep them strings. Metrics are never required. Multiple accomplishments
 can point to the same entry; all categories, including awards and research, can have evidence.
@@ -174,6 +181,87 @@ can point to the same entry; all categories, including awards and research, can 
 against external records. Unverified records are retained and flagged, not promoted into usable
 evidence. Missing verified evidence for any entry produces a warning. Keep unsupported impact,
 ownership, technologies and measurements out of verified statements.
+
+### Completion status is not verification
+
+Both background entries and accomplishments accept these exact, lowercase `completion_status`
+strings: `unknown`, `planned`, `in_progress`, `completed`, `on_hold`, `cancelled`.
+Omission means `unknown`; `null`, booleans, alternate casing and guessed synonyms are errors.
+Use `details` or the accomplishment statement to retain prototype/supervision/scope caveats;
+this small lifecycle vocabulary does not replace that factual text.
+
+Entry status describes the overall record's lifecycle, while accomplishment status describes
+only its scoped work. A completed, verified subtask may belong to an in-progress project.
+Neither status propagates to the other. Status also does not set, infer or revise dates:
+`present` is not automatically `in_progress`, and an old end date is not proof of completion.
+The validator does not infer whether a real-world date/status combination is factually consistent.
+
+`completed` never sets `verified: true`. Conversely, a reviewed statement about planned or
+ongoing work may be verified as a statement of that limited scope; it is not thereby a completed
+achievement. Existing verified bullets still need verified accomplishment references, but that
+graph check does not prove completion or semantic entailment. Unknown entry/accomplishment
+statuses produce warnings so a future selection/review step cannot quietly assume completion.
+
+### Resume preferences
+
+Preferences are user instructions in a separate root object, **not candidate evidence**:
+
+```yaml
+resume_preferences:
+  required_sections: [education, projects]
+  required_entry_ids: [proj_queue]
+  excluded_entry_ids: [other_tutor]
+  min_projects: 1
+  max_projects: 2
+  min_bullets_per_entry: 1
+  max_bullets_per_entry: 3
+```
+
+Use IDs that already exist in your own file. The example above refers to the fictional sample;
+these are not defaults or a recommendation to include those records. There is no planner yet.
+
+| Field | Contract for future content selection |
+| --- | --- |
+| `required_sections` | Distinct section names that must have non-excluded content. Allows the eight background section names above, plus `skills` and `coursework`; not `person`, `accomplishments` or `verified_bullets`. It does not require every entry in a section. |
+| `required_entry_ids` | Distinct existing background-entry IDs that must be included. Accomplishment/bullet IDs are not accepted. |
+| `excluded_entry_ids` | Distinct existing background-entry IDs that must not be selected; cannot overlap required IDs. Stored records/evidence are not deleted. A future planner must also exclude their claims and bullets rather than detach evidence references. |
+| `min_projects`, `max_projects` | Optional bounds on the number of selected project entries, not project bullets. |
+| `min_bullets_per_entry`, `max_bullets_per_entry` | Optional bounds for each selected background entry, not global/section bullet counts; skills/coursework lists are not bullet-budgeted entries. Zero permits a metadata-only entry where appropriate. |
+
+All four count fields accept strict integers **0–20** or `null` (unspecified). The cap is an
+input bound, not a claim that twenty projects/bullets will fit or be readable. Omitted counts
+are unspecified and omitted lists are empty; no target page count, font policy, selection rule
+or export preference is inferred. `resume_preferences: {}` is valid; the object/lists cannot
+be `null`. Unknown settings and duplicate lists are errors, not silently ignored directives.
+
+Validation rejects:
+
+- Unknown required/excluded entry IDs, requiring and excluding the same entry, or requiring a
+  section whose content is empty or whose background entries are all excluded.
+- A minimum greater than its corresponding maximum.
+- A project minimum exceeding the number of non-excluded projects.
+- A project maximum smaller than the number of explicitly required projects, or zero while
+  the projects section is required. A required projects section needs at least one project.
+
+Standalone `ResumePreferences` validates local types/ranges/conflicts; the enclosing `UserProfile`
+performs reference, section-availability and project-capacity checks. Preferences never approve
+unverified evidence, complete unfinished work, remove source records or choose content now.
+A profile may deliberately require an unfinished record, but its caveats must survive future
+planning/review; completion statuses are not silently filtered here.
+
+Passing these checks proves neither sufficient verified bullet evidence nor a feasible one-page
+layout. Those remaining conflicts belong to matching/planning/rendering and must be reported,
+not solved by inventing claims, dropping required content or shrinking text. Real private
+preferences remain in notes until you explicitly review and enter the typed fields yourself.
+
+#### Compatibility
+
+This is an additive extension to **profile schema version 1**, first supported by ResumeForge
+**0.5.0**. Old valid profiles need no migration and retain their source/IDs/notes; unknown-state
+warnings are new. Older application versions reject the new fields, so upgrade before using
+them. The application version changes; profile `schema_version` stays `1` because old field
+meanings and required fields did not change. Incompatible future changes require a new format
+version rather than heuristically interpreting old notes or silently rewriting private files.
 
 ### Existing verified resume bullets
 

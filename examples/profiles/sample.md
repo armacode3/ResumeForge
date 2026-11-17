@@ -13,6 +13,7 @@ education:
     organization: Fictional Example University
     start_date: "2023-09"
     end_date: "2027-05"
+    completion_status: in_progress
     details:
       - Expected graduation; all information in this file is fictional.
 experiences:
@@ -21,6 +22,7 @@ experiences:
     organization: Fictional Example Labs
     start_date: "2025-06"
     end_date: "2025-08"
+    completion_status: completed
     technologies: [Python, PostgreSQL]
     details:
       - Worked under supervision on an internal demonstration service.
@@ -29,6 +31,7 @@ projects:
     title: Demonstration Task Queue
     start_date: "2025-09"
     end_date: present
+    completion_status: in_progress
     technologies: [Python, SQLite]
 organizations:
   - id: org_computing
@@ -36,30 +39,35 @@ organizations:
     organization: Fictional Example University
     start_date: "2023-09"
     end_date: present
+    completion_status: in_progress
 research:
   - id: res_storage
     title: Undergraduate Storage Study
     organization: Fictional Example University
     start_date: "2025-01"
     end_date: "2025-05"
+    completion_status: completed
 certifications:
   - id: cert_python
     title: Fictional Python Course Certificate
     organization: Example Training
     start_date: "2024-12"
     end_date: "2024-12"
+    completion_status: completed
 awards:
   - id: award_demo
     title: Fictional Demo Day Award
     organization: Example Computing Club
     start_date: "2025-04"
     end_date: "2025-04"
+    completion_status: completed
 additional_experience:
   - id: other_tutor
     title: Peer Programming Tutor
     organization: Fictional Example University
     start_date: "2024-09"
     end_date: "2024-12"
+    completion_status: completed
 skills:
   languages: [Python, SQL]
   frameworks: [FastAPI]
@@ -75,6 +83,7 @@ accomplishments:
       Implemented automated tests for 12 existing internal API endpoints under
       a mentor's review, checking both successful requests and invalid inputs.
     verified: true
+    completion_status: completed
     technologies: [Python, pytest]
     metrics:
       - 12 existing internal API endpoints covered by the added tests.
@@ -82,15 +91,25 @@ accomplishments:
     entry_id: proj_queue
     statement: Implemented a local SQLite-backed task queue with retry handling.
     verified: true
+    completion_status: completed
     technologies: [Python, SQLite]
   - id: acc_queue_pending
     entry_id: proj_queue
     statement: Investigated whether batched writes could improve throughput.
     verified: false
+    completion_status: unknown
 verified_bullets:
   - id: bullet_api
     text: Added Python tests for 12 internal API endpoints under mentor review.
     accomplishment_ids: [acc_api]
+resume_preferences:
+  required_sections: [education, experiences, projects]
+  required_entry_ids: [exp_example]
+  excluded_entry_ids: [other_tutor]
+  min_projects: 1
+  max_projects: 2
+  min_bullets_per_entry: 1
+  max_bullets_per_entry: 3
 ---
 # Fictional profile notes
 

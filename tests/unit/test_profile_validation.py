@@ -50,6 +50,7 @@ def test_complete_evidence_can_have_no_warnings() -> None:
                     "organization": "Fictional University",
                     "start_date": "2020-01",
                     "end_date": "2024-01",
+                    "completion_status": "completed",
                 }
             ],
             "projects": [
@@ -58,6 +59,7 @@ def test_complete_evidence_can_have_no_warnings() -> None:
                     "title": "Utility",
                     "start_date": "2024-01",
                     "end_date": "present",
+                    "completion_status": "in_progress",
                 }
             ],
             "accomplishments": [
@@ -65,12 +67,14 @@ def test_complete_evidence_can_have_no_warnings() -> None:
                     "id": "acc_degree",
                     "entry_id": "edu_demo",
                     "statement": "Completed coursework.",
+                    "completion_status": "completed",
                     "verified": True,
                 },
                 {
                     "id": "acc_project",
                     "entry_id": "proj_demo",
                     "statement": "Built a utility.",
+                    "completion_status": "completed",
                     "verified": True,
                 },
             ],
