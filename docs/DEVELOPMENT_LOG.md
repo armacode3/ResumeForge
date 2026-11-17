@@ -305,3 +305,20 @@
   requirements, verified source evidence and explicit constraints, with status/context caveats
   and remaining conflicts surfaced. No resume plan, ranking, generation, PDF or live inference
   was implemented or run in this iteration.
+
+## Session 010 — Resolve profile-contract PR conflicts after squash merge
+
+- User requested conflict resolution for PR #4 (`feat/profile-planning-contracts` into `main`).
+  Inspected a clean worktree and fetched `origin/main` at `673a0b5`, the squash merge of the
+  earlier local-extraction review. Its tree matches the original review commit `0fb43c6`;
+  the divergent commit identities caused overlapping documentation conflicts, not new code changes.
+- Merged the target branch into the existing feature branch without rebasing or force-pushing.
+  Resolved README, decisions, development log, job-evaluation guide and roadmap by preserving
+  the review findings and newer 0.5.0 completion/preference status. No application source,
+  dependencies, profile fixtures or private data changed during resolution.
+- Verification on Python 3.12.3: all 382 tests passed with 99.90% branch-aware coverage; Ruff
+  lint/format, strict mypy, dependency checks and source/wheel builds passed. Resolved files
+  match the pre-merge feature tree except for this log entry; no conflict markers remain.
+  Hosted mergeability/check results are verified after push. The next feature remains deterministic
+  evidence eligibility/matching; this task
+  only reconciles existing work and does not merge the pull request into main.
