@@ -404,3 +404,49 @@
   Next separate slice: constrained resume planning with explicit evidence references and review
   needs; relevance ordering/weights still require justified policy/evaluation. Selection,
   generation, layout/PDFs, history and cloud inference remain unimplemented.
+
+## Session 013 — Reviewed-selection count-constrained resume plans
+
+- User authorized the next step. Fetched merged signals feature on main at `3abbb35`,
+  fast-forwarded local main and started `feat/constrained-resume-planning` from that clean base.
+  No private profile or selection was read or changed; no prior branch/history was rewritten.
+- Defined a deliberately explicit selection policy rather than introducing unchosen relevance
+  weights, keyword/metric ranking or automatic optional-content decisions. Added version-1
+  `PlanSelection` with selected entries/scoped accomplishment IDs, optional skills/coursework
+  placeholders and a nullable 0–20 total-slot budget. Duplicate/unknown/cross-parent references,
+  invalid types/versions and malformed/oversized/deep JSON fail safely.
+- Added interface-independent `plan_resume`, which requires separate exact-boolean review
+  acknowledgements, revalidates source snapshots and recomputes matching rather than trusting
+  external reports. Only eligible selected accomplishments enter slots. Preserve unchanged scoped
+  statements, stable IDs, full job-item categories/text/quotes and in-progress-parent caveats.
+  Eligible unmatched selections remain review findings, not missing-experience verdicts.
+- Required entries/sections remain visible even when omitted from selections, without choosing
+  evidence or arbitrary entries for them. Excluded/ineligible requests produce explicit conflicts
+  and no planned claim text. Metadata-only/unknown-state and unscoped content remain review needs.
+  Check selected project counts, per-entry bullet bounds and optional total slots; conflicts retain
+  all eligible selected/mandatory content instead of trimming, loosening constraints or inventing
+  facts. Each selected accomplishment reserves one slot, not approved wording or actual line space.
+- Added immutable, independently versioned `ResumePlan` snapshots with input/selection hashes,
+  budgets, actual/bound findings and `status: needs_review` on every draft. Counts passing is not
+  factual approval, job coverage or readable-one-page feasibility. No wording or layout is produced.
+- Added read-only `plan-resume` with four explicit paths and confirmation before all input I/O.
+  Exit 0 means a draft without detected conflicts, 3 emits a conflict-bearing draft, 1 is a safe
+  input/provenance/budget error with no partial JSON, and 2 is usage failure. Added fictional
+  selection/installed-wheel smoke that intentionally exposes the sample education bullet minimum
+  conflict instead of hiding it or inventing educational evidence. No default private-profile read,
+  provider activation, writes, migration, new dependency, rendering or cloud service was added.
+- Tests cover review gates, references, transitive exclusions/eligibility, provenance/quotes/budget
+  revalidation, all job categories/negation, required placeholders, metadata/unscoped review,
+  zero/exact/over/under count bounds, explicit order independent of counts/signals, immutable source
+  snapshots, malformed JSON/privacy and installed CLI success/conflict/failure behavior.
+- Application 0.8.0. Local Python 3.12.3: 480 unit + 60 integration = 540 tests passed with
+  GitHub-like colors and 99.94% branch-aware coverage. Ruff lint/format, strict mypy (50 files),
+  dependency checks and source/wheel builds passed. Fresh locked editable/runtime-only wheel
+  installs passed dependency checks; all 540 tests also passed against the installed wheel outside
+  the repository. Runtime-only planning smoke confirmed the explicit sample conflict/no invented
+  slot. CI shell parsing and staged/distribution path/secret-pattern reviews passed, excluding
+  private/runtime artifacts. Hosted CI is checked after push.
+- Updated planning policy, ADR-013, profile/matching guides, README, architecture, roadmap and
+  canonical agent guidance. Next separate feature: structured resume/claim-review contracts using
+  current evidence references, before wording generation/rendering. Automatic relevance ranking/
+  selection and actual layout/readability checks still require their own policy and evaluation.

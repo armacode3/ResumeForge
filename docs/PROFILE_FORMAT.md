@@ -77,15 +77,16 @@ omitted states become `unknown`, preferences are unspecified, and nothing is inf
 entry details, old "Present" labels or Markdown notes. Unknown states produce review warnings.
 The parser never rewrites an old file or migrates notes into structured facts automatically.
 
-These are **validated input contracts**, not implemented content selection or layout controls.
+These are **validated input contracts**, not automatic content selection or layout controls.
 Notes remain human context until deliberately transferred into the typed fields. `verified`
 still defaults false and means something different from completion; see the field reference below.
 
 Mandatory sections/entries, desired bullet counts and project counts may conflict with readable
-one-page output. A future planner must surface that conflict rather than silently omit required
-content or shrink typography. Also distinguish readable resume text from a verbatim `.tex`
+one-page output. The 0.8.0 reviewed-selection planner exposes count/evidence conflicts without
+omitting required content; readable page feasibility remains unchecked. Also distinguish readable
+resume text from a verbatim `.tex`
 mirror stored with a `.txt` extension; define separate export semantics before implementing them.
-None of these planning or export capabilities exists at this stage.
+See `docs/PLANNING.md` for the implemented draft scope. Export capabilities remain unimplemented.
 
 ## Minimal valid file
 
@@ -218,13 +219,14 @@ resume_preferences:
 ```
 
 Use IDs that already exist in your own file. The example above refers to the fictional sample;
-these are not defaults or a recommendation to include those records. There is no planner yet.
+these are not defaults or a recommendation to include those records. The reviewed-selection
+planner applies these preferences without choosing optional evidence automatically.
 
-| Field | Contract for future content selection |
+| Field | Contract for reviewed-selection planning |
 | --- | --- |
 | `required_sections` | Distinct section names that must have non-excluded content. Allows the eight background section names above, plus `skills` and `coursework`; not `person`, `accomplishments` or `verified_bullets`. It does not require every entry in a section. |
 | `required_entry_ids` | Distinct existing background-entry IDs that must be included. Accomplishment/bullet IDs are not accepted. |
-| `excluded_entry_ids` | Distinct existing background-entry IDs that must not be selected; cannot overlap required IDs. Stored records/evidence are not deleted. A future planner must also exclude their claims and bullets rather than detach evidence references. |
+| `excluded_entry_ids` | Distinct existing background-entry IDs that must not enter planned content; cannot overlap required IDs. Stored records/evidence are not deleted. The planner reports attempted exclusions and omits their entries/evidence; bullet wording is never independently selected. |
 | `min_projects`, `max_projects` | Optional bounds on the number of selected project entries, not project bullets. |
 | `min_bullets_per_entry`, `max_bullets_per_entry` | Optional bounds for each selected background entry, not global/section bullet counts; skills/coursework lists are not bullet-budgeted entries. Zero permits a metadata-only entry where appropriate. |
 
@@ -245,9 +247,10 @@ Validation rejects:
 
 Standalone `ResumePreferences` validates local types/ranges/conflicts; the enclosing `UserProfile`
 performs reference, section-availability and project-capacity checks. Preferences never approve
-unverified evidence, complete unfinished work, remove source records or choose content now.
+unverified evidence, complete unfinished work, remove source records or choose optional evidence.
 A profile may deliberately require an unfinished record, but its caveats must survive future
-planning/review; completion statuses are not silently filtered here.
+planning/review; completion statuses are not silently filtered by profile validation. The planner
+retains required metadata with review findings; only matching-eligible accomplishments enter slots.
 
 Passing these checks proves neither sufficient verified bullet evidence nor a feasible one-page
 layout. Those remaining conflicts belong to matching/planning/rendering and must be reported,

@@ -241,3 +241,32 @@ policy separate. Synthetic tests check source agreement and invariants, not sema
 quality. `matching_version` stays v1 for unchanged retrieval; additive report fields identify
 `signals_version: evidence-signals-v1`. Profiles need no rewrite. Output gains scoped candidate
 metric text and remains private. See `docs/MATCHING.md` for the exact contract and limitations.
+
+## ADR-013 — Explicit reviewed selections before automatic planning/ranking
+
+**Status:** Implemented in 0.8.0; automatic relevance selection, wording and layout remain deferred.
+
+Use a separate version-1 `PlanSelection` JSON contract for deliberate entry/accomplishment choices
+and an optional total bullet-slot cap. Existing typed profile preferences constrain that selection.
+One selected eligible accomplishment reserves one slot; it is not approved resume wording.
+Alternative automatic count/keyword/metric-based selection would imply an unchosen ranking policy
+and silently trade off evidence/content. Keep selection explicit instead; choose no arbitrary
+weights or default page/slot limits. No new dependency or profile migration is necessary.
+
+Revalidate snapshots and freshly run the reviewed-input matcher, not a caller-supplied report.
+Unknown/cross-parent selection references fail safely. Excluded or ineligible evidence produces
+explicit conflicts and no planned claim text. Omitted required entries/sections remain visible
+as placeholders; do not choose accomplishments or arbitrary entries to fill them. Metadata and
+unscoped sections require review. Unknown statuses/ongoing-parent caveats remain explicit.
+
+Check project/per-entry counts plus the selection's total cap, preserving eligible selected and
+required content on over-budget drafts. Report actuals/bounds, insufficient slots and unselected
+required sections without fabricating support, relaxing constraints, trimming mandatory content
+or shrinking typography. These are count constraints, not line/page/readability guarantees.
+
+Return immutable `ResumePlan` snapshots with evidence/source/selection identity, full job context,
+literal associations, budgets and findings. All plans remain `needs_review`; no claim or requirement
+is declared approved/satisfied. A draft with conflicts exits 3; invalid inputs exit 1 with no partial
+JSON; no-conflict drafts exit 0 but are not generation-ready. Explicit confirmation precedes all
+CLI input I/O. No default private profile, inference, automatic writes or live services are added.
+See `docs/PLANNING.md` for selection ordering, privacy and the intentional sample conflict.

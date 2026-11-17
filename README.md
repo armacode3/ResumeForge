@@ -4,7 +4,7 @@ An evidence-first resume tailoring application, built incrementally. The goal is
 a verified Markdown profile and a job description into a reviewable, one-page resume
 without inventing experience, technologies, or metrics.
 
-## Current status: Phase 3 — offline retrieval and source-backed review signals
+## Current status: Phase 3 — offline matching and reviewed-selection draft plans
 
 Implemented: an installable Typer CLI with help/version output, unit and installed-entry-point
 tests, privacy-ignore regression coverage, linting, formatting, strict typing, packaging checks,
@@ -29,7 +29,11 @@ Candidates now distinguish literal statement mentions from metadata-only technol
 preserve explicitly recorded scoped metrics. These unweighted observations are not semantic
 support, inferred impact or a relevance score; candidate ordering remains by evidence ID.
 
-**Resume generation is not implemented.** There is no cloud provider, ranking/planning engine,
+`plan-resume` now assembles explicitly reviewed entry/evidence selections into structured drafts,
+preserving mandatory content and exposing count/evidence conflicts. It does not automatically
+rank/select evidence or generate wording. All plans remain unapproved and need review.
+
+**Resume generation is not implemented.** There is no cloud provider, relevance-ranking engine,
 database, template renderer, PDF compiler, API, or browser extension yet.
 Local verification and hosted CI results are reported separately.
 
@@ -66,6 +70,10 @@ resumeforge analyze-job --job examples/jobs/backend_intern.md \
 resumeforge match-evidence --profile examples/profiles/sample.md \
   --job examples/jobs/backend_intern.md \
   --requirements examples/jobs/backend_intern.response.json --confirm-review
+resumeforge plan-resume --profile examples/profiles/sample.md \
+  --job examples/jobs/backend_intern.md \
+  --requirements examples/jobs/backend_intern.response.json \
+  --selection examples/plans/backend_intern.selection.json --confirm-review
 ```
 
 Running `resumeforge` without arguments also displays help and exits successfully.
@@ -92,6 +100,12 @@ It never loads a default profile or starts inference. Its JSON includes private 
 evidence, not a resume or qualification verdict; see [docs/MATCHING.md](docs/MATCHING.md) for
 eligibility, literal-match limits and review findings.
 
+`plan-resume` also requires an explicit reviewed selection file. The fictional example deliberately
+exits **3** with a draft: education lacks a selected bullet while the sample preferences require
+one per entry. Required content stays visible; no evidence is invented. Exit **0** still means
+an unapproved draft, not a finished resume. See [docs/PLANNING.md](docs/PLANNING.md) for format,
+budgets, findings, privacy and exit codes.
+
 ### Create your private profile
 
 ```bash
@@ -111,7 +125,8 @@ For an existing narrative, follow the guide's import checklist: keep claims pend
 preserve unfinished-work caveats and conflicting dates, and never put real data in examples/tests.
 In 0.5.0, optional typed completion states and `resume_preferences` are validated in schema version 1.
 Old profiles remain valid, with unknown-state warnings; notes are never migrated automatically.
-Preferences do not approve facts or select content. See [the field reference](docs/PROFILE_FORMAT.md).
+Preferences do not approve facts or choose optional evidence; the planner uses explicit reviewed
+selections and surfaces conflicts. See [the field reference](docs/PROFILE_FORMAT.md).
 
 ## Configuration and privacy
 
