@@ -153,7 +153,7 @@ def match_evidence_command(
         ),
     ] = False,
 ) -> None:
-    """Find offline lexical evidence candidates, not qualification verdicts or a resume plan."""
+    """Find offline lexical candidates with source signals, not qualification verdicts or a plan."""
     if not confirm_review:
         raise typer.BadParameter(
             "Review requirements against the full job, then pass --confirm-review."

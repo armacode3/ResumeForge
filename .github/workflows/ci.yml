@@ -64,3 +64,12 @@ jobs:
             --requirements "$GITHUB_WORKSPACE/examples/jobs/backend_intern.response.json" \
             --confirm-review > "$RUNNER_TEMP/evidence-matching.json"
           test -s "$RUNNER_TEMP/evidence-matching.json"
+          "$RUNNER_TEMP/resumeforge-smoke/bin/python" - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("evidence-matching.json").read_text())
+          assert report["signals_version"] == "evidence-signals-v1"
+          candidates = [candidate for item in report["items"] for candidate in item["candidates"]]
+          assert candidates and all("signals" in candidate for candidate in candidates)
+          PY

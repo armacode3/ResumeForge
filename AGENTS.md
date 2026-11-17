@@ -13,8 +13,9 @@ Build truthful, evidence-linked resumes from a verified Markdown profile and a j
 Phases 0–2 include profile validation, local job loading, provider Protocol, fake JSON replay,
 guarded local Ollama inference, structured requirements, quotation checks and `analyze-job`.
 Phase 3 includes optional completion states/preferences and offline evidence eligibility/lexical
-retrieval, not relevance ranking or resume planning. Omitted states stay unknown; version-1 files
-need no rewrite. Read `docs/MATCHING.md` for the retrieval boundary.
+retrieval with source-backed candidate review signals, not relevance ranking or resume planning.
+Omitted states stay unknown; version-1 files need no rewrite. Read `docs/MATCHING.md` for the
+retrieval boundary.
 Read `docs/PROFILE_FORMAT.md`, `docs/JOB_ANALYSIS.md`, and `docs/OLLAMA.md` as applicable.
 The fake is not extraction; local model results may fail validation or be incomplete. Do not imply
 cloud inference, resume generation, semantic claim proof, PDFs or history already work.
@@ -27,6 +28,7 @@ cloud inference, resume generation, semantic claim proof, PDFs or history alread
 - `src/resumeforge/jobs/`: source identity, extraction/quotation validation and exact-reference evaluation.
 - `src/resumeforge/providers/`: Protocol, fake replay and local-only Ollama HTTP adapter.
 - `src/resumeforge/matching/`: reviewed-input gate, eligibility, lexical candidates and review findings.
+  Candidate signals preserve literal statement mentions and scoped metric records, not scores.
 - `src/resumeforge/inputs.py`: bounded local text input for job/response files.
 - `examples/profiles/sample.md`: fictional fixture used by `tests/` and the CI smoke test.
 - `examples/jobs/`: fictional job and manually authored JSON response, not real application data.
@@ -62,6 +64,9 @@ acknowledgement, schema/quote revalidation, scoped verified/completed evidence, 
 status caveats. Do not inherit evidence from skills, parent technology lists, notes or bullet
 wording. Preserve full job items and required/preferred distinctions; no candidate is not proof
 of missing experience or absent requirements. No ranking/selection/claim approval is implemented.
+Signals annotate only retrieved eligible evidence: literal mentions may be negated/incidental,
+metrics need not be numeric or job-relevant, and null spans mean unknown, not a penalty. Never
+infer metrics/impact/ownership or rank by counts; keep independent signal version/provenance.
 Job analysis accepts no candidate profile. Keep trusted instructions separate from job data.
 Response text and its quote must be literal source substrings; that is provenance, not proof of
 classification/completeness. Preserve required/preferred distinctions and explicit unknowns.

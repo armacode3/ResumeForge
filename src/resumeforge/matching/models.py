@@ -37,11 +37,38 @@ class LexicalOverlap:
 
 
 @dataclass(frozen=True)
+class TechnologySignal:
+    """A retrieved technology's literal spans, not proof that it was used."""
+
+    technology: str
+    job_span: str
+    statement_span: str | None
+
+
+@dataclass(frozen=True)
+class MetricSignal:
+    """An explicitly recorded scoped metric; no numeric extraction or job alignment."""
+
+    text: str
+    statement_span: str | None
+
+
+@dataclass(frozen=True)
+class RelevanceSignals:
+    """Unweighted review observations; absence means unknown, not weaker experience."""
+
+    job_phrase_in_statement: bool
+    technologies: tuple[TechnologySignal, ...]
+    metrics: tuple[MetricSignal, ...]
+
+
+@dataclass(frozen=True)
 class EvidenceCandidate:
     accomplishment_id: str
     entry_id: str
     overlaps: tuple[LexicalOverlap, ...]
     caveats: tuple[str, ...]
+    signals: RelevanceSignals
 
 
 @dataclass(frozen=True)
@@ -69,6 +96,7 @@ class ConstraintFinding:
 @dataclass(frozen=True)
 class MatchingReport:
     matching_version: str
+    signals_version: str
     profile_model_sha256: str
     job_source_sha256: str
     requirements_model_sha256: str

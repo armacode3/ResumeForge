@@ -1,7 +1,7 @@
 """Conservative retrieval: traceable overlaps never become qualification or completion proof."""
 
 import json
-from dataclasses import asdict
+from dataclasses import FrozenInstanceError, asdict
 from typing import Any
 from unittest.mock import patch
 
@@ -97,7 +97,7 @@ def test_eligible_scoped_subtask_preserves_context_and_does_not_read_notes_or_ne
     assert item.candidates[0].caveats == ("parent_entry_in_progress",)
     assert item.candidates[0].overlaps[0].basis == "technology_mention"
     assert matching_profile.model_dump_json() == before
-    assert len(report.warnings) == 3
+    assert len(report.warnings) == 4
     assert "Fictional private name" not in json.dumps(asdict(report))
 
 
@@ -478,3 +478,287 @@ def test_ordering_and_duplicate_technology_labels_are_deterministic(
     assert report == match_evidence(
         profile, JobDocument("Python"), requirements, requirements_reviewed=True
     )
+
+
+@pytest.mark.parametrize(
+    ("technology", "statement", "span"),
+    [
+        ("Python", "Implemented tests using PYTHON.", "PYTHON"),
+        ("Python", "Implemented tests using Pythonic conventions.", None),
+        ("Python", "Implemented automated tests.", None),
+        ("C", "Implemented a C++ demo.", None),
+        ("C", "Implemented a C# demo.", None),
+        ("Java", "Implemented a JavaScript demo.", None),
+        ("SQL", "Implemented a PostgreSQL demo.", None),
+        ("C++", "Implemented a C++ demo.", "C++"),
+        ("C#", "Implemented a C# demo.", "C#"),
+        (".NET", "Implemented a .NET demo.", ".NET"),
+        ("Py(th)on", "Implemented a Py(th)on demo.", "Py(th)on"),
+        ("Python", "Did not use Python for this subtask.", "Python"),
+    ],
+)
+def test_technology_signals_distinguish_statement_mentions_from_metadata_only(
+    matching_profile: UserProfile,
+    empty_job_payload: dict[str, Any],
+    technology: str,
+    statement: str,
+    span: str | None,
+) -> None:
+    accomplishment = matching_profile.accomplishments[0]
+    accomplishment.technologies = [technology]
+    accomplishment.statement = statement
+    job = f"Experience with {technology}."
+    report = match_evidence(
+        matching_profile,
+        JobDocument(job),
+        requirements_for(job, empty_job_payload),
+        requirements_reviewed=True,
+    )
+    assert report.signals_version == "evidence-signals-v1"
+    signal = report.items[0].candidates[0].signals
+    assert not signal.job_phrase_in_statement
+    assert signal.metrics == ()
+    assert len(signal.technologies) == 1
+    mention = signal.technologies[0]
+    assert mention.technology == mention.job_span == technology
+    assert mention.statement_span == span
+    if span is not None:
+        assert span in statement
+
+
+def test_signals_preserve_mixed_anchors_and_do_not_infer_unlisted_technologies(
+    matching_profile: UserProfile, empty_job_payload: dict[str, Any]
+) -> None:
+    matching_profile.accomplishments[0].technologies = ["Python", "PYTHON", "SQL"]
+    matching_profile.accomplishments[0].statement = "Used PYTHON with Rust."
+    job = "Python, SQL or Rust."
+    report = match_evidence(
+        matching_profile,
+        JobDocument(job),
+        requirements_for(job, empty_job_payload),
+        requirements_reviewed=True,
+    )
+    signals = report.items[0].candidates[0].signals
+    assert [signal.technology for signal in signals.technologies] == ["Python", "SQL"]
+    assert [signal.statement_span for signal in signals.technologies] == ["PYTHON", None]
+    assert [signal.job_span for signal in signals.technologies] == ["Python", "SQL"]
+
+
+@pytest.mark.parametrize("technologies", [[], ["Python"]])
+def test_full_phrase_signal_is_derived_from_existing_retrieval_not_keyword_counts(
+    matching_profile: UserProfile, empty_job_payload: dict[str, Any], technologies: list[str]
+) -> None:
+    matching_profile.accomplishments[0].technologies = technologies
+    matching_profile.accomplishments[0].statement = "Implemented Python automated tests."
+    job = "Python automated tests"
+    report = match_evidence(
+        matching_profile,
+        JobDocument(job),
+        requirements_for(job, empty_job_payload),
+        requirements_reviewed=True,
+    )
+    candidate = report.items[0].candidates[0]
+    assert candidate.signals.job_phrase_in_statement
+    assert len(candidate.signals.technologies) == len(technologies)
+    assert candidate.signals.metrics == ()
+    assert candidate.caveats == ("parent_entry_in_progress",)
+
+
+def test_recorded_metrics_are_literal_scoped_observations_not_inferred_achievements(
+    matching_profile: UserProfile, empty_job_payload: dict[str, Any]
+) -> None:
+    accomplishment = matching_profile.accomplishments[0]
+    accomplishment.statement = "Implemented Python tests for 12 endpoints under mentor review."
+    accomplishment.metrics = [
+        "12 endpoints",
+        "MENTOR REVIEW",
+        "no baseline recorded",
+        "12 endpoints",
+    ]
+    before = matching_profile.model_dump_json()
+    report = match_evidence(
+        matching_profile,
+        JobDocument("Python"),
+        requirements_for("Python", empty_job_payload),
+        requirements_reviewed=True,
+    )
+    signals = report.items[0].candidates[0].signals
+    assert [metric.text for metric in signals.metrics] == accomplishment.metrics
+    assert [metric.statement_span for metric in signals.metrics] == [
+        "12 endpoints",
+        "mentor review",
+        None,
+        "12 endpoints",
+    ]
+    assert matching_profile.model_dump_json() == before
+    accomplishment.metrics.clear()
+    accomplishment.statement = "Changed later."
+    assert len(signals.metrics) == 4
+    assert signals.technologies[0].statement_span == "Python"
+    with pytest.raises(FrozenInstanceError):
+        signals.metrics[0].text = "invented"  # type: ignore[misc]
+
+
+def test_numbers_in_statement_are_not_automatically_extracted_as_metrics(
+    matching_profile: UserProfile, empty_job_payload: dict[str, Any]
+) -> None:
+    matching_profile.accomplishments[0].statement = "Added Python tests for 12 endpoints."
+    report = match_evidence(
+        matching_profile,
+        JobDocument("Python"),
+        requirements_for("Python", empty_job_payload),
+        requirements_reviewed=True,
+    )
+    assert report.items[0].candidates[0].signals.metrics == ()
+
+
+def test_metrics_cannot_create_candidates_or_change_id_order_or_context(
+    matching_profile: UserProfile, empty_job_payload: dict[str, Any]
+) -> None:
+    data = matching_profile.model_dump()
+    data["accomplishments"].append(
+        {
+            **data["accomplishments"][0],
+            "id": "acc_aaa",
+            "technologies": ["Python"],
+            "statement": "Implemented automated tests.",
+        }
+    )
+    profile = UserProfile.model_validate(data)
+    requirements = requirements_for("Python or Rust; either is sufficient.", empty_job_payload)
+    document = JobDocument("Python or Rust; either is sufficient.")
+    baseline = match_evidence(profile, document, requirements, requirements_reviewed=True)
+    profile.accomplishments[0].metrics = ["Python or Rust; either is sufficient."] * 10
+    annotated = match_evidence(profile, document, requirements, requirements_reviewed=True)
+    assert annotated.evidence == baseline.evidence
+    assert annotated.findings == baseline.findings
+    assert annotated.items[0].text == annotated.items[0].source_quote == document.text
+    assert [item.accomplishment_id for item in annotated.items[0].candidates] == [
+        "acc_aaa",
+        "acc_demo",
+    ]
+    for original, updated in zip(
+        baseline.items[0].candidates, annotated.items[0].candidates, strict=True
+    ):
+        assert original.overlaps == updated.overlaps
+        assert original.caveats == updated.caveats
+    profile.accomplishments[0].technologies = []
+    profile.accomplishments[1].technologies = []
+    assert (
+        not match_evidence(profile, document, requirements, requirements_reviewed=True)
+        .items[0]
+        .candidates
+    )
+
+
+@pytest.mark.parametrize("blocker", ["excluded", "unverified", "unknown", "parent_unknown"])
+def test_ineligible_metric_text_never_enters_signal_output(
+    matching_profile: UserProfile, empty_job_payload: dict[str, Any], blocker: str
+) -> None:
+    matching_profile.accomplishments[0].metrics = ["fictional-private-blocked-metric"]
+    if blocker == "excluded":
+        matching_profile.resume_preferences.excluded_entry_ids = ["proj_demo"]
+    elif blocker == "unverified":
+        matching_profile.accomplishments[0].verified = False
+    elif blocker == "unknown":
+        matching_profile.accomplishments[0].completion_status = "unknown"
+    else:
+        matching_profile.projects[0].completion_status = "unknown"
+    with patch(
+        "resumeforge.matching.engine.relevance_signals", side_effect=AssertionError("Ineligible")
+    ):
+        report = match_evidence(
+            matching_profile,
+            JobDocument("Python"),
+            requirements_for("Python", empty_job_payload),
+            requirements_reviewed=True,
+        )
+    assert "fictional-private-blocked-metric" not in json.dumps(asdict(report))
+
+
+def test_metric_schema_revalidation_cannot_be_bypassed_by_signal_annotation(
+    matching_profile: UserProfile, empty_job_payload: dict[str, Any]
+) -> None:
+    matching_profile.accomplishments[0].metrics = [123]  # type: ignore[list-item]
+    with pytest.raises(MatchingError, match="Invalid matching inputs"):
+        match_evidence(
+            matching_profile,
+            JobDocument("Python"),
+            requirements_for("Python", empty_job_payload),
+            requirements_reviewed=True,
+        )
+
+
+def test_signals_preserve_all_job_categories_and_never_promote_preferred_or_negated_text(
+    matching_profile: UserProfile, empty_job_payload: dict[str, Any]
+) -> None:
+    for section in JobRequirements.ITEM_FIELDS:
+        empty_job_payload[section] = [
+            {
+                "id": f"job_{section}",
+                "text": "Python is not required; Java preferred.",
+                "source_quote": "Python is not required; Java preferred.",
+            }
+        ]
+    requirements = JobRequirements.model_validate(empty_job_payload)
+    report = match_evidence(
+        matching_profile,
+        JobDocument("Python is not required; Java preferred."),
+        requirements,
+        requirements_reviewed=True,
+    )
+    assert [item.section for item in report.items] == list(JobRequirements.ITEM_FIELDS)
+    for item in report.items:
+        assert item.text == item.source_quote == "Python is not required; Java preferred."
+        candidate = item.candidates[0]
+        assert not candidate.signals.job_phrase_in_statement
+        assert candidate.signals.technologies[0].statement_span == "Python"
+        assert "score" not in asdict(candidate) and "satisfied" not in asdict(item)
+
+
+def test_signal_context_never_inherits_other_accomplishment_metrics_or_entry_details(
+    matching_profile: UserProfile, empty_job_payload: dict[str, Any]
+) -> None:
+    data = matching_profile.model_dump()
+    data["projects"][0]["details"] = ["fictional-private-parent-detail"]
+    data["accomplishments"].append(
+        {
+            **data["accomplishments"][0],
+            "id": "acc_other",
+            "technologies": [],
+            "statement": "Unrelated scoped result.",
+            "metrics": ["fictional-private-other-metric"],
+        }
+    )
+    profile = UserProfile.model_validate(data)
+    report = match_evidence(
+        profile,
+        JobDocument("Python"),
+        requirements_for("Python", empty_job_payload),
+        requirements_reviewed=True,
+    )
+    assert len(report.items[0].candidates) == 1
+    assert report.items[0].candidates[0].signals.metrics == ()
+    output = json.dumps(asdict(report))
+    assert "fictional-private-parent-detail" not in output
+    assert "fictional-private-other-metric" not in output
+
+
+def test_comparison_budget_is_enforced_before_signal_annotation(
+    matching_profile: UserProfile,
+    empty_job_payload: dict[str, Any],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr("resumeforge.matching.engine.MAX_MATCH_PAIRS", 0)
+    with (
+        patch(
+            "resumeforge.matching.engine.relevance_signals", side_effect=AssertionError("Budget")
+        ),
+        pytest.raises(MatchingError, match="comparison budget"),
+    ):
+        match_evidence(
+            matching_profile,
+            JobDocument("Python"),
+            requirements_for("Python", empty_job_payload),
+            requirements_reviewed=True,
+        )

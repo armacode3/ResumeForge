@@ -366,3 +366,41 @@
   canonical agent guidance. Next: explainable relevance signals beyond lexical overlap, followed
   by constrained resume planning as a separate slice. No ranking, resume selection, bullet
   generation, semantic entailment proof, rendering, PDF, history or cloud activation was added.
+
+## Session 012 — Source-backed candidate relevance signals
+
+- User confirmed the retrieval feature was merged and requested the next step. Fast-forwarded
+  local main to merged `cf64d86` and created `feat/evidence-relevance-signals` from that base;
+  the starting tree was clean. No private profile was read or changed.
+- Defined the slice as explainable, unweighted review observations, not an unvalidated scoring
+  formula. Existing eligibility, reviewed-input/quote/schema gates, exclusions, pair budget,
+  complete job categories/qualifiers and accomplishment-ID ordering remain unchanged.
+- Added immutable `RelevanceSignals`, `TechnologySignal` and `MetricSignal` snapshots on each
+  retrieved candidate. Technology signals retain scoped labels/job spans and nullable literal
+  statement spans, distinguishing statement mentions from metadata-only overlaps. The full-job-
+  phrase flag reflects the existing overlap. Metric signals preserve explicitly recorded scoped
+  metric text and nullable literal statement spans; nothing is inferred from numbers in prose.
+- Extracted the existing literal-span policy into one shared helper without changing retrieval.
+  Signal construction happens only for retrieved eligible records, after the comparison guard.
+  No skills, parent details/technologies, notes, bullet wording or other accomplishment metrics
+  supply these annotations. Ineligible/unmatched metric text remains absent from report output.
+- Kept `matching_version: evidence-matching-v1`; new root `signals_version: evidence-signals-v1`
+  identifies additive candidate annotations independently. Application version is 0.7.0, with no
+  dependency or profile schema change. Existing command/options work unchanged; JSON output now
+  deliberately includes candidate metric text and remains private. Added a signal-limit warning.
+- Tests cover metadata-only/mixed/full-phrase anchors, bounded technology names, original-case
+  spans, negated mentions, all eight unchanged job categories, metric duplicates/non-numeric and
+  unmatched records, no inferred numbers/technologies, immutable snapshots, schema revalidation,
+  ineligibility/privacy/budget gates, unchanged candidate ordering and installed CLI JSON.
+  These check literal provenance/invariants, not semantic or ranking accuracy. No quality weights,
+  count-based ordering, ownership/impact inference, qualification verdicts or model calls were added.
+- Local Python 3.12.3: 463 tests passed with GitHub-like colors and 99.92% branch-aware coverage;
+  Ruff lint/format, strict mypy (44 files), dependency checks and source/wheel builds passed.
+  Fresh locked editable and runtime-only wheel installs passed dependency checks. All 463 tests
+  also passed against the installed wheel outside the repository, and the runtime-only signals/
+  version/metric smoke passed. CI shell blocks parsed; distribution/staged path and secret-pattern
+  reviews passed, excluding private/runtime artifacts. Hosted CI is checked after push.
+- Updated matching policy, ADR-012, architecture, README, roadmap and canonical agent guidance.
+  Next separate slice: constrained resume planning with explicit evidence references and review
+  needs; relevance ordering/weights still require justified policy/evaluation. Selection,
+  generation, layout/PDFs, history and cloud inference remain unimplemented.

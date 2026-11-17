@@ -4,7 +4,7 @@ An evidence-first resume tailoring application, built incrementally. The goal is
 a verified Markdown profile and a job description into a reviewable, one-page resume
 without inventing experience, technologies, or metrics.
 
-## Current status: Phase 3 — offline evidence candidate retrieval
+## Current status: Phase 3 — offline retrieval and source-backed review signals
 
 Implemented: an installable Typer CLI with help/version output, unit and installed-entry-point
 tests, privacy-ignore regression coverage, linting, formatting, strict typing, packaging checks,
@@ -25,6 +25,9 @@ Profile validation now also accepts explicit completion states and resume prefer
 checks for required/excluded references and contradictory count bounds. Offline `match-evidence`
 now retrieves literal review candidates from eligible scoped accomplishments and reviewed job
 requirements. **It does not prove qualifications, rank evidence, select content or validate layout.**
+Candidates now distinguish literal statement mentions from metadata-only technology overlaps and
+preserve explicitly recorded scoped metrics. These unweighted observations are not semantic
+support, inferred impact or a relevance score; candidate ordering remains by evidence ID.
 
 **Resume generation is not implemented.** There is no cloud provider, ranking/planning engine,
 database, template renderer, PDF compiler, API, or browser extension yet.
