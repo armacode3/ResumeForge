@@ -1,0 +1,7 @@
+Role: Test Engineer
+Employer: Example Quality Lab
+Work: Write automated tests.
+Required: Python programming.
+SQL knowledge is helpful, not mandatory.
+Kubernetes experience is not required.
+Evidence sought: A test report explaining failures.

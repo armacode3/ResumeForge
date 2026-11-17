@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "company": {"text": "Example Quality Lab", "source_quote": "Employer: Example Quality Lab"},
+  "job_title": {"text": "Test Engineer", "source_quote": "Role: Test Engineer"},
+  "responsibilities": [
+    {"id": "job_resp_1", "text": "Write automated tests.", "source_quote": "Work: Write automated tests."}
+  ],
+  "required_qualifications": [
+    {"id": "job_req_1", "text": "Python programming.", "source_quote": "Required: Python programming."}
+  ],
+  "preferred_qualifications": [
+    {"id": "job_pref_1", "text": "SQL knowledge is helpful, not mandatory.", "source_quote": "SQL knowledge is helpful, not mandatory."}
+  ],
+  "programming_languages": [
+    {"id": "job_lang_1", "text": "Python", "source_quote": "Required: Python programming."},
+    {"id": "job_lang_2", "text": "SQL", "source_quote": "SQL knowledge is helpful, not mandatory."}
+  ],
+  "frameworks": [],
+  "technical_concepts": [
+    {"id": "job_concept_1", "text": "automated tests", "source_quote": "Work: Write automated tests."},
+    {"id": "job_concept_2", "text": "Kubernetes", "source_quote": "Kubernetes experience is not required."}
+  ],
+  "domain_terms": [],
+  "evidence_sought": [
+    {"id": "job_evidence_1", "text": "A test report explaining failures.", "source_quote": "Evidence sought: A test report explaining failures."}
+  ]
+}

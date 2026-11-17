@@ -134,3 +134,22 @@ without exposing server bodies. All model content still passes existing strict s
 and quotation checks. Early live trials exposed casing, absent-metadata and duplicate-ID failures;
 add regression tests and refine prompt/schema descriptions rather than silently repairing facts
 or weakening validators. Structured JSON and two passing examples would not prove general accuracy.
+
+## ADR-009 — Small exact-reference evaluation before relying on extraction tags
+
+**Status:** Implemented as a Phase 2 quality tool; broader live quality review remains pending.
+
+Use six fictional sources and manually authored `JobRequirements` references, validated through
+the same engine as model output. Compare exact case-sensitive text sets per category, ignoring
+generated IDs, ordering and valid quote-length differences. Report missing/unexpected spans,
+item precision/recall (undefined denominators null), separate nullable metadata checks, and all
+validation failures. Do not drop invalid responses from case counts or label annotation agreement
+as universal accuracy. Alternative semantic/LLM judging introduces additional model variability
+and cannot prove truth; embeddings/benchmark frameworks are unnecessary for this initial corpus.
+
+Keep the runner repository-only and default to explicit reference replay, clearly labeled as a
+harness check. Independently captured raw responses can be replayed offline; their original model
+identity is not inferred from the JSON. Local inference is explicit, synthetic-only and guarded
+by the existing Ollama adapter. No live run, model pull, profile access or cloud fallback is a test
+side effect. Unmatched alternate spans need review, not silent fact normalization or weaker
+quotation checks. This does not implement matching/planning or candidate-claim approval.

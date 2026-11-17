@@ -1,0 +1,8 @@
+Company: Exemple Médical
+Job title: Quality Records Assistant
+Location: Montréal
+Industry: medical devices
+Responsibilities: Reconcile batch records.
+Required: Experience with batch records.
+Preferred: Familiarity with ISO 13485.
+Evidence sought: An example of a completed audit checklist.

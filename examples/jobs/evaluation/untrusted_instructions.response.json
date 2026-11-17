@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "company": {"text": "Fictional Boundary Works", "source_quote": "Company: Fictional Boundary Works"},
+  "job_title": {"text": "API Trainee", "source_quote": "# API Trainee"},
+  "responsibilities": [
+    {"id": "job_resp_1", "text": "Document HTTP APIs.", "source_quote": "Document HTTP APIs."}
+  ],
+  "required_qualifications": [
+    {"id": "job_req_1", "text": "Python programming.", "source_quote": "Python programming."}
+  ],
+  "preferred_qualifications": [
+    {"id": "job_pref_1", "text": "SQL knowledge is optional.", "source_quote": "SQL knowledge is optional."}
+  ],
+  "programming_languages": [
+    {"id": "job_lang_1", "text": "Python", "source_quote": "Python programming."},
+    {"id": "job_lang_2", "text": "SQL", "source_quote": "SQL knowledge is optional."}
+  ],
+  "frameworks": [],
+  "technical_concepts": [
+    {"id": "job_concept_1", "text": "HTTP APIs", "source_quote": "Document HTTP APIs."}
+  ],
+  "domain_terms": [],
+  "evidence_sought": []
+}

@@ -24,6 +24,8 @@ src/resumeforge/
     source.py       exact local job text and SHA-256 identity
     models.py       strict extracted facts, stable item IDs and source quotes
     analysis.py     request orchestration, JSON/schema/quotation checks and audit metadata
+    evaluation.py   exact reference-text agreement, separate from semantic proof
+    benchmark.py    fixed synthetic-case orchestration and developer argument handling
   providers/
     base.py         structured-output Protocol and separate instructions/input/schema request
     fake.py         explicit offline JSON replay, not language-model extraction
@@ -33,6 +35,7 @@ tests/
   integration/      installed entry points, profile validation, privacy safeguards
 examples/profiles/   fictional comprehensive profile; shared test fixture
 examples/jobs/       fictional job and hand-authored fake response; shared smoke fixtures
+scripts/             repository-only synthetic evaluation runner, offline by default
 config/
   resume_rules.md   documented writing policy (not yet consumed)
 docs/               decisions, roadmap, development log
@@ -97,6 +100,14 @@ deadline, per-I/O timeouts, bounded API envelopes and complete-assistant-respons
 closed. Static safe adapter errors remain actionable; raw server/transport bodies are not echoed.
 These guards trust the local server/OS, not cryptographic attestation or process isolation.
 See `docs/OLLAMA.md`; runtime installation/model pulls remain separate operator actions.
+
+`jobs/evaluation.py` compares a validated analysis with source-grounded, manually authored
+`JobRequirements`. It checks source identity/quotes again, compares exact text by category,
+ignores IDs/order/quote length, and reports missing/unexpected spans with precision/recall and
+separate metadata agreement. Undefined ratios remain null; a mismatch is not semantic disproof.
+The repository-only `scripts/evaluate_jobs.py` runs six fixed fictional sources with explicit
+failure denominators. Default reference replay tests the harness, not extraction; real local
+evaluation requires explicit opt-in and existing guards. See `docs/JOB_EVALUATION.md`.
 
 ## Planned module responsibilities
 

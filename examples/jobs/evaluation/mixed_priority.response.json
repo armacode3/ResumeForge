@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "company": {"text": "Sample Pipeline Studio", "source_quote": "Company: Sample Pipeline Studio"},
+  "job_title": {"text": "Service Developer", "source_quote": "# Service Developer"},
+  "responsibilities": [
+    {"id": "job_resp_1", "text": "Maintain HTTP APIs.", "source_quote": "Maintain HTTP APIs."}
+  ],
+  "required_qualifications": [
+    {"id": "job_req_1", "text": "Python or Java experience; either is sufficient.", "source_quote": "Python or Java experience; either is sufficient."},
+    {"id": "job_req_2", "text": "Ability to write automated tests.", "source_quote": "Ability to write automated tests."}
+  ],
+  "preferred_qualifications": [
+    {"id": "job_pref_1", "text": "SQL knowledge.", "source_quote": "SQL knowledge."},
+    {"id": "job_pref_2", "text": "Exposure to FastAPI.", "source_quote": "Exposure to FastAPI."}
+  ],
+  "programming_languages": [
+    {"id": "job_lang_1", "text": "Python", "source_quote": "Python or Java experience; either is sufficient."},
+    {"id": "job_lang_2", "text": "Java", "source_quote": "Python or Java experience; either is sufficient."},
+    {"id": "job_lang_3", "text": "SQL", "source_quote": "SQL knowledge."}
+  ],
+  "frameworks": [
+    {"id": "job_framework_1", "text": "FastAPI", "source_quote": "Exposure to FastAPI."}
+  ],
+  "technical_concepts": [
+    {"id": "job_concept_1", "text": "HTTP APIs", "source_quote": "Maintain HTTP APIs."},
+    {"id": "job_concept_2", "text": "automated tests", "source_quote": "Ability to write automated tests."}
+  ],
+  "domain_terms": [],
+  "evidence_sought": [
+    {"id": "job_evidence_1", "text": "A project showing automated tests.", "source_quote": "A project showing automated tests."}
+  ]
+}

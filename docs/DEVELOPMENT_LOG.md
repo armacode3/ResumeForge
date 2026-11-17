@@ -183,3 +183,44 @@
   Python 3.13/hosted outcomes must be checked on the new pushed run,
   not inferred from local tests. No model inference, private data or external service was needed.
 - Next feature remains broader synthetic extraction-quality evaluation, not another pipeline phase.
+
+## Session 007 — Synthetic extraction-quality evaluation
+
+- User merged the cumulative Phase 2 branch into main. Fetched/fast-forwarded local main to
+  merge commit `d975ca5`, then started `feat/job-analysis-evaluation` from that base without
+  altering old branches, remotes or private inputs. The prior help repair's hosted run
+  `44125236207` passed both Python 3.12/3.13 jobs, including builds and installed-wheel smoke.
+- Kept this iteration inside the documented Phase 2 quality gate: add a conservative exact-text
+  scorer and six fixed fictional sources with hand-authored references. Added mixed-priority/
+  alternative wording, negation, an untrusted footer, Unicode and non-software domain coverage
+  alongside the two existing examples. Reference replay is not model extraction or an accuracy test.
+- Scoring rechecks source hash/quotation grounding, compares exact category-specific texts while
+  ignoring IDs/order/valid quote-length differences, and reports matched/missing/unexpected spans.
+  Metadata checks stay separate; zero precision/recall denominators are null. Category swaps,
+  missing tags, absent metadata and narrower literal spans are review findings rather than silent
+  repairs or semantic truth claims. Validation failures remain in selected-case totals.
+- Added a repository-only runner with offline reference/independent-response replay and explicit
+  guarded local mode. There is no new installed CLI command, retry, download or provider fallback.
+  The runner accepts only the fixed synthetic corpus and never loads candidate profiles. Existing
+  extraction prompts and validators are unchanged. Application version is 0.4.1; no new dependency.
+- Offline replay of saved prompt-v3 Qwen3:4b results reproduced 9/10 backend reference items and
+  5/6 missing-metadata items, exposing the previously noted automated-tests/SQL omissions despite
+  retained qualification text. Both results validate but fail exact-reference agreement. Private
+  generated reports remain under approved temporary storage. No new live inference was performed;
+  the four new cases have no real-model results and the broader quality gate remains open.
+- Added schema/source, missing/extra/category-swap, metadata, zero-denominator, source-identity,
+  quote, ordering/ID, invalid-response and mocked-provider/CLI regression tests. Initial external
+  wheel testing exposed repository-tool import assumptions; moved reusable orchestration into
+  the installed package and left the script as a thin repository-path entry point instead of
+  adding PYTHONPATH workarounds or shipping the corpus as runtime candidate data.
+- Python 3.12.3 verification: 243 unit + 33 integration = 276 tests passed with GitHub-like color
+  settings, at 99.89% branch-aware application coverage. Ruff lint/format, strict mypy (36 files),
+  editable installation and dependency checks passed. Source/wheel builds, a fresh locked editable
+  installation, all 276 tests against the installed wheel outside the repository, and the wheel's
+  developer-benchmark smoke passed. Staged/distribution path and secret-pattern review excluded
+  private/runtime data. Hosted checks are verified separately after push; no live model is a
+  normal test dependency.
+- Documented annotation/scoring limits and opt-in commands in `docs/JOB_EVALUATION.md`, ADR-009,
+  README, architecture, roadmap and canonical agent guidance. Next: explicitly run/review the
+  expanded local corpus if desired, then add typed completion-state/preferences before Phase 3
+  matching/planning. No matching, profile approval, resume generation or PDF feature was added.
