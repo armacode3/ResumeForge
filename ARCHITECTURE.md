@@ -2,7 +2,7 @@
 
 ## Status and approach
 
-Phase 0 is implemented. Everything below labeled **planned** is a design boundary, not a
+Phases 0–1 are implemented. Everything below labeled **planned** is a design boundary, not a
 working feature. Prefer a modular monolith: one Python package, with small components and
 explicit typed contracts, rather than services or unnecessary infrastructure.
 
@@ -12,11 +12,16 @@ explicit typed contracts, rather than services or unnecessary infrastructure.
 src/resumeforge/
   __init__.py       installed distribution version
   __main__.py       python -m entry point
-  cli.py            Typer presentation layer; help/version only
+  cli.py            Typer presentation layer; help/version and validate-profile
   py.typed          typed-package marker
+  profile/
+    models.py       strict Pydantic schemas and evidence-reference validation
+    parser.py       bounded safe YAML/front-matter parsing and source preservation
+    validation.py   non-fatal missing-detail / unverified-evidence warnings
 tests/
-  unit/             CLI behavior and invalid-input contracts
-  integration/      installed entry points and private-path ignore safeguards
+  unit/             CLI/schema/parser/gap contracts and invalid inputs
+  integration/      installed entry points, profile validation, privacy safeguards
+examples/profiles/   fictional comprehensive profile; shared test fixture
 config/
   resume_rules.md   documented writing policy (not yet consumed)
 docs/               decisions, roadmap, development log
@@ -29,13 +34,31 @@ The `src/` layout prevents tests from accidentally importing a root-level source
 has never been installed. Both entry points use the same Typer app. CLI commands will call
 engine services, not contain parsing, provider, or rendering logic.
 
+## Implemented profile boundary
+
+See `docs/PROFILE_FORMAT.md` for schema version 1. YAML front matter explicitly records person,
+background entries across eight categories, skills/coursework, accomplishments and verified bullets.
+The Markdown body is retained as rough notes, not inferred evidence. `ProfileDocument` carries
+`UserProfile`, exact decoded `source_text`, and verbatim `markdown_notes`; no writer is implemented.
+The CLI calls `load_profile`/`find_profile_gaps`, which have no dependency on Typer or HTTP.
+
+Strict Pydantic models reject unknown fields, incorrect types, invalid IDs/dates, duplicate IDs,
+dangling evidence references, and verified bullets citing unverified records. Accomplishments
+default to unverified. Completeness warnings cover missing contact/education/background, dates,
+institutions/employers, and verified evidence. Parsing validates structure and provenance links,
+not whether claims are true or semantically supported by the cited statements.
+
+The parser accepts a bounded regular UTF-8 file (1 MiB), uses a restricted SafeLoader with duplicate
+key rejection and explicit boolean behavior, and rejects anchors/aliases/tags and nesting beyond
+32 collections. Errors shown by the CLI omit private input values/YAML snippets. Private source
+text and models are available in memory to callers, which must not log them indiscriminately.
+
 ## Planned module responsibilities
 
 Create these modules only as their features are implemented:
 
 | Component | Responsibility and contract |
 | --- | --- |
-| `profile/` | Parse documented Markdown/YAML convention; validate Pydantic `UserProfile`, experience and accomplishment IDs; preserve evidence and rough notes. |
 | `jobs/` | Accept local job text and validate structured `JobRequirements`, including required/preferred distinctions. |
 | `providers/` | Configurable LLM interface, structured responses, bounded failures, deterministic fake; real provider added explicitly later. |
 | `matching/` | Rank evidence by technical relevance, demonstrated responsibility, specificity and constraints, not keyword counts alone. |
@@ -62,8 +85,8 @@ Create these modules only as their features are implemented:
 7. Once history is implemented, persist provenance, validation, decisions, versions and artifact
    references. Failed generations must not masquerade as approved final resumes.
 
-Schemas are deliberately deferred to the phase that implements them. Pydantic will validate
-untrusted structured inputs/outputs; malformed model responses must fail actionably.
+Profile schemas exist now; job/plan/resume schemas remain deferred to their implementing phases.
+Pydantic validates profile input and will validate untrusted model responses, which must fail actionably.
 `config/resume_rules.md` holds writing policy; planned `config/layout.yaml` will separately
 hold machine-readable page, spacing, and minimum-readability constraints.
 
@@ -103,7 +126,7 @@ call, API key configuration or paid service is enabled now. Tests must use deter
 
 FastAPI will call the same engine and validated request/response contracts. Before exposing it,
 choose authentication, authorization, artifact access, request limits, origin policy, and long-job
-handling. No network service or deployment is configured in Phase 0.
+handling. No network service or deployment is configured in Phase 1.
 
 The Manifest V3 extension will extract a job only on user invocation using minimal permissions
 (such as `activeTab` and `scripting` if sufficient), let the user edit it, then call the secured

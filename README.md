@@ -4,20 +4,22 @@ An evidence-first resume tailoring application, built incrementally. The goal is
 a verified Markdown profile and a job description into a reviewable, one-page resume
 without inventing experience, technologies, or metrics.
 
-## Current status: Phase 0
+## Current status: Phase 1 — profile knowledge base
 
 Implemented: an installable Typer CLI with help/version output, unit and installed-entry-point
 tests, privacy-ignore regression coverage, linting, formatting, strict typing, packaging checks,
-and a GitHub Actions workflow.
+and a GitHub Actions workflow. Profile support now includes a documented Markdown/YAML format,
+Pydantic schemas, stable evidence IDs, safe parsing, source preservation, completeness warnings,
+and the `validate-profile` command. A fictional sample covers every supported background section.
 
-**Resume generation is not implemented.** There are no AI calls, profile parser, database,
-templates, PDF compiler, API, or browser extension yet. CI runs on GitHub only after the
-repository is pushed there; local verification is separate.
+**Resume generation is not implemented.** There are no AI calls, job analyzer, database,
+templates, PDF compiler, API, or browser extension yet. Local verification and hosted CI
+results are reported separately.
 
 ## Prerequisites and installation
 
 - Python 3.12+ with `pip` and `venv` (on Ubuntu, install `python3.12-venv` if needed).
-- Git. No API key, TeX installation, Docker, or paid service is required for Phase 0.
+- Git. No API key, TeX installation, Docker, or paid service is required for Phase 1.
 - The CI workflow targets Python 3.12 and 3.13 on Linux.
 
 From the repository root (Linux/macOS):
@@ -39,11 +41,28 @@ The editable install points Python at `src/`, so source changes do not require r
 resumeforge --help
 resumeforge --version
 python -m resumeforge --help
+resumeforge validate-profile --profile examples/profiles/sample.md
 ```
 
 Running `resumeforge` without arguments also displays help and exits successfully.
 Unknown commands/options fail with exit code 2. No generation commands are advertised
-until implemented. The CLI currently does not read or write any user data.
+until implemented. Profile validation is local and read-only; help/version do not read the profile.
+
+### Create your private profile
+
+```bash
+mkdir -p data/profile
+cp examples/profiles/sample.md data/profile/user_information.md
+# Replace the fictional information in the private copy.
+resumeforge validate-profile
+```
+
+Read [docs/PROFILE_FORMAT.md](docs/PROFILE_FORMAT.md) for all fields and conventions.
+Facts live in YAML front matter, with stable IDs such as `exp_example` and `acc_api`.
+The Markdown body preserves rough notes without promoting them into verified facts.
+Invalid files, duplicate IDs, broken references and reversed dates fail with exit code 1.
+Structurally valid but incomplete profiles exit 0 with warnings. A `verified` label records
+your review; the application does not prove factual truth or check bullet entailment yet.
 
 ## Configuration and privacy
 
@@ -51,7 +70,8 @@ There are no active configuration settings or environment variables yet. `.env.e
 documents this intentionally; it is not loaded by the application.
 `config/resume_rules.md` records future writing policy, not an active prompt or validator.
 
-The planned private profile location is `data/profile/user_information.md`. All of `data/`,
+The default private profile location is `data/profile/user_information.md`, relative to your
+working directory; use `--profile` for another location. All of `data/`,
 generated artifact directories, `.env` files, PDFs, LaTeX output, and databases are ignored
 by Git by default. Put future sanitized fixtures under `tests/fixtures/` or `examples/`,
 not in private `data/`. Git ignores prevent accidental tracking, **not disclosure**:
@@ -73,7 +93,8 @@ CI runs these checks plus a wheel-install smoke test outside the repository. The
 coverage threshold is 90%, with branch measurement and subprocess coverage.
 Normal tests require no credentials, network requests, or live LLM calls. Dependency installation
 does require package-index access.
-The CLI smoke test is **not** an end-to-end resume-generation test; that comes in Phase 5.
+The wheel smoke test also validates the fictional profile. This is **not** an end-to-end
+resume-generation test; that comes in Phase 5.
 
 `requirements-dev.lock` pins the development, runtime, and build-tool dependencies resolved
 on Python 3.12; `pyproject.toml` declares supported ranges. See

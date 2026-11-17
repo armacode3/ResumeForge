@@ -1,13 +1,15 @@
 """Command-line boundary; future domain logic belongs outside this module."""
 
+from pathlib import Path
 from typing import Annotated
 
 import typer
 
 from resumeforge import __version__
+from resumeforge.profile import ProfileError, find_profile_gaps, load_profile
 
 app = typer.Typer(
-    help="ResumeForge: evidence-first resume tailoring. Phase 0: CLI foundation only.",
+    help="ResumeForge: evidence-first resume tailoring. Validate profiles before tailoring.",
     add_completion=False,
     invoke_without_command=True,
     pretty_exceptions_enable=False,
@@ -29,3 +31,26 @@ def main(
         raise typer.Exit()
     if context.invoked_subcommand is None:
         typer.echo(context.get_help())
+
+
+@app.command("validate-profile")
+def validate_profile(
+    profile: Annotated[
+        Path,
+        typer.Option("--profile", "-p", help="Path to a UTF-8 Markdown profile."),
+    ] = Path("data/profile/user_information.md"),
+) -> None:
+    """Validate profile structure and evidence references; report missing details."""
+    try:
+        document = load_profile(profile)
+    except ProfileError as error:
+        typer.echo(f"Profile validation failed:\n{error}", err=True)
+        raise typer.Exit(code=1) from None
+    verified_count = sum(item.verified for item in document.profile.accomplishments)
+    typer.echo(
+        f"Profile structure valid: {len(document.profile.entries())} entries, "
+        f"{len(document.profile.accomplishments)} accomplishments ({verified_count} verified)."
+    )
+    for warning in find_profile_gaps(document.profile):
+        typer.echo(f"Warning: {warning}")
+    typer.echo("Structure checks do not establish factual truth; review your source evidence.")

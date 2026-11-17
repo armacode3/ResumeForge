@@ -10,18 +10,22 @@ do not create conflicting duplicate instructions.
 ## Purpose and current state
 
 Build truthful, evidence-linked resumes from a verified Markdown profile and a job description.
-Only Phase 0 is implemented: package metadata, Typer help/version CLI, tests, tooling, and CI.
-Do not imply that profile validation, AI generation, PDFs, or history already work.
+Phases 0–1 are implemented: package/CLI/tooling/CI and the Markdown/YAML profile loader,
+Pydantic schemas, stable IDs, reference checks, gap warnings and `validate-profile`.
+Read `docs/PROFILE_FORMAT.md` before changing profile behavior. Do not imply AI generation,
+semantic claim checking, PDFs or history already work.
 
 ## Stack and repository map
 
-- Python 3.12+, Typer, pytest, Ruff, strict mypy; `requirements-dev.lock` pins tooling.
+- Python 3.12+, Typer, Pydantic, PyYAML, pytest, Ruff, strict mypy; dependencies pinned in the lock.
 - `src/resumeforge/`: installed application; `cli.py` is the presentation boundary.
-- `tests/unit/`, `tests/integration/`: deterministic tests; later sanitized fixtures here.
+- `src/resumeforge/profile/`: schemas, bounded safe parser, source preservation, completeness flags.
+- `examples/profiles/sample.md`: fictional fixture used by `tests/` and the CI smoke test.
+- `tests/unit/`, `tests/integration/`: deterministic schema/parser/CLI/privacy checks.
 - `config/resume_rules.md`: policy only, not currently loaded by code.
 - `docs/`: decisions, roadmap, development log; `.github/workflows/ci.yml`: checks.
-- `data/profile/user_information.md`: future private input, ignored; never create real data in Git.
-- Planned only: Pydantic models, provider interfaces, Jinja2, LaTeX/PyMuPDF, SQLite,
+- `data/profile/user_information.md`: default private input, ignored; never create real data in Git.
+- Planned only: provider interfaces, Jinja2, LaTeX/PyMuPDF, SQLite,
   then Docker, FastAPI, and a Manifest V3 extension. Add dependencies when needed.
 
 ## Architecture and truthfulness
@@ -33,6 +37,9 @@ Track every claim to stable accomplishment IDs and verified source evidence. Nev
 metrics, technology use, responsibilities, or ownership. Flag insufficient evidence for explicit
 user review. Historical AI output is not a source of verified facts. Prefer deterministic
 validation; AI review is additional evidence, not proof. No vector database without a real need.
+Profile parsing validates structure, not semantic truth. `verified` defaults false; verified
+bullets must reference existing verified accomplishments. Markdown notes are not verified evidence.
+Preserve stable IDs and source text; version incompatible format changes rather than guessing.
 
 ## Feature workflow
 
@@ -59,6 +66,7 @@ source .venv/bin/activate
 python -m pip install -r requirements-dev.lock
 python -m pip install --no-build-isolation --no-deps -e .
 resumeforge --help
+resumeforge validate-profile --profile examples/profiles/sample.md
 python -m ruff check .
 python -m ruff format --check .
 python -m mypy

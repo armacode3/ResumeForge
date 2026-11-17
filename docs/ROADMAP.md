@@ -14,7 +14,7 @@ successful compilation; exactly one page with extractable expected text and read
 constraints; manual factual/visual review; deterministic end-to-end smoke test. No universal
 ATS or automated factual-correctness guarantee. The first practical release adds Phase 6 history.
 
-## Phase 0 — Engineering foundation (complete locally)
+## Phase 0 — Engineering foundation (complete)
 
 - Package and CLI help/version; no placeholder generation commands.
 - pytest unit and installed-entry-point integration tests, Ruff, strict mypy, coverage.
@@ -24,21 +24,28 @@ ATS or automated factual-correctness guarantee. The first practical release adds
 
 Verified on Python 3.12.3: 7 unit and 3 integration tests, 90.91% branch-aware coverage including
 subprocesses, Ruff lint/format, strict mypy, dependency checks, source/wheel builds, clean editable
-installation, and wheel-installed tests outside the repository. No Git remote is configured;
-push and hosted CI are blocked. Python 3.13 is configured in CI but not locally verified.
+installation, and wheel-installed tests outside the repository. The user subsequently configured
+`origin`; remote `main` contains the foundation commit. Python 3.13 is configured in CI but
+not locally verified.
 
-## Phase 1 — Profile knowledge base (next)
+## Phase 1 — Profile knowledge base (complete locally)
 
-Suggested first feature: document a Markdown/YAML-front-matter convention and validate a small
-sanitized profile with Pydantic, stable experience/accomplishment IDs, and actionable errors.
-Then add remaining sections and `validate-profile` incrementally.
+Implemented: documented version-1 Markdown/YAML convention, strict Pydantic schemas for all
+background categories, stable IDs and evidence links, safe bounded parser, exact source/body
+preservation, completeness warnings, `validate-profile`, fictional sample, and automated tests.
+No profile rewriting, prose fact extraction or semantic claim checking is implied.
 
 Gate: round-trip/source evidence preservation, duplicate/dangling IDs rejected, required-field
 and malformed-file tests, Unicode and rough-note handling, synthetic fixtures only. Include
 contact, education, experience, projects, skills/tools, coursework, certifications, awards,
 organizations, research, quantitative accomplishments and verified bullets in the design.
 
-## Phase 2 — Local jobs and structured analysis
+Verified on Python 3.12.3: 74 unit and 9 integration tests, 99.69% branch-aware coverage, Ruff
+lint/format, strict mypy, dependency checks, source/wheel builds, fresh locked editable install,
+all tests against the installed wheel outside the repository, and a runtime-only wheel/profile
+smoke test. No live services or private profile data were used. Hosted CI is not locally verified.
+
+## Phase 2 — Local jobs and structured analysis (next)
 
 Accept local text/Markdown, introduce provider contracts and deterministic fakes, validate job
 requirements and malformed responses, separate required/preferred qualifications. Decide on

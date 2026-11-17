@@ -12,12 +12,12 @@ runner = CliRunner()
 
 
 @pytest.mark.parametrize("option", ["--help", "-h"])
-def test_help_describes_only_the_foundation(option: str) -> None:
+def test_help_describes_only_implemented_commands(option: str) -> None:
     result = runner.invoke(app, [option])
 
     assert result.exit_code == 0
     assert "ResumeForge" in result.output
-    assert "CLI foundation only" in result.output
+    assert "validate-profile" in result.output
     assert "--version" in result.output
     assert "generate" not in result.output
 

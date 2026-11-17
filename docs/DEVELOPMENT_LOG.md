@@ -21,3 +21,34 @@
   adding the remote before publishing. CI targets 3.12/3.13; only 3.12 was locally verified.
 - Not attempted: live LLM calls, parsing, resume generation, PDF checks, Docker or deployment.
 - Next: Phase 1 profile format, Pydantic evidence schemas and parser/validation tests.
+
+## Session 002 — Phase 1 profile knowledge base
+
+- Inspected a clean worktree and read the current project context. The user configured `origin`;
+  remote `main` already contains the Phase 0 foundation. Worked on `feat/profile-knowledge-base`
+  without changing remote settings or modifying `main`.
+- Added schema version 1: explicit YAML facts in a Markdown file, eight typed background
+  categories, contact/skills/coursework, stable entry/accomplishment/bullet IDs and evidence links.
+  Documented the convention and supplied a fully fictional example; no real profile was created.
+- Added independent profile schemas/parser/gap detection and a thin `validate-profile` command.
+  Pydantic/PyYAML are direct dependencies; YAML stubs are development-only. Updated the lock
+  without unrelated upgrades and bumped application metadata to 0.2.0.
+- Preserve original decoded source and Markdown body, including BOM/CRLF/Unicode. Reject unknown
+  fields, duplicate keys/IDs, invalid dates, dangling references and bullets citing unverified
+  evidence. Verification defaults false; missing information produces warnings, not guessed facts.
+- Restrict YAML object tags/anchors/aliases, cap input at 1 MiB and nesting at 32 collections,
+  and display sanitized errors without source snippets or private input values. Verified labels
+  and valid references do not establish semantic truth; that remains user review/Phase 4 work.
+- Initial checks caught an assumption about Typer's current test runner API; replaced its absent
+  filesystem helper with pytest's temporary directory/chdir fixture. Strict typing and formatting
+  issues were fixed and all checks rerun, without weakening quality gates.
+- Verification on Python 3.12.3: 74 unit + 9 integration = 83 tests passed; full branch-aware
+  coverage 99.69%. Ruff lint/format, strict mypy (15 source files), and `pip check` passed.
+  Built/inspected sdist and wheel; clean locked editable install passed both test groups;
+  all 83 tests passed against the installed wheel outside the repository. A separate runtime-only
+  environment passed version/help/profile smoke checks and dependency validation.
+- Extended the existing CI wheel smoke test to validate the sample. Python 3.13 remains a CI
+  target, not locally tested; hosted CI results have not been verified in this session.
+- Next: populate/review a private profile using the format guide; then Phase 2 local job inputs,
+  structured job requirements and a deterministic provider contract/fake. No live LLM calls,
+  generation, PDF compilation, persistent history, API or Docker were introduced.

@@ -52,3 +52,4 @@ jobs:
           cd "$RUNNER_TEMP"
           "$RUNNER_TEMP/resumeforge-smoke/bin/resumeforge" --version
           "$RUNNER_TEMP/resumeforge-smoke/bin/python" -m resumeforge --help
+          "$RUNNER_TEMP/resumeforge-smoke/bin/resumeforge" validate-profile --profile "$GITHUB_WORKSPACE/examples/profiles/sample.md"
