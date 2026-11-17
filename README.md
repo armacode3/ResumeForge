@@ -63,6 +63,9 @@ The Markdown body preserves rough notes without promoting them into verified fac
 Invalid files, duplicate IDs, broken references and reversed dates fail with exit code 1.
 Structurally valid but incomplete profiles exit 0 with warnings. A `verified` label records
 your review; the application does not prove factual truth or check bullet entailment yet.
+For an existing narrative, follow the guide's import checklist: keep claims pending review,
+preserve unfinished-work caveats and conflicting dates, and never put real data in examples/tests.
+Completion state and resume preferences can be retained in notes, but are not active configuration.
 
 ## Configuration and privacy
 

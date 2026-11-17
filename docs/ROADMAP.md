@@ -56,6 +56,9 @@ a real provider before enabling external calls. Gate: unit/integration tests wit
 Rank evidence beyond keywords, honor mandatory sections/experiences, produce structured plans
 with evidence references, space budgets and review flags. Gate: deterministic selection/ranking
 and contradictory-constraint tests; explanations correspond to actual decisions.
+Add explicit validated completion-state and user-preference contracts before content selection
+relies on them. Preserved Markdown notes are not automatically enforced constraints. Surface
+conflicts between mandatory content, desired bullet/project budgets and readable one-page layout.
 
 ## Phase 4 — Bullets, claims and review
 

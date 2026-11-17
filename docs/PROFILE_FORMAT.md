@@ -33,6 +33,54 @@ Exit codes: **0** = structurally valid, possibly with warnings; **1** = file/for
 failure; **2** = CLI usage error. Warnings do not mean the profile is ready for generation.
 Neither successful parsing nor a `verified: true` field proves factual correctness.
 
+## Importing an existing narrative profile
+
+There is no automatic narrative-import command. Curate an existing document into the schema
+and retain qualifications, unresolved conflicts, source history and preferences in private notes.
+This is a data-preparation task, not permission to rewrite a biography as confirmed facts.
+
+- Create only a private copy under ignored `data/profile/`; never replace the fictional fixture
+  with real information or paste the source into public docs, tests, issues or commit messages.
+- Keep experience/project/organization IDs when valid. If an older accomplishment ID lacks
+  `acc_`, prefix it once and record the original-to-canonical mapping in the private notes.
+  Do not renumber existing IDs to improve appearance.
+- Keep imported accomplishments `verified: false` until the user reviews each statement,
+  attribution, technology and metric. Do not bulk-approve claims just because parsing succeeds.
+  Entry metadata and skill/course lists also need review; their schema validity is not proof.
+- Preserve lower bounds, uncertainty, supervision and contribution scope. Do not turn a quantity
+  into an exact count, or a prototype/design/testability goal into implemented, tested behavior.
+- Leave disputed or unknown dates unset and record alternatives in notes. Do not infer a month
+  from an event year, or current membership from an old resume's "Present" label.
+- Keep unconfirmed awards/certifications and pre-approved bullets empty; do not create them
+  merely to populate every supported section. Keep student/client work distinct from paid roles.
+- Do not duplicate one position under both experience and research, or repeat its accomplishments
+  under an organization just to add more entries.
+- If reorganizing or condensing a narrative, describe the import as curated rather than claiming
+  it is a verbatim archive. Record evidence sources and substantive editorial choices privately.
+
+Check locally with `resumeforge validate-profile` and verify ignore coverage:
+
+```bash
+git check-ignore data/profile/user_information.md
+git ls-files -- data/
+```
+
+The first command should show the ignored path; the second should show no tracked private files.
+Keep any saved validation report under ignored private storage too. Ignore rules are not
+encryption; review staged changes and restrict local file permissions where appropriate.
+
+### Completion state and preferences are not active configuration yet
+
+Schema version 1 has no typed completion-status or resume-preference fields. Preserve this
+context in entry `details` and/or Markdown notes, but do not mistake it for enforced behavior.
+Future matching/planning needs explicit validated contracts for these constraints before use.
+
+Mandatory sections/entries, desired bullet counts and project counts may conflict with readable
+one-page output. A future planner must surface that conflict rather than silently omit required
+content or shrink typography. Also distinguish readable resume text from a verbatim `.tex`
+mirror stored with a `.txt` extension; define separate export semantics before implementing them.
+None of these planning or export capabilities exists at this stage.
+
 ## Minimal valid file
 
 ```markdown

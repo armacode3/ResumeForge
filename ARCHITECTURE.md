@@ -47,6 +47,9 @@ dangling evidence references, and verified bullets citing unverified records. Ac
 default to unverified. Completeness warnings cover missing contact/education/background, dates,
 institutions/employers, and verified evidence. Parsing validates structure and provenance links,
 not whether claims are true or semantically supported by the cited statements.
+There are no typed completion-state or resume-preference contracts yet. Preserving these in
+entry details/notes does not make them active planning constraints; implement validated contracts
+before the matching/planning phases rely on them.
 
 The parser accepts a bounded regular UTF-8 file (1 MiB), uses a restricted SafeLoader with duplicate
 key rejection and explicit boolean behavior, and rejects anchors/aliases/tags and nesting beyond

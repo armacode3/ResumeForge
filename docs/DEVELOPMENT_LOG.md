@@ -52,3 +52,29 @@
 - Next: populate/review a private profile using the format guide; then Phase 2 local job inputs,
   structured job requirements and a deterministic provider contract/fake. No live LLM calls,
   generation, PDF compilation, persistent history, API or Docker were introduced.
+
+## Session 003 — Private narrative profile onboarding
+
+- Reviewed an existing narrative and curated it into the supported profile format using the
+  existing loader/CLI, rather than adding an importer or beginning another pipeline phase.
+  The personal profile and local validation report remain exclusively under ignored `data/profile/`;
+  no biographical facts, contact details, actual ID mappings or private sources enter public fixtures.
+- Kept imported accomplishments pending individual user review, left disputed/unknown dates
+  unset, preserved metric bounds and prototype/in-progress/authorship qualifications, and
+  documented the curated import's provenance privately. Parsing does not substantiate metadata.
+- Recorded planning/layout/export preferences as notes, not active configuration. Documented
+  the need for validated completion-state/preferences before future selection relies on them,
+  and for explicit readable-text versus verbatim-TeX-mirror export semantics.
+- Added synthetic regression tests for notes not approving/completing claims, historical
+  "Present" not implying current membership, and lower-bound metrics remaining qualified.
+- Verification on Python 3.12.3: the private profile passes schema/reference and CLI checks;
+  completeness warnings are expected while evidence/dates await review. All 86 automated tests
+  passed with 99.69% branch-aware coverage; Ruff lint/format, strict mypy and dependency checks
+  passed. Built sdist/wheel and checked both for private paths and contact-detail leakage.
+  Private directories use mode 700 and files mode 600; Git tracks no `data/` content.
+- Public changes are limited to generic guidance, roadmap/context and synthetic tests on
+  `docs/profile-import-review`. Application version/API remain unchanged. Private data is
+  intentionally not committed or pushed; hosted CI has not been verified in this session.
+- Next: user review of provisional facts and missing dates; Phase 2 local job input and fake
+  structured-analysis provider can proceed independently. No matching, rendering or live AI
+  integration was added, and no resume was generated.

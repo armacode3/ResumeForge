@@ -40,6 +40,9 @@ validation; AI review is additional evidence, not proof. No vector database with
 Profile parsing validates structure, not semantic truth. `verified` defaults false; verified
 bullets must reference existing verified accomplishments. Markdown notes are not verified evidence.
 Preserve stable IDs and source text; version incompatible format changes rather than guessing.
+Narrative onboarding must keep claims pending user review, preserve qualifiers/status caveats,
+and leave disputed dates unset. Record any required ID mapping only in private notes. Current
+schemas have no typed completion-state/preferences; notes are not enforced planning constraints.
 
 ## Feature workflow
 
