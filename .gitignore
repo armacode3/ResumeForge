@@ -1,0 +1,48 @@
+# Local environments, credentials, and tool caches
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# Build output
+build/
+dist/
+*.egg-info/
+
+# Private inputs, generated resumes, and persistent history
+/data/
+/output/
+/outputs/
+/artifacts/
+/history/
+/storage/
+/resumes/
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.pdf
+*.tex
+!templates/**/*.tex
+*.aux
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# Editor and OS metadata
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
