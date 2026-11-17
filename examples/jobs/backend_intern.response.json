@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "company": {"text": "Example Systems", "source_quote": "Company: Example Systems"},
+  "job_title": {"text": "Backend Engineering Intern", "source_quote": "# Backend Engineering Intern"},
+  "responsibilities": [
+    {"id": "job_api", "text": "Build and test HTTP APIs.", "source_quote": "Build and test HTTP APIs."},
+    {"id": "job_docs", "text": "Document implementation decisions.", "source_quote": "Document implementation decisions."}
+  ],
+  "required_qualifications": [
+    {"id": "job_python_required", "text": "Experience writing Python programs.", "source_quote": "Experience writing Python programs."},
+    {"id": "job_tests_required", "text": "Familiarity with automated tests.", "source_quote": "Familiarity with automated tests."}
+  ],
+  "preferred_qualifications": [
+    {"id": "job_sql_framework_preferred", "text": "Exposure to PostgreSQL and FastAPI.", "source_quote": "Exposure to PostgreSQL and FastAPI."}
+  ],
+  "programming_languages": [
+    {"id": "job_language_python", "text": "Python", "source_quote": "Experience writing Python programs."}
+  ],
+  "frameworks": [
+    {"id": "job_framework_fastapi", "text": "FastAPI", "source_quote": "Exposure to PostgreSQL and FastAPI."}
+  ],
+  "technical_concepts": [
+    {"id": "job_http", "text": "HTTP APIs", "source_quote": "Build and test HTTP APIs."},
+    {"id": "job_testing", "text": "automated tests", "source_quote": "Familiarity with automated tests."}
+  ],
+  "domain_terms": [],
+  "evidence_sought": [
+    {"id": "job_api_evidence", "text": "A project demonstrating HTTP API testing.", "source_quote": "A project demonstrating HTTP API testing."}
+  ]
+}

@@ -14,7 +14,7 @@ successful compilation; exactly one page with extractable expected text and read
 constraints; manual factual/visual review; deterministic end-to-end smoke test. No universal
 ATS or automated factual-correctness guarantee. The first practical release adds Phase 6 history.
 
-## Phase 0 — Engineering foundation (complete locally)
+## Phase 0 — Engineering foundation (complete)
 
 - Package and CLI help/version; no placeholder generation commands.
 - pytest unit and installed-entry-point integration tests, Ruff, strict mypy, coverage.
@@ -24,31 +24,63 @@ ATS or automated factual-correctness guarantee. The first practical release adds
 
 Verified on Python 3.12.3: 7 unit and 3 integration tests, 90.91% branch-aware coverage including
 subprocesses, Ruff lint/format, strict mypy, dependency checks, source/wheel builds, clean editable
-installation, and wheel-installed tests outside the repository. No Git remote is configured;
-push and hosted CI are blocked. Python 3.13 is configured in CI but not locally verified.
+installation, and wheel-installed tests outside the repository. The user subsequently configured
+`origin`; remote `main` contains the foundation commit. Python 3.13 is configured in CI but
+not locally verified.
 
-## Phase 1 — Profile knowledge base (next)
+## Phase 1 — Profile knowledge base (complete locally)
 
-Suggested first feature: document a Markdown/YAML-front-matter convention and validate a small
-sanitized profile with Pydantic, stable experience/accomplishment IDs, and actionable errors.
-Then add remaining sections and `validate-profile` incrementally.
+Implemented: documented version-1 Markdown/YAML convention, strict Pydantic schemas for all
+background categories, stable IDs and evidence links, safe bounded parser, exact source/body
+preservation, completeness warnings, `validate-profile`, fictional sample, and automated tests.
+No profile rewriting, prose fact extraction or semantic claim checking is implied.
 
 Gate: round-trip/source evidence preservation, duplicate/dangling IDs rejected, required-field
 and malformed-file tests, Unicode and rough-note handling, synthetic fixtures only. Include
 contact, education, experience, projects, skills/tools, coursework, certifications, awards,
 organizations, research, quantitative accomplishments and verified bullets in the design.
 
-## Phase 2 — Local jobs and structured analysis
+Verified on Python 3.12.3: 74 unit and 9 integration tests, 99.69% branch-aware coverage, Ruff
+lint/format, strict mypy, dependency checks, source/wheel builds, fresh locked editable install,
+all tests against the installed wheel outside the repository, and a runtime-only wheel/profile
+smoke test. No live services or private profile data were used. Hosted CI is not locally verified.
+
+## Phase 2 — Local jobs and structured analysis (local adapter implemented)
 
 Accept local text/Markdown, introduce provider contracts and deterministic fakes, validate job
 requirements and malformed responses, separate required/preferred qualifications. Decide on
 a real provider before enabling external calls. Gate: unit/integration tests without API costs.
+
+Implemented: bounded local UTF-8 job/response inputs, source hashes, strict quoted requirement
+schemas and IDs, provider Protocol, deterministic explicit fake replay, malformed-response and
+quotation checks, `analyze-job`, fictional fixtures, and installed-CLI tests. See `docs/JOB_ANALYSIS.md`.
+The fake does not extract requirements from arbitrary jobs. The user selected local-only Ollama
+with Qwen3:4b. Its adapter now enforces loopback/no-proxy/no-redirect operation, server cloud
+disablement, local-model checks, bounded context/response/time/output and complete-message checks.
+See `docs/OLLAMA.md`. No cloud adapter, automatic install/pull, retry or inference fallback exists.
+**Next quality gate:** evaluate local extraction on varied synthetic jobs and review classification,
+coverage and failures without weakening fact validation. Larger/different models or cloud use
+require deliberate resource/data decisions; normal tests must stay independent of real models.
+
+Offline-slice verification on Python 3.12.3: 151 unit + 16 integration = 167 tests passed,
+99.83% branch-aware coverage, Ruff lint/format, strict mypy, dependency checks and package builds.
+Fresh locked editable installation, all tests against the installed wheel outside the repository,
+and runtime-only help/profile/job smoke tests passed. Hosted CI/Python 3.13 are not locally verified.
+
+Local-adapter verification on Python 3.12.3: 212 unit + 20 integration = 232 tests passed,
+99.87% branch-aware coverage, lint/format/types/dependency checks and package builds. Normal tests
+use only mocks or synthetic loopback HTTP. Separately, two fictional live examples passed strict
+schema/quote/basic-metadata checks with Qwen3:4b and prompt v3 after earlier failures were caught;
+manual review still found incomplete taxonomy tags. This is not a general accuracy certification.
 
 ## Phase 3 — Matching and planning
 
 Rank evidence beyond keywords, honor mandatory sections/experiences, produce structured plans
 with evidence references, space budgets and review flags. Gate: deterministic selection/ranking
 and contradictory-constraint tests; explanations correspond to actual decisions.
+Add explicit validated completion-state and user-preference contracts before content selection
+relies on them. Preserved Markdown notes are not automatically enforced constraints. Surface
+conflicts between mandatory content, desired bullet/project budgets and readable one-page layout.
 
 ## Phase 4 — Bullets, claims and review
 

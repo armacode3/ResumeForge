@@ -52,3 +52,9 @@ jobs:
           cd "$RUNNER_TEMP"
           "$RUNNER_TEMP/resumeforge-smoke/bin/resumeforge" --version
           "$RUNNER_TEMP/resumeforge-smoke/bin/python" -m resumeforge --help
+          "$RUNNER_TEMP/resumeforge-smoke/bin/resumeforge" validate-profile --profile "$GITHUB_WORKSPACE/examples/profiles/sample.md"
+          "$RUNNER_TEMP/resumeforge-smoke/bin/resumeforge" analyze-job \
+            --job "$GITHUB_WORKSPACE/examples/jobs/backend_intern.md" \
+            --mock-response "$GITHUB_WORKSPACE/examples/jobs/backend_intern.response.json" \
+            > "$RUNNER_TEMP/offline-job-analysis.json"
+          test -s "$RUNNER_TEMP/offline-job-analysis.json"

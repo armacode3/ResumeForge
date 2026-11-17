@@ -28,10 +28,10 @@ locked, non-isolated editable install works in a fresh environment, not only an 
 
 ## ADR-003 — Evidence-first data and human review
 
-**Status:** Accepted design; pipeline deferred.
+**Status:** Profile schemas and provenance-link validation implemented; generation pipeline deferred.
 
-The profile is the fact source. Future Pydantic models and stable accomplishment IDs carry
-provenance through matching, generation and validation. Historical approvals improve wording,
+The profile is the fact source. Pydantic profile models and stable accomplishment IDs establish
+provenance for future matching, generation and validation. Historical approvals improve wording,
 not verified biography. Prefer deterministic checks plus explicit human review over treating
 an LLM's self-review as proof. Keep rules separate from machine-readable layout constraints.
 
@@ -53,3 +53,84 @@ Document untrusted-content boundaries before enabling providers, URL ingestion o
 Git ignores are not encryption or a substitute for staged-diff review. Provider data disclosure,
 history deletion, compiler isolation and API access control require tests when implemented.
 No project license is assumed on the user's behalf; decide before public distribution.
+
+## ADR-006 — Explicit versioned profile facts plus preserved Markdown notes
+
+**Status:** Implemented in Phase 1.
+
+Use YAML front matter for structured fields and a Markdown body for rough notes. Alternative:
+infer facts/IDs from arbitrary prose headings. Explicit structure is less forgiving to author,
+but deterministic, reviewable, and independent of an LLM. A complete fictional example and
+`docs/PROFILE_FORMAT.md` document the convention. Exact decoded source/body are retained;
+this is not an auto-rewriting Markdown serializer.
+
+Use a common typed background-entry shape across eight sections, with section-specific ID
+prefixes and optional metadata; defer profession-specific models until real requirements arise.
+Require explicit schema version 1 and a name, but allow incomplete background with warnings.
+Unknown fields, duplicate IDs/keys, reversed dates and invalid evidence references are hard errors.
+Dates use month precision; do not invent precision for uncertain dates. ID assignment is explicit
+and stable across edits, not generated from list positions.
+
+Accomplishments default to unverified. Verified bullet references must exist and point to
+verified accomplishments; this validates the graph, not semantic entailment. The `verified`
+flag records the user's assertion. Markdown notes and historical AI output do not become facts
+through parsing. Missing metrics are not errors or prompts to fabricate values.
+
+Use PyYAML with a bounded SafeLoader subset, duplicate-key rejection, explicit booleans,
+no YAML object tags/anchors/aliases, and a depth cap. The CLI displays safe domain errors rather
+than raw YAML/Pydantic exception dumps, while a separate gap pass reports incomplete details.
+No generic Markdown parser, email-validation dependency or provider SDK is needed for this feature.
+
+## ADR-007 — Provider-neutral job contracts with explicit offline replay first
+
+**Status:** Offline contracts implemented first in Phase 2; local inference added under ADR-008.
+
+Use a small Python Protocol and dependency injection for structured JSON completion, not a
+framework, a hard-coded remote SDK or model-generated executable tools. Requests separate
+versioned trusted instructions, untrusted job text and a JSON schema. The job service has no
+candidate-profile input. This tests the integration boundary without data disclosure or API costs.
+
+The initial adapter was a fake returning an explicitly supplied fixture. Alternative:
+pretend a fixed/keyword-based fake is useful semantic extraction for arbitrary jobs. Reject that
+ambiguity: `analyze-job` requires `--mock-response`, identifies fake provider/model, and prints an
+offline notice. Structured extraction by a real provider remains a distinct authorized feature.
+The fake is also useful for repeatable failure, Unicode/layout and packaging tests.
+
+Require literal job facts with source quotations rather than unconstrained paraphrased summaries
+in this initial schema. Validate text-within-quote and quote-within-source, stable unique job IDs,
+strict field types, explicit empty categories and nullable unknown metadata. Quotation existence
+does not prove correct interpretation, classification or completeness; retain human review.
+Hash exact source bytes and record provider/model/prompt version for later history provenance.
+
+Fail on duplicate/nonstandard/malformed JSON and bounded size/depth violations; sanitize errors,
+including provider exceptions. Call once, with no implicit retry/provider fallback. A live adapter
+will need explicit network timeouts/limits and structured-output compatibility decisions.
+Keep stdout machine-readable; diagnostic/mock notices go to stderr. Do not add paid dependencies
+or claim live extraction is complete until an adapter is selected, approved and tested.
+
+## ADR-008 — Explicit local-only Ollama with fail-closed inference
+
+**Status:** Implemented following user selection of Ollama; model quality remains review-dependent.
+
+Use Qwen3:4b initially through Ollama's HTTP API and the existing provider Protocol. The user
+preferred free/local inference and approved this local setup. Alternatives: a free cloud tier
+(quotas/data-use constraints, private data leaves the machine) or a larger local model (more
+memory/download/latency). Do not activate a cloud fallback or pull another model automatically.
+
+Use HTTPX rather than a provider-specific SDK so loopback address, disabled environment proxies,
+no redirects, bounded response reads and timeouts are explicit and mockable. A separate server
+process must report cloud disabled via `/api/status`; `/api/show` must identify a local GGUF
+completion model with no remote host/model. Only then transmit job text. A trusted local server
+is still required; its metadata is not cryptographic attestation or OS isolation.
+
+Keep fake mode the default for compatibility and zero implicit inference. Ollama mode is explicit,
+mutually exclusive with mock input, and uses validated model/port/time/output flags, schema-guided
+non-thinking generation, no tools, conservative context budgeting, no retry and unload-on-finish.
+Client cancellation does not guarantee server computation stopped; model tags are not pinned
+weight digests. Runtime installation/pulls and opt-in evaluations are separate operator actions.
+
+Map adapter failures to explicitly safe `ProviderError` messages; preserve them through the engine
+without exposing server bodies. All model content still passes existing strict schema, provenance
+and quotation checks. Early live trials exposed casing, absent-metadata and duplicate-ID failures;
+add regression tests and refine prompt/schema descriptions rather than silently repairing facts
+or weakening validators. Structured JSON and two passing examples would not prove general accuracy.
