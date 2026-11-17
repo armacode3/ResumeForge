@@ -18,6 +18,8 @@ performs inference, with results still subject to strict validation and human re
 A six-case synthetic evaluation tool now checks exact reference-text agreement, metadata and
 category/tag omissions separately from schema validity. Run `python scripts/evaluate_jobs.py`
 for **offline reference replay, not a model accuracy test**; see [docs/JOB_EVALUATION.md](docs/JOB_EVALUATION.md).
+The initial live six-case review found valid schema/quotes but incomplete tags and lost known
+metadata; see [results and limitations](docs/evaluations/qwen3-4b-v3.md). Human review remains necessary.
 
 **Resume generation is not implemented.** There is no cloud provider, matching/planning engine,
 database, template renderer, PDF compiler, API, or browser extension yet.

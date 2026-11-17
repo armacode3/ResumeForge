@@ -224,3 +224,45 @@
   README, architecture, roadmap and canonical agent guidance. Next: explicitly run/review the
   expanded local corpus if desired, then add typed completion-state/preferences before Phase 3
   matching/planning. No matching, profile approval, resume generation or PDF feature was added.
+
+## Session 008 — Requested single-pass local-model review
+
+- User requested the next step: run/review the expanded synthetic corpus. Fetched the merged
+  evaluation feature, fast-forwarded local main to `d549a1e` and started
+  `docs/local-extraction-review`. The source tree matched the previous branch after its squash
+  merge; no old branch/history was rewritten. Runtime application version remains 0.4.1.
+- Reused the existing loopback-only Ollama v0.40.16 on port 11435 and confirmed cloud disabled
+  and the previously downloaded Qwen3:4b digest. No server restart/config change, model download,
+  cloud inference or private-profile read was needed. Model/prompt/settings are recorded in
+  `docs/evaluations/qwen3-4b-v3.md`.
+- Ran the unchanged benchmark once per case, six sequential requests, through the original
+  guarded adapter. A temporary capture wrapper saved only synthetic assistant JSON and timing
+  metadata outside Git, not full prompts or thinking. Raw responses, hashes, report and driver
+  are under `/tmp/opencode/resumeforge-live-corpus.zvZ69I/`; private operator notes point there.
+  Context/output remained 16,384/4,096 tokens with a 600-second deadline per case. No retries,
+  reference edits, prompt tuning or validator changes were made to improve the measured score.
+- Result: **6/6 schema/quote-valid, 0/6 exact-reference matches**, about 475 seconds total.
+  Benchmark exit 1 signaled disagreement, not a crash. Main responsibilities/required clauses
+  matched in all six cases, but tags were incomplete throughout. The negation case kept SQL
+  preferred with a full quote but shortened item text; the footer case omitted known company/title
+  without adopting the injected employer or moving SQL to required. There was no paired control,
+  so neither a causal footer effect nor general injection resistance is claimed.
+- Reviewed every source/response and separated omission from alternate-span disagreement. A
+  missing Kubernetes mention tag is not a missing positive requirement. The broader review pass
+  is now complete, **not** an approval for unattended ranking. Five cases had matching nullable
+  metadata; the remaining case lost both explicit fields. Retained all cases and score denominators.
+- Stock-runner offline replay reproduced every comparison result from the captured responses,
+  and source/reference hashes still match the frozen baseline. No second live run was needed.
+- Added three constructed, deterministic safety-characterization tests showing that genuinely
+  quoted text can still lose an alternative qualifier, misclassify negation, or copy footer metadata.
+  These tests are synthetic mutations, not committed/generated model outputs or claimed observations
+  of those exact failures in this pass. Documented the review protocol and sanitized findings.
+- Verification on Python 3.12.3: 246 unit + 33 integration = 279 tests passed with GitHub-like
+  terminal settings, 99.89% branch-aware coverage; lint/format, strict mypy (36 files), dependency
+  checks, source/wheel builds and all tests against the installed wheel outside the repository
+  passed. Distribution/privacy review excluded private inputs, captured responses and runtime data.
+  Hosted results are verified separately after push; normal tests never call a real model.
+- Next: typed completion-state/preferences as a small independent Phase 3 prerequisite. Later
+  matching must use reviewed requirements or deterministic fixtures and verified candidate evidence,
+  not missing taxonomy tags as proof of job absence. Extraction-quality improvements need a
+  separate measured/held-out iteration, not automatic larger-model/cloud activation.
