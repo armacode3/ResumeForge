@@ -1,7 +1,7 @@
 """Plan-bound wording proposals, never source facts, selection, approval or rendering."""
 
 import json
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
 from hashlib import sha256
 
 from resumeforge.inputs import MAX_INPUT_BYTES
@@ -11,7 +11,13 @@ from resumeforge.profile import UserProfile
 from resumeforge.providers.base import ProviderError, StructuredOutputProvider, StructuredRequest
 from resumeforge.resume.documents import parse_resume_document, parse_wording_response
 from resumeforge.resume.engine import review_resume
-from resumeforge.resume.models import ResumeError, WordingAttempt, WordingResponse, WordingResult
+from resumeforge.resume.models import (
+    ResumeError,
+    WordingAttempt,
+    WordingObjective,
+    WordingResponse,
+    WordingResult,
+)
 
 WORDING_VERSION = "source-bound-wording-v1"
 WORDING_PROMPT_VERSION = "source-bound-wording-prompt-v1"
@@ -28,6 +34,42 @@ Do not supply approval, support verdicts, findings, LaTeX, Markdown fences or ex
 Output one JSON object only. Every suggestion remains unapproved and needs human review.
 """
 
+# Preserve the original policy and request bytes by default. This candidate is separately opt-in.
+CONCISE_REWRITE_INSTRUCTIONS = (
+    WORDING_INSTRUCTIONS
+    + """
+Objective: concise_rewrite. Rewrite redundant source prose into a readable resume bullet when
+you can preserve every distinct material fact and qualifier. Remove repeated setup phrases,
+first-person narration and repeated descriptions of the same work; combine redundant clauses.
+Prefer the source's accurate action and concrete method, without upgrading its responsibility.
+Keep tools, quantities, units, bounds, attribution, negative scope and completion limitations.
+Do not remove an inconvenient caveat to sound stronger, imply an unmeasured result, turn a task
+into project ownership, or import a fact from another bullet or the job. Reordering within one
+bullet is allowed; reordering bullets or changing evidence is not. There is no word/length quota
+and shorter text is not inherently better. Copy the complete statement if a faithful rewrite is
+uncertain or the source is already concise. Return the same JSON fields only, without commentary.
+"""
+)
+
+
+@dataclass(frozen=True)
+class WordingPolicy:
+    wording_version: str
+    prompt_version: str
+    instructions: str
+
+
+def wording_policy(objective: WordingObjective) -> WordingPolicy:
+    if objective == "source_faithful":
+        return WordingPolicy(WORDING_VERSION, WORDING_PROMPT_VERSION, WORDING_INSTRUCTIONS)
+    if objective == "concise_rewrite":
+        return WordingPolicy(
+            "source-bound-wording-v2",
+            "source-bound-wording-prompt-v2",
+            CONCISE_REWRITE_INSTRUCTIONS,
+        )
+    raise ResumeError("Unknown wording objective; choose source_faithful or concise_rewrite.")
+
 
 def suggest_wording(
     profile: UserProfile,
@@ -39,6 +81,7 @@ def suggest_wording(
     requirements_reviewed: bool = False,
     selection_reviewed: bool = False,
     provider_data_confirmed: bool = False,
+    objective: WordingObjective = "source_faithful",
 ) -> WordingResult:
     """Call once after revalidation and disclosure confirmation; inspect every returned edit.
 
@@ -48,6 +91,7 @@ def suggest_wording(
     """
     if provider_data_confirmed is not True:
         raise ResumeError("Explicitly confirm the wording provider's selected-source data use.")
+    policy = wording_policy(objective)
     seed = review_resume(
         profile,
         job,
@@ -63,8 +107,9 @@ def suggest_wording(
     )
     if seed.status == "blocked_by_plan" or not seed.bullets:
         return WordingResult(
-            wording_version=WORDING_VERSION,
-            prompt_version=WORDING_PROMPT_VERSION,
+            objective=objective,
+            wording_version=policy.wording_version,
+            prompt_version=policy.prompt_version,
             status=seed.status,
             attempt=None,
             review=seed,
@@ -90,7 +135,7 @@ def suggest_wording(
         "job_items": [asdict(item) for item in seed.plan.job_items],
     }
     request = StructuredRequest(
-        instructions=WORDING_INSTRUCTIONS,
+        instructions=policy.instructions,
         input_text=json.dumps(payload, ensure_ascii=False, separators=(",", ":")),
         response_schema=WordingResponse.model_json_schema(),
     )
@@ -138,8 +183,9 @@ def suggest_wording(
         selection_reviewed=selection_reviewed,
     )
     return WordingResult(
-        wording_version=WORDING_VERSION,
-        prompt_version=WORDING_PROMPT_VERSION,
+        objective=objective,
+        wording_version=policy.wording_version,
+        prompt_version=policy.prompt_version,
         status=review.status,
         attempt=WordingAttempt(
             provider=provider.name,

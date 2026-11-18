@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "case_id": "eval_components",
+  "profile": {
+    "schema_version": 1,
+    "person": {"name": "Fictional Rewrite Evaluation Person"},
+    "projects": [
+      {"id": "proj_eval_import", "title": "Fictional importer prototype", "completion_status": "completed"},
+      {"id": "proj_eval_queue", "title": "Fictional ongoing queue", "completion_status": "in_progress"}
+    ],
+    "accomplishments": [
+      {"id": "acc_eval_import", "entry_id": "proj_eval_import", "statement": "Built a local Python prototype for checking 6 importer error cases. The prototype I built was local and was used to check those importer errors, which were 6 error cases in total. It was never deployed to production, did not use SQLite, and had no measured speed improvement.", "verified": true, "completion_status": "completed", "technologies": ["Python"]},
+      {"id": "acc_eval_queue", "entry_id": "proj_eval_queue", "statement": "Completed SQLite retry checks for 30 synthetic queue tasks. What I completed was the retry-checking work on those 30 synthetic tasks, not the whole queue project. The larger queue project remains in progress. This work did not implement the importer and did not use Python.", "verified": true, "completion_status": "completed", "technologies": ["SQLite"]}
+    ]
+  },
+  "job_text": "Python and SQLite experience required. Production Kubernetes ownership is preferred.",
+  "requirements": {
+    "schema_version": 1, "company": null, "job_title": null,
+    "responsibilities": [],
+    "required_qualifications": [{"id": "job_required_tools", "text": "Python and SQLite experience required.", "source_quote": "Python and SQLite experience required."}],
+    "preferred_qualifications": [{"id": "job_preferred_production", "text": "Production Kubernetes ownership is preferred.", "source_quote": "Production Kubernetes ownership is preferred."}],
+    "programming_languages": [{"id": "job_language_python", "text": "Python", "source_quote": "Python and SQLite experience required."}],
+    "frameworks": [],
+    "technical_concepts": [{"id": "job_concept_sqlite", "text": "SQLite", "source_quote": "Python and SQLite experience required."}],
+    "domain_terms": [], "evidence_sought": []
+  },
+  "selection": {"schema_version": 1, "entries": [
+    {"entry_id": "proj_eval_import", "accomplishment_ids": ["acc_eval_import"]},
+    {"entry_id": "proj_eval_queue", "accomplishment_ids": ["acc_eval_queue"]}
+  ]},
+  "review_focus": ["Importer: retain local Python prototype, 6 error cases, never deployed, no SQLite and no measured speed gain.", "Queue: retain completed SQLite retry checks for 30 synthetic tasks, not the whole ongoing project, no importer implementation and no Python.", "Do not merge slots, transfer quantities/tools, erase negative scope, or infer Kubernetes/production ownership from the job."]
+}

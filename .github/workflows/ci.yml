@@ -213,3 +213,21 @@ jobs:
           assert report["manual_review_status"] == "not_performed"
           assert not report["rendering_authorized"]
           PY
+          "$RUNNER_TEMP/resumeforge-smoke/bin/python" \
+            "$GITHUB_WORKSPACE/scripts/evaluate_wording.py" \
+            --suite rewrite_holdout --objective concise_rewrite > "$RUNNER_TEMP/rewrite-evaluation.json"
+          "$RUNNER_TEMP/resumeforge-smoke/bin/python" - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("rewrite-evaluation.json").read_text())
+          assert report["suite"] == "rewrite_holdout" and report["objective"] == "concise_rewrite"
+          assert report["mode"] == "source_seed_replay"
+          assert report["prompt_version"] == "source-bound-wording-prompt-v2"
+          assert report["total_cases"] == report["validated_cases"] == 3
+          assert report["inspected_bullets"] == 4
+          assert report["source_characters"] == report["draft_characters"]
+          assert report["edited_bullets"] == 0
+          assert report["manual_review_status"] == "not_performed"
+          assert not report["rendering_authorized"]
+          PY

@@ -43,6 +43,11 @@ class ProviderChoice(StrEnum):
     OLLAMA = "ollama"
 
 
+class WordingObjectiveChoice(StrEnum):
+    SOURCE_FAITHFUL = "source_faithful"
+    CONCISE_REWRITE = "concise_rewrite"
+
+
 app = typer.Typer(
     help="ResumeForge: evidence-first resumes. Profile validation, job analysis "
     "and evidence retrieval/planning/draft review with opt-in wording assistance.",
@@ -251,6 +256,10 @@ def suggest_wording_command(
         ProviderChoice,
         typer.Option("--provider", help="Fake replay by default; local inference is opt-in."),
     ] = ProviderChoice.FAKE,
+    objective: Annotated[
+        WordingObjectiveChoice,
+        typer.Option("--objective", help="Wording objective; concise_rewrite is experimental."),
+    ] = WordingObjectiveChoice.SOURCE_FAITHFUL,
     confirm_review: Annotated[
         bool,
         typer.Option("--confirm-review", help="Acknowledge review of requirements and selection."),
@@ -311,6 +320,9 @@ def suggest_wording_command(
             requirements_reviewed=True,
             selection_reviewed=True,
             provider_data_confirmed=provider == ProviderChoice.FAKE or confirm_local_data,
+            objective="concise_rewrite"
+            if objective == WordingObjectiveChoice.CONCISE_REWRITE
+            else "source_faithful",
         )
     except (
         ProfileError,
@@ -332,6 +344,11 @@ def suggest_wording_command(
             "no semantic proof or approval."
         )
     typer.echo(notice, err=True)
+    if objective == WordingObjectiveChoice.CONCISE_REWRITE:
+        typer.echo(
+            "Experimental objective: shorter wording may distort claims; human review is required.",
+            err=True,
+        )
     typer.echo(result.model_dump_json(indent=2))
     if result.status == "blocked_by_plan":
         raise typer.Exit(code=3)

@@ -188,7 +188,11 @@ class WordingAttempt(ResumeModel):
     response_sha256: Digest
 
 
+WordingObjective = Literal["source_faithful", "concise_rewrite"]
+
+
 class WordingResult(ResumeModel):
+    objective: WordingObjective = "source_faithful"
     wording_version: str
     prompt_version: str
     status: Literal["needs_review", "blocked_by_plan"]

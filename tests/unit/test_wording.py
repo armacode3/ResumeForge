@@ -24,6 +24,7 @@ from resumeforge.resume import (
     review_resume,
     suggest_wording,
 )
+from resumeforge.resume.models import WordingObjective
 from resumeforge.resume.wording import WORDING_INSTRUCTIONS
 
 
@@ -50,7 +51,11 @@ class WordingInputs:
     selection: PlanSelection
     response: dict[str, Any]
 
-    def run(self, provider: RecordingProvider | FakeProvider | OllamaProvider) -> WordingResult:
+    def run(
+        self,
+        provider: RecordingProvider | FakeProvider | OllamaProvider,
+        objective: WordingObjective = "source_faithful",
+    ) -> WordingResult:
         return suggest_wording(
             self.profile,
             self.job,
@@ -60,6 +65,7 @@ class WordingInputs:
             requirements_reviewed=True,
             selection_reviewed=True,
             provider_data_confirmed=True,
+            objective=objective,
         )
 
 
@@ -494,3 +500,68 @@ def test_proposed_wording_invalidates_old_decisions_and_cannot_bypass_findings(
         )
         assert applied.rendering_authorized is False
         assert applied.review.bullets[0].findings == result.review.bullets[0].findings
+
+
+def test_objective_is_opt_in_with_identical_data_schema_and_pending_inspection(
+    wording_inputs: WordingInputs,
+) -> None:
+    response = json.dumps(wording_inputs.response)
+    original = RecordingProvider(response)
+    revised = RecordingProvider(response)
+    baseline = wording_inputs.run(original)
+    candidate = wording_inputs.run(revised, "concise_rewrite")
+    assert baseline.objective == "source_faithful"
+    assert candidate.objective == "concise_rewrite"
+    assert candidate.wording_version == "source-bound-wording-v2"
+    assert candidate.prompt_version == "source-bound-wording-prompt-v2"
+    assert original.requests[0].instructions == WORDING_INSTRUCTIONS
+    assert revised.requests[0].instructions.startswith(WORDING_INSTRUCTIONS)
+    assert "every distinct material fact" in revised.requests[0].instructions
+    assert original.requests[0].input_text == revised.requests[0].input_text
+    assert original.requests[0].response_schema == revised.requests[0].response_schema
+    assert baseline.review == candidate.review
+    assert baseline.attempt is not None and candidate.attempt is not None
+    assert baseline.attempt.request_sha256 != candidate.attempt.request_sha256
+    assert all(b.review_status == "pending_review" for b in candidate.review.bullets)
+    assert candidate.rendering_authorized is False
+
+
+@pytest.mark.parametrize(
+    "objective", [None, False, 1, "private-objective", {"instructions": "private"}]
+)
+def test_unknown_objectives_fail_before_source_inspection_or_provider_use(
+    wording_inputs: WordingInputs, objective: Any
+) -> None:
+    inputs = wording_inputs
+    provider = RecordingProvider(AssertionError("No provider call"))
+    with (
+        patch(
+            "resumeforge.resume.wording.review_resume", side_effect=AssertionError("No inspection")
+        ),
+        pytest.raises(ResumeError, match="Unknown wording objective") as error,
+    ):
+        inputs.run(provider, objective)
+    assert "private" not in str(error.value)
+    assert provider.requests == []
+
+
+@pytest.mark.parametrize("objective", ["source_faithful", "concise_rewrite"])
+def test_rewriting_never_bypasses_findings_or_grants_semantic_support(
+    wording_inputs: WordingInputs, objective: WordingObjective
+) -> None:
+    wording_inputs.response["bullets"][0]["text"] = "Owned 99 production services."
+    result = wording_inputs.run(FakeProvider(json.dumps(wording_inputs.response)), objective)
+    assert len(result.review.bullets[0].findings) == 2
+    assert result.review.bullets[0].wording_status == "edited_requires_review"
+    assert result.review.bullets[0].review_status == "pending_review"
+    assert not result.rendering_authorized
+
+
+def test_concise_objective_keeps_copy_fallback_and_plan_blocking(
+    wording_inputs: WordingInputs,
+) -> None:
+    wording_inputs.profile.resume_preferences.min_bullets_per_entry = 1
+    provider = RecordingProvider(AssertionError("No inference"))
+    result = wording_inputs.run(provider, "concise_rewrite")
+    assert result.objective == "concise_rewrite" and result.status == "blocked_by_plan"
+    assert result.attempt is None and provider.requests == []

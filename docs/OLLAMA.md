@@ -18,6 +18,11 @@ inspection/human decisions. See `docs/evaluations/qwen3-4b-wording-v1.md` for re
 `docs/WORDING_ASSISTANCE.md` for the complete
 disclosure, strict response contract, fake-first workflow and limitations.
 
+The later opt-in `concise_rewrite` objective uses the same guards/data policy. Its three-case
+paired comparison produced shorter text but distorted qualifiers/project scope; the original
+objective remains default. See `docs/evaluations/qwen3-4b-wording-v2-comparison.md`. Experimental
+wording does not become approved through schema validity, literal checks or local execution.
+
 The initial target is **Qwen3:4b** (Q4_K_M, approximately 2.5 GB of weights). It requires more
 memory during inference than its download size, and CPU execution may be slow. This is a
 starting point for evaluation, not a guarantee that a small model will extract every job correctly.

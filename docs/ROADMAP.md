@@ -157,10 +157,18 @@ Qwen3:4b pass produced **6/6 structurally valid responses, 7/7 verbatim bullets*
 rewriting benefit. See `docs/WORDING_EVALUATION.md`, `docs/evaluations/qwen3-4b-wording-v1.md` and
 ADR-018. No prompt/validator change or second live pass was made.
 
-**Next:** a separate measured wording-usefulness iteration with a versioned objective and held-out
-rougher sources, retaining truthful copy fallback and review gates. Model/data policy stays
-explicit; semantic proof, complete resume/metadata review, rendering and automatic ranking remain
-unimplemented. Valid copied output does not justify moving to rendering or unattended use.
+Implemented in 0.14.0: explicit `concise_rewrite` wording/prompt v2, preserving the default v1
+request bytes and all source/schema/review boundaries. Separate rough-source development/evaluation
+suites and descriptive character counts support comparison, not quality grading. The separately
+authorized six-call paired pass validated all three cases per objective: v1 copied four sources;
+v2 shortened all four (1,262 to 633 characters) but distorted negative qualifiers/project scope.
+It remains experimental/opt-in, not a replacement default. See `docs/WORDING_REWRITE_EVALUATION.md`,
+`docs/evaluations/qwen3-4b-wording-v2-comparison.md` and ADR-019. No prompt tuning/reruns followed.
+
+**Next:** explicit source-fragment omission/qualifier review with source/draft-bound observations,
+not a length-based support verdict or LLM truth judge. Keep copy fallback and the conservative
+default; semantic proof, full-resume/metadata approval, rendering and automatic ranking remain
+unimplemented. Shorter structurally valid text did not establish reliable faithful rewriting.
 
 Generate structured bullets with accomplishment IDs, check unsupported tools/metrics/ownership,
 dates and contradictions, report gaps, and implement review/approval. Gate: fabricated-claim

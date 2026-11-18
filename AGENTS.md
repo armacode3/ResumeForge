@@ -26,6 +26,14 @@ remains unproven. See `docs/evaluations/qwen3-4b-wording-v1.md`. No live run is 
 implicit continuation step.
 The fixed synthetic wording evaluation runner defaults to source-seed replay, not model-quality
 scoring. Read `docs/WORDING_EVALUATION.md`; live runs and runtime/model setup need separate opt-in.
+`source_faithful` remains the original default. Opt-in `concise_rewrite` uses wording/prompt v2,
+same data/response schemas and review gates, no forced edits or length quotas. Separate rough-source
+development/evaluation suites are described in `docs/WORDING_REWRITE_EVALUATION.md`; preserve the
+original frozen benchmark/protocol/results. Length/edit counts are not quality or support scores.
+The paired local comparison shortened all four evaluation bullets but distorted negative qualifiers/
+project relationships. Keep v2 experimental/opt-in and v1 default; see
+`docs/evaluations/qwen3-4b-wording-v2-comparison.md`. Do not tune/rerun this frozen comparison or
+treat zero findings/acknowledgements as semantic support. Next: explicit source-fragment omission review.
 Omitted states stay unknown; version-1 profile/draft files need no rewrite (not old decisions).
 Read `docs/MATCHING.md` for the
 retrieval boundary.

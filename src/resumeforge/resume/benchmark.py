@@ -34,9 +34,10 @@ from resumeforge.resume.models import (
     ResumeError,
     ResumeModel,
     ResumeReview,
+    WordingObjective,
     WordingResult,
 )
-from resumeforge.resume.wording import WORDING_PROMPT_VERSION, WORDING_VERSION, suggest_wording
+from resumeforge.resume.wording import suggest_wording, wording_policy
 
 BENCHMARK_VERSION = "synthetic-wording-v1"
 CASES = (
@@ -47,6 +48,18 @@ CASES = (
     "unicode_qualitative",
     "untrusted_job",
 )
+DEVELOPMENT_CASES = ("dev_supervision", "dev_prototype", "dev_team")
+HOLDOUT_CASES = ("eval_bound_tests", "eval_components", "eval_survey")
+SUITE_CASES = {
+    "baseline": CASES,
+    "rewrite_development": DEVELOPMENT_CASES,
+    "rewrite_holdout": HOLDOUT_CASES,
+}
+SUITE_VERSIONS = {
+    "baseline": BENCHMARK_VERSION,
+    "rewrite_development": "synthetic-wording-rewrite-development-v1",
+    "rewrite_holdout": "synthetic-wording-rewrite-holdout-v1",
+}
 
 
 class WordingCase(ResumeModel):
@@ -101,8 +114,8 @@ class ObservedProvider:
         return self.response
 
 
-def prepare_case(case_id: str, corpus_root: Path) -> PreparedCase:
-    if case_id not in CASES:
+def prepare_case(case_id: str, corpus_root: Path, *, suite: str = "baseline") -> PreparedCase:
+    if case_id not in SUITE_CASES.get(suite, ()):
         raise ResumeError("Unknown fixed wording evaluation case.")
     text = read_utf8_file(corpus_root / f"{case_id}.json", label="Synthetic wording case")
     case = _parse_resume_model(text, WordingCase, label="Synthetic wording case")
@@ -160,6 +173,7 @@ def run_case(
     *,
     responses_dir: Path | None = None,
     capture_dir: Path | None = None,
+    objective: WordingObjective = "source_faithful",
 ) -> CaseReport:
     case = prepared.case
     observed: ObservedProvider | None = None
@@ -185,6 +199,7 @@ def run_case(
             requirements_reviewed=True,
             selection_reviewed=True,
             provider_data_confirmed=True,
+            objective=objective,
         )
     except (InputError, ResumeError) as failure:
         error = str(failure)
@@ -213,7 +228,16 @@ def run_case(
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--case", choices=CASES, action="append", help="Default: all fixed cases.")
+    parser.add_argument("--suite", choices=SUITE_CASES, default="baseline")
+    parser.add_argument(
+        "--objective", choices=("source_faithful", "concise_rewrite"), default="source_faithful"
+    )
+    parser.add_argument(
+        "--case",
+        choices=tuple(c for cases in SUITE_CASES.values() for c in cases),
+        action="append",
+        help="Default: all cases in the selected suite.",
+    )
     parser.add_argument("--responses-dir", type=Path, help="Replay independent responses offline.")
     parser.add_argument("--provider", choices=("fake", "ollama"), default="fake")
     parser.add_argument("--confirm-local-data", action="store_true")
@@ -230,6 +254,14 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None, *, corpus_root: Path) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    objective: WordingObjective = (
+        "concise_rewrite" if args.objective == "concise_rewrite" else "source_faithful"
+    )
+    policy = wording_policy(objective)
+    selected = list(dict.fromkeys(args.case or SUITE_CASES[args.suite]))
+    if not set(selected) <= set(SUITE_CASES[args.suite]):
+        parser.error("Selected cases must belong to the selected fixed suite.")
+    selected_root = corpus_root if args.suite == "baseline" else corpus_root.parent / args.suite
     provider: StructuredOutputProvider | None = None
     if args.provider == "ollama":
         if not args.confirm_local_data or args.responses_dir is not None:
@@ -253,12 +285,11 @@ def main(argv: list[str] | None = None, *, corpus_root: Path) -> int:
         ):
             parser.error("Local data/model options require --provider ollama.")
         mode = "response_replay" if args.responses_dir is not None else "source_seed_replay"
-    selected = list(dict.fromkeys(args.case or CASES))
     prepared = []
     reports = []
     for case_id in selected:
         try:
-            prepared.append(prepare_case(case_id, corpus_root))
+            prepared.append(prepare_case(case_id, selected_root, suite=args.suite))
         except (InputError, ResumeError):
             reports.append(
                 CaseReport(
@@ -286,16 +317,19 @@ def main(argv: list[str] | None = None, *, corpus_root: Path) -> int:
                 provider,
                 responses_dir=args.responses_dir,
                 capture_dir=args.capture_responses_dir,
+                objective=objective,
             )
             for case in prepared
         ]
     print(
         json.dumps(
             {
-                "benchmark_version": BENCHMARK_VERSION,
+                "benchmark_version": SUITE_VERSIONS[args.suite],
+                "suite": args.suite,
+                "objective": objective,
                 "mode": mode,
-                "wording_version": WORDING_VERSION,
-                "prompt_version": WORDING_PROMPT_VERSION,
+                "wording_version": policy.wording_version,
+                "prompt_version": policy.prompt_version,
                 "total_cases": len(reports),
                 "validated_cases": sum(
                     report.status == "validated_needs_review" for report in reports
@@ -315,6 +349,20 @@ def main(argv: list[str] | None = None, *, corpus_root: Path) -> int:
                     for report in reports
                     if report.result
                     for bullet in report.result.review.bullets
+                ),
+                "source_characters": sum(
+                    len(b.source_statement)
+                    for report in reports
+                    if report.result
+                    for b in report.result.review.bullets
+                ),
+                "draft_characters": sum(
+                    len(b.text)
+                    for report in reports
+                    if report.result
+                    for s in report.result.review.document.sections
+                    for e in s.entries
+                    for b in e.bullets
                 ),
                 "requested_runtime": {
                     "model": args.model,

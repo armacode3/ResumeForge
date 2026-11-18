@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "case_id": "dev_team",
+  "profile": {
+    "schema_version": 1,
+    "person": {"name": "Fictional Rewrite Development Person"},
+    "research": [{"id": "res_dev_checks", "title": "Fictional team checks", "completion_status": "completed"}],
+    "accomplishments": [{"id": "acc_dev_checks", "entry_id": "res_dev_checks", "statement": "Contributed Python checks for missing survey values while working with a bilingual research team. The checks that I contributed checked for missing values in the survey data. This was a contribution as a team member, not leadership of the study. No numeric improvement was measured for these checks.", "verified": true, "completion_status": "completed", "technologies": ["Python"]}]
+  },
+  "job_text": "Python data-cleaning experience required. Research leadership preferred.",
+  "requirements": {
+    "schema_version": 1, "company": null, "job_title": null,
+    "responsibilities": [],
+    "required_qualifications": [{"id": "job_required_python", "text": "Python data-cleaning experience required.", "source_quote": "Python data-cleaning experience required."}],
+    "preferred_qualifications": [{"id": "job_preferred_leadership", "text": "Research leadership preferred.", "source_quote": "Research leadership preferred."}],
+    "programming_languages": [{"id": "job_language_python", "text": "Python", "source_quote": "Python data-cleaning experience required."}],
+    "frameworks": [], "technical_concepts": [], "domain_terms": [], "evidence_sought": []
+  },
+  "selection": {"schema_version": 1, "entries": [{"entry_id": "res_dev_checks", "accomplishment_ids": ["acc_dev_checks"]}]},
+  "review_focus": ["Combine repeated descriptions of missing-value checks.", "Retain bilingual team context, contribution rather than leadership, and no measured numeric gains.", "Readability is reviewed separately from length and literal findings."]
+}

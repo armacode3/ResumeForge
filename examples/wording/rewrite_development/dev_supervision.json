@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "case_id": "dev_supervision",
+  "profile": {
+    "schema_version": 1,
+    "person": {"name": "Fictional Rewrite Development Person"},
+    "experiences": [{"id": "exp_dev_tests", "title": "Fictional supervised tests", "completion_status": "completed"}],
+    "accomplishments": [{"id": "acc_dev_tests", "entry_id": "exp_dev_tests", "statement": "Assisted with writing Python tests for at least 10 internal endpoints under supervision. The work I did was writing these tests, and those tests checked successful requests as well as invalid requests. I did not own the service; my contribution was the supervised testing work just described.", "verified": true, "completion_status": "completed", "technologies": ["Python"]}]
+  },
+  "job_text": "Python testing experience required. Service ownership preferred.",
+  "requirements": {
+    "schema_version": 1, "company": null, "job_title": null,
+    "responsibilities": [],
+    "required_qualifications": [{"id": "job_required_python", "text": "Python testing experience required.", "source_quote": "Python testing experience required."}],
+    "preferred_qualifications": [{"id": "job_preferred_ownership", "text": "Service ownership preferred.", "source_quote": "Service ownership preferred."}],
+    "programming_languages": [{"id": "job_language_python", "text": "Python", "source_quote": "Python testing experience required."}],
+    "frameworks": [], "technical_concepts": [], "domain_terms": [], "evidence_sought": []
+  },
+  "selection": {"schema_version": 1, "entries": [{"entry_id": "exp_dev_tests", "accomplishment_ids": ["acc_dev_tests"]}]},
+  "review_focus": ["A readable rewrite can combine repeated descriptions of the testing task.", "Retain assistance, supervision, at least 10, both request outcomes and explicit non-ownership.", "No invented results or job-derived ownership; unchanged text remains acceptable fallback."]
+}

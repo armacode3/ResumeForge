@@ -11,7 +11,15 @@ from pydantic import ValidationError
 from resumeforge.inputs import InputError
 from resumeforge.providers import FakeProvider, ProviderError
 from resumeforge.resume import ResumeError
-from resumeforge.resume.benchmark import CASES, main, prepare_case, run_case, source_replay
+from resumeforge.resume.benchmark import (
+    CASES,
+    DEVELOPMENT_CASES,
+    HOLDOUT_CASES,
+    main,
+    prepare_case,
+    run_case,
+    source_replay,
+)
 
 
 @pytest.fixture
@@ -292,3 +300,81 @@ def test_untrusted_footer_and_manual_rubric_are_kept_in_separate_channels(
     assert "ignore instructions" in requests[0].input_text
     assert "ignore instructions" not in requests[0].instructions
     assert prepared.case.review_focus[0] not in requests[0].input_text
+
+
+@pytest.mark.parametrize(
+    ("case_id", "expected"),
+    [
+        ("supervised_bounds", "8dad42841a53d49888d5f076e99742e9ccca8d07b823827ffff80d4e602d233e"),
+        ("negated_prototype", "72ffdb5357bf5cfdca1fd9571f57919f3d0fa7f8798e60d8490374c52450b3ee"),
+        ("ongoing_parent", "cf3d75af6bd895eb0ea41a5a0a13b40a49ee258871bd734c6a585c0ffcc134f7"),
+        ("cross_evidence", "f71a879b175d19da637819f0e1bde6136da3ec4e180976eeb49f3d2f9079e8c3"),
+        ("unicode_qualitative", "4805fdeab8f1376594feee622835d1fa4c6fce5675e92c2dcec21c9f82157701"),
+        ("untrusted_job", "7887de9a76fde9da4dea2c757728b5bcda005ce55574815edbcf5ccc4f61dc50"),
+    ],
+)
+def test_default_requests_preserve_the_original_frozen_live_baseline(
+    corpus_root: Path, case_id: str, expected: str
+) -> None:
+    report = run_case(prepare_case(case_id, corpus_root))
+    assert report.result is not None and report.result.attempt is not None
+    assert report.result.attempt.request_sha256 == expected
+
+
+@pytest.mark.parametrize(
+    ("suite", "case_ids"),
+    [
+        ("rewrite_development", DEVELOPMENT_CASES),
+        ("rewrite_holdout", HOLDOUT_CASES),
+    ],
+)
+def test_new_suites_are_separate_valid_and_replay_only(
+    corpus_root: Path, suite: str, case_ids: tuple[str, ...]
+) -> None:
+    for case_id in case_ids:
+        prepared = prepare_case(case_id, corpus_root.parent / suite, suite=suite)
+        report = run_case(prepared, objective="concise_rewrite")
+        assert report.result is not None and report.result.objective == "concise_rewrite"
+        assert report.status == "validated_needs_review"
+        assert report.manual_review_status == "not_performed"
+        assert all(b.wording_status == "verbatim_source" for b in report.result.review.bullets)
+        assert not report.result.rendering_authorized
+
+
+@pytest.mark.parametrize(
+    "args",
+    [
+        ["--suite", "rewrite_holdout", "--case", "supervised_bounds"],
+        ["--case", "eval_bound_tests"],
+        ["--suite", "unknown"],
+        ["--objective", "unknown"],
+    ],
+)
+def test_suite_objective_mismatch_is_rejected_before_io(corpus_root: Path, args: list[str]) -> None:
+    with (
+        patch("resumeforge.resume.benchmark.prepare_case", side_effect=AssertionError("No IO")),
+        pytest.raises(SystemExit) as error,
+    ):
+        main(args, corpus_root=corpus_root)
+    assert error.value.code == 2
+
+
+def test_rewrite_report_identifies_suite_policy_and_inert_length_observations(
+    corpus_root: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    assert (
+        main(
+            ["--suite", "rewrite_holdout", "--objective", "concise_rewrite"],
+            corpus_root=corpus_root,
+        )
+        == 0
+    )
+    report = json.loads(capsys.readouterr().out)
+    assert report["suite"] == "rewrite_holdout" and report["objective"] == "concise_rewrite"
+    assert report["benchmark_version"] == "synthetic-wording-rewrite-holdout-v1"
+    assert report["prompt_version"] == "source-bound-wording-prompt-v2"
+    assert report["total_cases"] == report["validated_cases"] == 3
+    assert report["inspected_bullets"] == 4
+    assert report["source_characters"] == report["draft_characters"] > 0
+    assert report["edited_bullets"] == report["literal_findings"] == 0
+    assert report["manual_review_status"] == "not_performed" and not report["rendering_authorized"]

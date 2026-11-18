@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "case_id": "eval_bound_tests",
+  "profile": {
+    "schema_version": 1,
+    "person": {"name": "Fictional Rewrite Evaluation Person"},
+    "experiences": [{"id": "exp_eval_validation", "title": "Fictional supervised validation", "completion_status": "completed"}],
+    "accomplishments": [{"id": "acc_eval_validation", "entry_id": "exp_eval_validation", "statement": "Assisted with Python tests for at least 18 internal request validators under mentor review. In doing this testing work, I checked valid requests and malformed requests; checking both kinds of requests was what the tests did. My completed contribution was these tests under mentor review, not ownership of the service. No performance improvement was measured from this testing work.", "verified": true, "completion_status": "completed", "technologies": ["Python"]}]
+  },
+  "job_text": "Python testing experience required. Service ownership and quantified performance gains are preferred.",
+  "requirements": {
+    "schema_version": 1, "company": null, "job_title": null,
+    "responsibilities": [],
+    "required_qualifications": [{"id": "job_required_python", "text": "Python testing experience required.", "source_quote": "Python testing experience required."}],
+    "preferred_qualifications": [{"id": "job_preferred_impact", "text": "Service ownership and quantified performance gains are preferred.", "source_quote": "Service ownership and quantified performance gains are preferred."}],
+    "programming_languages": [{"id": "job_language_python", "text": "Python", "source_quote": "Python testing experience required."}],
+    "frameworks": [], "technical_concepts": [], "domain_terms": [], "evidence_sought": []
+  },
+  "selection": {"schema_version": 1, "entries": [{"entry_id": "exp_eval_validation", "accomplishment_ids": ["acc_eval_validation"]}]},
+  "review_focus": ["Combine repeated task narration while retaining Python, internal request validators, at least 18 and both valid/malformed checks.", "Retain assistance, mentor review, completed testing versus service non-ownership, and no measured performance improvement.", "Do not use job-preferred ownership or impact as evidence; rewriting is optional if fidelity is uncertain."]
+}
