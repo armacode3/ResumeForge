@@ -15,10 +15,12 @@ from resumeforge.resume.models import (
     ResumeReview,
     ReviewDecisionResult,
     ReviewDecisions,
+    ReviewWorksheet,
     WordingResponse,
     WordingResult,
 )
 from resumeforge.resume.wording import suggest_wording
+from resumeforge.resume.worksheet import build_review_worksheet
 
 __all__ = [
     "ResumeDocument",
@@ -26,9 +28,11 @@ __all__ = [
     "ResumeReview",
     "ReviewDecisionResult",
     "ReviewDecisions",
+    "ReviewWorksheet",
     "WordingResponse",
     "WordingResult",
     "apply_review_decisions",
+    "build_review_worksheet",
     "load_resume_document",
     "load_review_decisions",
     "parse_resume_document",

@@ -456,3 +456,28 @@ forward. Frozen profile/draft/wording-response schema 1 and exact provider instr
 remain unchanged. No new provider, dependency, command, migration, model call or rendering authority.
 Synthetic tests characterize literal limits and snapshot/decision invariants, not semantic quality.
 See `docs/SOURCE_FRAGMENT_REVIEW.md` and `docs/REVIEW_DECISIONS.md` for contracts and blind spots.
+
+## ADR-021 — Pending worksheet scaffolds reduce copying, never user review
+
+**Status:** Implemented in 0.16.0, offline only.
+
+Add a fresh review envelope plus an unfilled v3 decision template instead of preselecting approval,
+acknowledging all findings, accepting omissions or inventing rationales/draft links. Copy only
+current hashes and ordered bullet/fragment IDs. Null-only typed pending fields and empty
+acknowledgements keep the scaffold distinct from valid decisions; even verbatim wording gets no
+attestation. Empty documents remain unapprovable by vacuity. Retain complete review/plan context.
+
+Require original sources, explicit draft and exact review acknowledgements, not an old report,
+worksheet or decision receipt. Cap complete default worksheet serialization at 1 MiB without
+truncation. Reuse strict source/draft inspection and safe failures. Expose an opt-in `--worksheet`
+on the existing offline command, mutually exclusive with decision application; validate options
+before I/O and write nothing automatically. No interactive editor/framework, provider or dependency.
+
+Users extract only the template, deliberately complete records actually reviewed and remove
+pending records. Unchanged v3 input validation, separate confirmation, fresh bindings, independent
+finding/fragment gates and plan-conflict/rejection/missing precedence still apply. Null placeholder
+records are rejected, not silently converted into pending or accepted decisions. Output models
+are not a new input format or converter, and generated worksheets import no earlier approval.
+No profile/draft/response/decision or inspection-policy migration is needed. Provider prompts,
+observation policies, frozen evaluations and rendering prohibition remain unchanged. See
+`docs/REVIEW_WORKSHEETS.md` for exact workflow, limits and privacy boundaries.

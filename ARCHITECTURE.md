@@ -57,6 +57,7 @@ src/resumeforge/
     decisions.py    snapshot-bound user attestations, never full-resume/rendering approval
     findings.py     versioned finite numeric/caveat observations and provenance-bound fingerprints
     fragments.py    literal source-segment absence with exact spans and snapshot-bound fingerprints
+    worksheet.py    fresh review and null-only decision scaffolds, never automatic attestations
     wording.py      source-bound provider proposals, minimized inputs, exact slots and fresh review
     benchmark.py    fixed synthetic wording replay/live harness, no automatic quality verdicts
 tests/
@@ -241,6 +242,16 @@ equivalence or safe qualifier removal. Supplied invalid/stale/cross-bullet refer
 Source observations remain visible on approval/rejection. Profile/draft/wording response schemas,
 provider instructions and request data remain unchanged; old attestations are not auto-upgraded.
 See `docs/SOURCE_FRAGMENT_REVIEW.md`, `docs/REVIEW_DECISIONS.md` and ADR-020.
+
+`resume.build_review_worksheet` accepts original sources, an explicit draft and exact review
+acknowledgements, recomputes inspection and emits a distinct bounded worksheet envelope. It retains
+full review context and a separate v3 decision template with current bindings/IDs but null choices,
+reasons and passage links, and no finding acknowledgements. Pending output models cannot encode
+prefilled attestations. The envelope is not input to draft/decision loaders; users must extract and
+deliberately complete/remove pending records. The existing decision engine remains the only path
+to applying explicitly confirmed user attestations. No previous receipt is imported. The CLI adds
+mutually exclusive `review-resume --worksheet`, requiring an explicit draft; no provider, writer,
+policy/schema migration or interactive framework is added. See `docs/REVIEW_WORKSHEETS.md` and ADR-021.
 
 `resume.benchmark` preflights a fixed fictional six-case/seven-bullet corpus and invokes the same
 wording engine. Source-seed replay is the default, independent-response replay is explicit, and

@@ -125,6 +125,11 @@ requirements_reviewed=True, selection_reviewed=True)` returns `ResumeReview`; op
 is a `ResumeDocument`. `parse_resume_document`/`load_resume_document` validate private draft JSON.
 Safe boundary failures raise `ResumeError` (file loading may also raise `InputError`).
 
+With an explicit draft, add `--worksheet` to emit a fresh inspection plus a separate unfilled
+decision template. It cannot be combined with decision application; ordinary inspection is
+unchanged. This output is not a draft or approval receipt. See `docs/REVIEW_WORKSHEETS.md` for
+private extraction/completion, pending placeholders, byte limits and the unchanged confirmation gate.
+
 Separate snapshot-bound human bullet-wording decisions are now available; pending document/
 inspection states remain unchanged. Literal findings and explicit source-fragment review are now
 available. Source-bound `suggest-wording` proposals are available in

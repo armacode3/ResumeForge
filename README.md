@@ -44,8 +44,8 @@ pending, stale decisions fail, and plan conflicts block approvals. This narrow u
 does not approve metadata, prove claim support or authorize rendering.
 
 Inspection now reports literal numeric tokens absent from the cited statement and missing cues
-from a finite caveat vocabulary, with exact spans and documented blind spots. Version-2 decisions
-must bind current findings and explicitly acknowledge them before approval can apply. Empty or
+from a finite caveat vocabulary, with exact spans and documented blind spots. Current decisions
+bind these findings and require explicit acknowledgement before approval can apply. Empty or
 acknowledged findings are not proof of support. See [docs/CLAIM_FINDINGS.md](docs/CLAIM_FINDINGS.md).
 
 `suggest-wording` now accepts snapshot-bound fake replay or explicitly opted-in guarded local
@@ -78,6 +78,12 @@ account for each observed fragment: link a draft passage, deliberately accept an
 request revision. Missing reviews/revision requests keep approval pending, independently of literal
 finding acknowledgements. See [docs/SOURCE_FRAGMENT_REVIEW.md](docs/SOURCE_FRAGMENT_REVIEW.md).
 Old decision files require fresh review; version-1 profiles/drafts/responses need no rewrite.
+
+`review-resume --draft ... --worksheet --confirm-review` now emits fresh review context and an
+unfilled decision template with current hashes/IDs. Choices, reasons and fragment passage links
+stay null; no findings are acknowledged. Extract and deliberately complete the template before
+applying decisions with separate confirmation. See
+[docs/REVIEW_WORKSHEETS.md](docs/REVIEW_WORKSHEETS.md). This reduces copying, not user review.
 
 **End-to-end resume generation is not implemented.** There is no cloud provider, relevance-ranking engine,
 database, template renderer, PDF compiler, API, or browser extension yet.
