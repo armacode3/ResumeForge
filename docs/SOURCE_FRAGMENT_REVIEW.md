@@ -111,3 +111,8 @@ characterize literal behavior and decision invariants, not real-world semantic p
 No live evaluation was run or implicitly authorized. The concise objective stays experimental,
 and the conservative source-faithful default stays unchanged. No semantic proof, full-resume/
 metadata approval, rendering, automatic ranking, persistence or cloud inference is added.
+
+An offline pending worksheet now copies current fragment IDs into null disposition/reason/passage
+slots; it never auto-links wording or accepts omissions. Users must deliberately complete/remove
+those records before applying decisions. See `docs/REVIEW_WORKSHEETS.md`; this observation policy
+and the existing v3 fragment-review gates are unchanged.

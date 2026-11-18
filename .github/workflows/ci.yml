@@ -193,6 +193,24 @@ jobs:
           assert result["status"] == "bullet_wording_approved_by_user"
           assert result["review"]["bullets"][0]["source_fragments"]
           assert not result["rendering_authorized"]
+          worksheet = run(draft_args + ["--worksheet"], 0)
+          assert worksheet["worksheet_version"] == "pending-review-worksheet-v1"
+          assert worksheet["review"]["document"] == draft
+          assert not worksheet["rendering_authorized"]
+          template = worksheet["decision_template"]
+          assert template["document_sha256"] == review["document_sha256"]
+          for pending, bullet in zip(template["bullets"], review["bullets"], strict=True):
+              assert pending["decision"] is pending["reason"] is None
+              assert pending["acknowledged_finding_ids"] == []
+              assert [f["fragment_id"] for f in pending["fragment_decisions"]] == [
+                  f["id"] for f in bullet["source_fragments"]]
+              assert all(f["disposition"] is f["reason"] is f["draft_span"] is None
+                         for f in pending["fragment_decisions"])
+          Path("pending-template.json").write_text(json.dumps(template))
+          untouched = subprocess.run(args + draft_args + ["--decisions", "pending-template.json",
+                                     "--confirm-decisions"], capture_output=True, text=True,
+                                     check=False, timeout=10)
+          assert untouched.returncode == 1 and untouched.stdout == ""
           seed = run([], 0)
           response = {"schema_version": 1,
                       "plan_sha256": seed["document"]["plan_sha256"],

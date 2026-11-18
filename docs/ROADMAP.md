@@ -174,10 +174,17 @@ or source-coverage scoring. Profiles/drafts/responses and prompts remain unchang
 require fresh review. No frozen comparison artifacts were changed or live evaluation run. See
 `docs/SOURCE_FRAGMENT_REVIEW.md`, `docs/REVIEW_DECISIONS.md` and ADR-020.
 
-**Next:** improve offline review ergonomics with a pending review worksheet, not bulk approvals or
-another implicit model run. Keep copy fallback and the conservative default; semantic proof,
-full-resume/metadata approval, rendering and automatic ranking remain unimplemented. Shorter
-structurally valid text did not establish reliable faithful rewriting.
+Implemented in 0.16.0: offline pending review worksheet for an explicit draft, with full fresh review
+context and a v3 decision template containing current bindings/IDs but no chosen decisions,
+rationales, acknowledgements, dispositions or passage links. Users extract and deliberately
+complete/remove pending records; unchanged decision gates reject null choices, stale snapshots
+and unreviewed/revision fragments. A new worksheet is not a prior approval import or migration.
+See `docs/REVIEW_WORKSHEETS.md` and ADR-021. No provider or observation policy changed.
+
+**Next:** define the source-bound metadata review/structured-resume completion boundary, before
+any rendering authorization. Keep copy fallback and the conservative default; semantic proof,
+full-resume/metadata approval, rendering and automatic ranking remain unimplemented. No implicit
+live run or automatic approval follows from worksheet generation or shorter valid text.
 
 Generate structured bullets with accomplishment IDs, check unsupported tools/metrics/ownership,
 dates and contradictions, report gaps, and implement review/approval. Gate: fabricated-claim

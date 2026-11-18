@@ -814,3 +814,49 @@
   pending review worksheet to make deliberate user review easier, not bulk approvals or an
   implicit live run. Semantic proof, full-resume/metadata review, rendering/PDFs, ranking, history
   and cloud inference remain unimplemented.
+
+## Session 022 — Offline pending review worksheet
+
+- User confirmed source-fragment review was merged and authorized the next step. Fetched merged
+  `main` at `55ce603`, fast-forwarded local main and created `feat/pending-review-worksheet` from a
+  clean tree. Prior `c5f6761` hosted checks passed on Python 3.12/3.13. No private profile, draft,
+  decisions or old review receipt was read, changed, migrated or approved; no live provider/runtime
+  was activated and no frozen evaluation was rerun.
+- Defined this slice as reducing manual hash/ID copying, not reducing deliberate user review.
+  Added `build_review_worksheet` with original sources, explicit draft and exact review flags.
+  Freshly recompute source/plan/draft inspection, retain full context/conflicts/caveats/observations,
+  and pair it with a version-3 decision template carrying only current bindings and ordered IDs.
+- Added immutable output-only pending schemas: bullet choices/reasons and fragment dispositions/
+  reasons/passage links are null, finding acknowledgements empty. No reason, omission acceptance,
+  representation or approval is inferred, even for verbatim text. All underlying drafts/reviews
+  stay pending; scope remains bullet wording and rendering authorization false. Default indented
+  UTF-8 worksheet JSON is capped at 1 MiB; oversize output fails without truncation/partial JSON.
+- Added `review-resume --worksheet`, requiring explicit `--draft` and `--confirm-review`, mutually
+  exclusive with decision/decision-confirmation options. Checks precede all source I/O. The command
+  emits private JSON on stdout, safe notices on stderr and writes nothing automatically. Exit 0
+  remains an unfilled worksheet, 3 preserves complete plan conflicts, 1 rejects invalid/stale/
+  oversized input/output, and 2 rejects invalid usage before input reads. Other modes are unchanged.
+- The worksheet envelope is not draft/decision input. Users extract only `decision_template`,
+  deliberately complete actual reviewed records and remove unresolved placeholders. Existing v3
+  decision validation rejects remaining null records; omitted decisions/fragments stay pending,
+  revision requests block approvals, and original source bindings plus separate confirmation still
+  apply. Empty documents cannot pass by vacuity. New worksheets do not import prior attestations.
+- Added unit/installed CLI tests for exact context and binding copying, pending-only schemas,
+  no prefilled choices/acknowledgements/links, template extraction and deliberate completion,
+  independent fragment/confirmation gates, stale wording/source/policy rejection, malformed draft
+  revalidation, conflicts/empty plans, size limits, immutable/privacy/offline/read-only behavior and
+  styled help. CI's runtime-wheel smoke checks null templates and rejects untouched decision input.
+- Application 0.16.0, no new dependency. Local Python 3.12.3: 1,001 tests passed with GitHub-like
+  colors and 99.96% branch-aware coverage. Ruff lint/format, strict mypy (73 files) and dependency
+  checks and source/wheel builds passed. Fresh locked editable/runtime-only installs, all 1,001
+  tests against the installed wheel outside the repository, and the exact CI runtime-wheel smoke
+  passed. Reviewed all 19 staged public files and both distribution contents/secret patterns;
+  private/runtime artifacts are excluded. Hosted outcomes are verified after push, not inferred
+  from local success.
+- Documented the private extraction/completion workflow and limitations in `docs/REVIEW_WORKSHEETS.md`,
+  updated actual-status/context and related guides, and added ADR-021. Profile/draft/wording-response
+  schema 1, inspection/decision policy v3, current valid v3 decisions, provider instructions/data,
+  literal policies and frozen corpora/protocols/results remain unchanged. No migration or inference.
+- Next separate slice: define source-bound metadata review/structured-resume completion before
+  rendering authorization. Semantic proof, full-resume/metadata approval, PDFs/layout, automatic
+  ranking, history and cloud inference remain unimplemented. A worksheet is not a resume or approval.

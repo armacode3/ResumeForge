@@ -30,7 +30,9 @@ from resumeforge.resume import (
     ResumeError,
     ResumeReview,
     ReviewDecisionResult,
+    ReviewWorksheet,
     apply_review_decisions,
+    build_review_worksheet,
     load_resume_document,
     load_review_decisions,
     review_resume,
@@ -370,6 +372,13 @@ def review_resume_command(
             "--draft", help="Edited ResumeDocument JSON; omit to seed verbatim pending wording."
         ),
     ] = None,
+    worksheet: Annotated[
+        bool,
+        typer.Option(
+            "--worksheet",
+            help="Emit fresh context and an unfilled decision template; requires --draft.",
+        ),
+    ] = False,
     decisions: Annotated[
         Path | None,
         typer.Option(
@@ -400,6 +409,10 @@ def review_resume_command(
         raise typer.BadParameter("--decisions requires --draft and explicit --confirm-decisions.")
     if confirm_decisions and decisions is None:
         raise typer.BadParameter("--confirm-decisions requires --decisions.")
+    if worksheet and (draft is None or decisions is not None or confirm_decisions):
+        raise typer.BadParameter(
+            "--worksheet requires --draft and cannot be combined with decision options."
+        )
     try:
         document = load_job(job)
         analysis = analyze_job(document, FakeProvider.from_file(requirements))
@@ -407,8 +420,20 @@ def review_resume_command(
         proposed = load_resume_document(draft) if draft is not None else None
         choices_review = load_review_decisions(decisions) if decisions is not None else None
         candidate = load_profile(profile)
-        result: ResumeReview | ReviewDecisionResult
-        if choices_review is not None:
+        result: ResumeReview | ReviewDecisionResult | ReviewWorksheet
+        if worksheet:
+            assert proposed is not None
+            result = build_review_worksheet(
+                candidate.profile,
+                document,
+                analysis.requirements,
+                choices,
+                proposed,
+                requirements_reviewed=True,
+                selection_reviewed=True,
+            )
+            blocked = result.status == "blocked_by_plan"
+        elif choices_review is not None:
             assert proposed is not None
             result = apply_review_decisions(
                 candidate.profile,
@@ -436,11 +461,17 @@ def review_resume_command(
     except (ProfileError, InputError, JobAnalysisError, PlanningError, ResumeError) as error:
         typer.echo(f"Resume draft review failed:\n{error}", err=True)
         raise typer.Exit(code=1) from None
-    notice = (
-        "Offline user decision snapshot; no inference, semantic proof or rendering authorization."
-        if decisions is not None
-        else "Offline draft inspection; no inference, semantic proof or claim approval."
-    )
+    if worksheet:
+        notice = (
+            "Offline pending review worksheet; no choices or acknowledgements made, no inference."
+        )
+    elif decisions is not None:
+        notice = (
+            "Offline user decision snapshot; no inference, semantic proof "
+            "or rendering authorization."
+        )
+    else:
+        notice = "Offline draft inspection; no inference, semantic proof or claim approval."
     typer.echo(notice, err=True)
     typer.echo(result.model_dump_json(indent=2))
     if blocked:

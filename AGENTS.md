@@ -40,7 +40,14 @@ and requires per-fragment user dispositions: exact draft passage, accepted omiss
 or needs revision. Missing/revision dispositions stay pending even with all old findings acknowledged.
 Exact spans do not prove equivalence; accepted omissions do not prove qualifier safety. Keep source
 observations visible, reject old attestations without automatic upgrade, and preserve prompt/data/
-response contracts. Next: offline pending-review worksheet ergonomics, not model inference/rendering.
+response contracts.
+Offline `review-resume --draft ... --worksheet` now emits fresh review and a null-only pending
+decision template. Read `docs/REVIEW_WORKSHEETS.md`. Never prefill choices, reasons, finding
+acknowledgements, fragment dispositions or draft links; copy only current bindings/IDs. The envelope
+is not draft/decision input. Users extract/complete/remove pending records and still use explicit
+decision confirmation and unchanged v3 gates. No prior approvals are imported or migrated. Keep
+the complete default worksheet bounded and private. Next: define source-bound metadata review/
+structured-resume completion, not implicit inference or rendering authorization.
 Omitted states stay unknown; version-1 profile/draft files need no rewrite (not old decisions).
 Read `docs/MATCHING.md` for the
 retrieval boundary.

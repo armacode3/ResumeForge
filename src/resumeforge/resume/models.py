@@ -171,6 +171,43 @@ class ReviewDecisions(ResumeModel):
         return self
 
 
+class PendingFragmentDecision(ResumeModel):
+    fragment_id: Digest
+    disposition: None = None
+    reason: None = None
+    draft_span: None = None
+
+
+class PendingBulletDecision(ResumeModel):
+    bullet_id: BulletId
+    decision: None = None
+    reason: None = None
+    acknowledged_finding_ids: tuple[()] = ()
+    fragment_decisions: tuple[PendingFragmentDecision, ...]
+
+
+class PendingReviewDecisions(ResumeModel):
+    """Output scaffold, deliberately not valid ReviewDecisions for nonempty drafts."""
+
+    schema_version: Literal[3] = 3
+    review_version: Literal["resume-draft-review-v3"]
+    plan_sha256: Digest
+    document_sha256: Digest
+    findings_sha256: Digest
+    fragments_sha256: Digest
+    bullets: tuple[PendingBulletDecision, ...]
+
+
+class ReviewWorksheet(ResumeModel):
+    worksheet_version: Literal["pending-review-worksheet-v1"] = "pending-review-worksheet-v1"
+    scope: Literal["bullet_wording_only"] = "bullet_wording_only"
+    rendering_authorized: Literal[False] = False
+    status: Literal["needs_review", "blocked_by_plan"]
+    review: ResumeReview
+    decision_template: PendingReviewDecisions
+    warnings: tuple[str, ...]
+
+
 class AppliedBulletDecision(ResumeModel):
     bullet_id: str
     accomplishment_id: str

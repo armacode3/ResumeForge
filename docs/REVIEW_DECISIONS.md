@@ -6,6 +6,12 @@ generate wording or authorize rendering. Profile verification flags and source f
 
 ## Workflow
 
+For less manual copying, `review-resume --draft ... --worksheet --confirm-review` now emits fresh
+review context and an unfilled decision template. Extract only `decision_template`, deliberately
+complete the records actually reviewed, and remove unresolved placeholder records. Nulls are not
+valid decisions; this does not preselect approval, acknowledge findings or bypass confirmation.
+See `docs/REVIEW_WORKSHEETS.md`. The existing v3 decision format and all gates below are unchanged.
+
 1. Use `review-resume` as documented in `docs/RESUME_DRAFTS.md`. Save its inner `document`
    privately, inspect the full source statements, scope caveats, job context and plan findings,
    and deliberately edit wording if necessary.
