@@ -22,6 +22,7 @@ def test_help_describes_only_implemented_commands(option: str) -> None:
     assert "validate-profile" in help_text
     assert "analyze-job" in help_text
     assert "match-evidence" in help_text
+    assert "plan-resume" in help_text
     assert "--version" in help_text
     assert "generate" not in help_text
 

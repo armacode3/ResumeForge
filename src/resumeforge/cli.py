@@ -12,6 +12,7 @@ from resumeforge import __version__
 from resumeforge.inputs import InputError
 from resumeforge.jobs import JobAnalysisError, analyze_job, load_job
 from resumeforge.matching import MatchingError, match_evidence
+from resumeforge.planning import PlanningError, load_selection, plan_resume
 from resumeforge.profile import ProfileError, find_profile_gaps, load_profile
 from resumeforge.providers import (
     FakeProvider,
@@ -34,7 +35,7 @@ class ProviderChoice(StrEnum):
 
 app = typer.Typer(
     help="ResumeForge: evidence-first resumes. Profile validation, job analysis "
-    "and offline evidence retrieval.",
+    "and offline evidence retrieval/planning.",
     add_completion=False,
     invoke_without_command=True,
     pretty_exceptions_enable=False,
@@ -173,3 +174,50 @@ def match_evidence_command(
         err=True,
     )
     typer.echo(json.dumps(asdict(report), ensure_ascii=False, indent=2))
+
+
+@app.command("plan-resume")
+def plan_resume_command(
+    profile: Annotated[Path, typer.Option("--profile", help="Explicit local Markdown profile.")],
+    job: Annotated[
+        Path, typer.Option("--job", help="Exact local source for reviewed requirements.")
+    ],
+    requirements: Annotated[
+        Path, typer.Option("--requirements", help="Reviewed JobRequirements JSON; no inference.")
+    ],
+    selection: Annotated[
+        Path, typer.Option("--selection", help="Reviewed version-1 entry/evidence selection JSON.")
+    ],
+    confirm_review: Annotated[
+        bool,
+        typer.Option("--confirm-review", help="Acknowledge review of requirements and selection."),
+    ] = False,
+) -> None:
+    """Assemble an offline count-constrained draft; no resume wording or page layout."""
+    if not confirm_review:
+        raise typer.BadParameter(
+            "Review the full job requirements and selection, then pass --confirm-review."
+        )
+    try:
+        document = load_job(job)
+        analysis = analyze_job(document, FakeProvider.from_file(requirements))
+        choices = load_selection(selection)
+        candidate = load_profile(profile)
+        plan = plan_resume(
+            candidate.profile,
+            document,
+            analysis.requirements,
+            choices,
+            requirements_reviewed=True,
+            selection_reviewed=True,
+        )
+    except (ProfileError, InputError, JobAnalysisError, PlanningError) as error:
+        typer.echo(f"Resume planning failed:\n{error}", err=True)
+        raise typer.Exit(code=1) from None
+    typer.echo(
+        "Offline draft plan; no inference, generated wording or layout validation.", err=True
+    )
+    typer.echo(json.dumps(asdict(plan), ensure_ascii=False, indent=2))
+    if plan.constraint_status == "conflicts":
+        typer.echo("Plan has constraint conflicts; review findings before proceeding.", err=True)
+        raise typer.Exit(code=3)

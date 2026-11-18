@@ -64,6 +64,14 @@ jobs:
             --requirements "$GITHUB_WORKSPACE/examples/jobs/backend_intern.response.json" \
             --confirm-review > "$RUNNER_TEMP/evidence-matching.json"
           test -s "$RUNNER_TEMP/evidence-matching.json"
+          plan_status=0
+          "$RUNNER_TEMP/resumeforge-smoke/bin/resumeforge" plan-resume \
+            --profile "$GITHUB_WORKSPACE/examples/profiles/sample.md" \
+            --job "$GITHUB_WORKSPACE/examples/jobs/backend_intern.md" \
+            --requirements "$GITHUB_WORKSPACE/examples/jobs/backend_intern.response.json" \
+            --selection "$GITHUB_WORKSPACE/examples/plans/backend_intern.selection.json" \
+            --confirm-review > "$RUNNER_TEMP/resume-plan.json" || plan_status=$?
+          test "$plan_status" -eq 3
           "$RUNNER_TEMP/resumeforge-smoke/bin/python" - <<'PY'
           import json
           from pathlib import Path
@@ -72,4 +80,8 @@ jobs:
           assert report["signals_version"] == "evidence-signals-v1"
           candidates = [candidate for item in report["items"] for candidate in item["candidates"]]
           assert candidates and all("signals" in candidate for candidate in candidates)
+          plan = json.loads(Path("resume-plan.json").read_text())
+          assert plan["status"] == "needs_review" and plan["constraint_status"] == "conflicts"
+          assert plan["budget"]["bullet_slot_count"] == 2
+          assert any(f["code"] == "entry_bullet_minimum_not_met" for f in plan["findings"])
           PY

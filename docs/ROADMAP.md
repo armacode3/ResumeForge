@@ -88,7 +88,7 @@ limited run. See `docs/evaluations/qwen3-4b-v3.md`. This is **not** approval for
 Typed completion-state/preferences can be developed independently of model quality; later
 matching uses reviewed requirements or deterministic fixtures, never model tag absence as proof.
 
-## Phase 3 — Matching and planning (typed inputs, retrieval and review signals implemented)
+## Phase 3 — Matching and planning (reviewed-selection count plans implemented; ranking deferred)
 
 Rank evidence beyond keywords, honor mandatory sections/experiences, produce structured plans
 with evidence references, space budgets and review flags. Gate: deterministic selection/ranking
@@ -110,12 +110,18 @@ mentions in statements from metadata-only overlaps, preserving full-phrase ancho
 scoped metric records with nullable statement spans. Signals are unweighted observations, not
 inferred impact, responsibility or semantic relevance. Eligibility and ID ordering are unchanged.
 
-**Next:** constrained `ResumePlan` selection as a separate slice, with explicit review findings.
-Relevance ordering/weights still require justified policy and evaluation; ranking, resume selection
-and planning are not implemented yet.
-Preserved Markdown notes are not enforced constraints. Later planning must also surface
-insufficient evidence and mandatory-content/readable-one-page conflicts; validated counts and
-lexical candidates alone cannot guarantee feasibility or truthful generated claims.
+Implemented in 0.8.0: `PlanSelection` and `plan-resume` assemble explicit reviewed choices into
+immutable `ResumePlan` drafts, preserving required entries/sections and evidence qualifiers.
+Excluded/ineligible choices cannot become slots; unmatched eligible choices remain reviewable.
+Project/per-entry/total-slot count conflicts are reported without trimming mandatory content or
+inventing evidence. All plans need review; the sample intentionally exposes an education bullet
+minimum conflict. See `docs/PLANNING.md` and ADR-013.
+
+**Next:** a separate Phase 4 structured resume/claim-review contract using these evidence references,
+before wording generation or rendering. Relevance ordering/automatic selection still require
+justified policy and evaluation; this is not completion of the automated ranking/layout gates.
+Markdown notes are not enforced constraints. Count-based drafts do not guarantee sufficient
+evidence, job coverage, readable-one-page feasibility or truthful generated claims.
 
 ## Phase 4 — Bullets, claims and review
 

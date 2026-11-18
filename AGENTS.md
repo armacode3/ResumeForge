@@ -13,7 +13,8 @@ Build truthful, evidence-linked resumes from a verified Markdown profile and a j
 Phases 0–2 include profile validation, local job loading, provider Protocol, fake JSON replay,
 guarded local Ollama inference, structured requirements, quotation checks and `analyze-job`.
 Phase 3 includes optional completion states/preferences and offline evidence eligibility/lexical
-retrieval with source-backed candidate review signals, not relevance ranking or resume planning.
+retrieval with source-backed candidate review signals and explicit reviewed-selection count plans,
+not relevance ranking, wording generation or layout feasibility.
 Omitted states stay unknown; version-1 files need no rewrite. Read `docs/MATCHING.md` for the
 retrieval boundary.
 Read `docs/PROFILE_FORMAT.md`, `docs/JOB_ANALYSIS.md`, and `docs/OLLAMA.md` as applicable.
@@ -29,15 +30,17 @@ cloud inference, resume generation, semantic claim proof, PDFs or history alread
 - `src/resumeforge/providers/`: Protocol, fake replay and local-only Ollama HTTP adapter.
 - `src/resumeforge/matching/`: reviewed-input gate, eligibility, lexical candidates and review findings.
   Candidate signals preserve literal statement mentions and scoped metric records, not scores.
+- `src/resumeforge/planning/`: strict explicit selections, immutable draft plans and count conflicts.
 - `src/resumeforge/inputs.py`: bounded local text input for job/response files.
 - `examples/profiles/sample.md`: fictional fixture used by `tests/` and the CI smoke test.
 - `examples/jobs/`: fictional job and manually authored JSON response, not real application data.
+- `examples/plans/`: fictional explicit selections; the sample intentionally exposes a count conflict.
 - `scripts/evaluate_jobs.py`: repository-only six-case synthetic benchmark; defaults to reference replay.
 - `tests/unit/`, `tests/integration/`: deterministic schema/parser/CLI/privacy checks.
 - `config/resume_rules.md`: policy only, not currently loaded by code.
 - `docs/`: decisions, roadmap, development log; `.github/workflows/ci.yml`: checks.
 - `data/profile/user_information.md`: default private input, ignored; never create real data in Git.
-- Planned only: relevance ranking/resume planning, Jinja2, LaTeX/PyMuPDF, SQLite,
+- Planned only: relevance ranking/automatic selection, wording/claim review, Jinja2, LaTeX/PyMuPDF, SQLite,
   then Docker, FastAPI, and a Manifest V3 extension. Add dependencies when needed.
 
 ## Architecture and truthfulness
@@ -57,16 +60,21 @@ and leave disputed dates unset. Record any required ID mapping only in private n
 schemas validate optional completion states and root resume preferences; notes are not enforced
 planning constraints. Completion is independent of verification, dates and parent/subtask state.
 Preserve unknown-state warnings, required/excluded reference checks and count/section conflicts;
-preferences do not prove evidence sufficiency or one-page feasibility. No private migration or
-resume content selection is implemented. See `docs/PROFILE_FORMAT.md` and ADR-010.
+preferences do not prove evidence sufficiency or one-page feasibility. No private migration is
+implemented. See `docs/PROFILE_FORMAT.md` and ADR-010.
 Matching is offline candidate retrieval, not qualification proof. Keep explicit job-review
 acknowledgement, schema/quote revalidation, scoped verified/completed evidence, exclusions and
 status caveats. Do not inherit evidence from skills, parent technology lists, notes or bullet
 wording. Preserve full job items and required/preferred distinctions; no candidate is not proof
-of missing experience or absent requirements. No ranking/selection/claim approval is implemented.
+of missing experience or absent requirements. Matching performs no ranking/selection/claim approval.
 Signals annotate only retrieved eligible evidence: literal mentions may be negated/incidental,
 metrics need not be numeric or job-relevant, and null spans mean unknown, not a penalty. Never
 infer metrics/impact/ownership or rank by counts; keep independent signal version/provenance.
+Planning uses explicit reviewed selections, not automatic relevance ordering. Recompute matching
+from revalidated sources, preserve required placeholders/status caveats, and never let excluded or
+ineligible evidence enter slots. One accomplishment reserves one unapproved slot; do not infer or
+reuse bullet wording. Keep over-budget content visible with conflicts, not silent trimming.
+All drafts need review; count constraints are not page feasibility. See `docs/PLANNING.md`.
 Job analysis accepts no candidate profile. Keep trusted instructions separate from job data.
 Response text and its quote must be literal source substrings; that is provenance, not proof of
 classification/completeness. Preserve required/preferred distinctions and explicit unknowns.

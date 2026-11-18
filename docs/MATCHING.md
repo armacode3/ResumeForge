@@ -151,7 +151,8 @@ to the job or blocked from lexical retrieval.
 Project/bullet maxima, per-entry bullet allocation, relevance ranking, section assembly and
 readable-one-page feasibility are **not** allocated or solved here. The profile boundary already
 rejects structural preference contradictions; the matcher does not override those constraints or
-choose content. A future planner must honor exclusions transitively and surface remaining conflicts.
+choose content. The separate reviewed-selection planner honors exclusions and surfaces count/
+evidence conflicts; actual readable layout remains deferred. See `docs/PLANNING.md`.
 
 ## API, provenance and limits
 
@@ -182,6 +183,7 @@ before retrieval instead of truncating evidence or job content. This is a compar
 guard, not a hard CPU/process sandbox. Existing bounded file/schema loaders still apply to CLI
 inputs. Normal tests use fictional inputs and fake JSON only, never a model or private profile.
 
-Next: constrained resume planning as a separate slice, with explicit review needs and evidence
-references. Relevance ordering/weights still need a justified policy and evaluation; never use
+Reviewed-selection count planning is now a separate offline feature; see `docs/PLANNING.md`.
+The matcher itself still performs no content selection or allocation.
+Relevance ordering/weights still need a justified policy and evaluation; never use
 lexical/metric counts alone or promote a retrieval candidate into an approved claim.

@@ -4,8 +4,9 @@
 
 Phases 0–2 include profile validation and fake/local Ollama job analysis. Phase 3 now has typed
 completion states/preferences, offline evidence eligibility/lexical retrieval and source-backed
-candidate review signals. Ranking, resume planning and semantic qualification checks are not
-implemented.
+candidate review signals. Reviewed-selection draft planning now checks count constraints and
+preserves mandatory content. Relevance ranking, wording generation and semantic qualification
+checks are not implemented.
 No cloud provider is enabled.
 Everything below labeled **planned** is a design boundary, not a
 working feature. Prefer a modular monolith: one Python package, with small components and
@@ -17,7 +18,7 @@ explicit typed contracts, rather than services or unnecessary infrastructure.
 src/resumeforge/
   __init__.py       installed distribution version
   __main__.py       python -m entry point
-  cli.py            Typer help/version, profile/job validation and offline match-evidence
+  cli.py            Typer help/version, validation, offline matching and draft planning
   inputs.py         bounded local UTF-8 loading for jobs and fake response fixtures
   py.typed          typed-package marker
   profile/
@@ -39,6 +40,10 @@ src/resumeforge/
     engine.py       explicit review gate, eligibility and literal candidate retrieval
     literals.py     shared bounded case-insensitive literal-span policy
     signals.py      unweighted statement-mention and scoped metric observations
+  planning/
+    models.py       strict reviewed selection schema and immutable draft-plan snapshots
+    selection.py    bounded safe local JSON selection loader
+    engine.py       explicit assembly, mandatory placeholders and count-conflict findings
 tests/
   unit/             CLI/schema/parser/gap contracts and invalid inputs
   integration/      installed entry points, profile validation, privacy safeguards
@@ -76,9 +81,9 @@ verification. Unknown states yield review warnings. Root `ResumePreferences` rec
 sections/entries, excluded entries and optional project/per-entry bullet bounds. Local constraints
 validate in that model; `UserProfile` resolves references, checks available content and rejects
 contradictory project capacity. No preferences are inferred and no private profiles are migrated.
-These are validated input contracts, not selection/layout: a future planner must preserve status
-caveats, use verified evidence and report remaining evidence/space conflicts. Notes are still not
-enforced constraints. See `docs/PROFILE_FORMAT.md` for defaults, bounds and compatibility.
+These are validated input contracts; the reviewed-selection planner now preserves status caveats,
+uses eligible evidence and reports count/evidence conflicts. They do not guarantee layout. Notes
+are still not enforced constraints. See `docs/PROFILE_FORMAT.md` for defaults and compatibility.
 
 The parser accepts a bounded regular UTF-8 file (1 MiB), uses a restricted SafeLoader with duplicate
 key rejection and explicit boolean behavior, and rejects anchors/aliases/tags and nesting beyond
@@ -144,6 +149,22 @@ context and canonical model/source hashes. Findings expose required-content elig
 allocation/layout remain deferred. A comparison-count cap fails without truncation. See
 `docs/MATCHING.md` for the versioned policy and limitations.
 
+## Implemented reviewed-selection planning boundary
+
+`planning.plan_resume` accepts profile/job/requirements plus explicit `PlanSelection`, with separate
+boolean review acknowledgements. It revalidates snapshots and recomputes matching rather than
+trusting a supplied report. One selected eligible accomplishment reserves one bullet slot with
+unchanged source text, stable ID, job links and caveats. No relevance scores or inferred facts
+drive selection. Required entries/sections remain visible; excluded/ineligible selections cannot
+enter planned content. Count conflicts never trigger silent trimming or invented evidence.
+
+`ResumePlan` is an immutable, independently versioned draft with count-budget actuals/bounds,
+source/selection hashes, complete job items and actionable findings. Metadata-only and unscoped
+content remain review needs; all plans stay `needs_review`, even when counts pass. No page/line
+feasibility or wording approval is claimed. The read-only `plan-resume` CLI requires four explicit
+paths and acknowledgement, emits private JSON, and exits 3 for a conflict-bearing draft (0 for a
+draft without detected conflicts, 1 for safe input errors). See `docs/PLANNING.md`.
+
 ## Planned module responsibilities
 
 Create these modules only as their features are implemented:
@@ -152,7 +173,7 @@ Create these modules only as their features are implemented:
 | --- | --- |
 | Other provider adapters | Add only when explicitly approved; retain structured interface, data disclosure, limits and safe failure policy. No automatic fallback. |
 | Matching ranking | Evaluate relevance ordering beyond the implemented source observations; never rank by keyword/metric counts alone. |
-| `planning/` | Produce `ResumePlan`: selected evidence, mandatory content, space budgets, review flags and concise decision explanations. |
+| Planning extensions | Add evaluated automatic relevance selection and actual space/layout budgets beyond reviewed-selection count plans. |
 | `generation/` | Produce structured `ResumeDocument` and bullets with supporting accomplishment IDs; never raw model-authored LaTeX. |
 | `validation/` | Validate references and factual claims; produce `ValidationResult` and blocking/review flags. Later inspect PDFs. |
 | `rendering/` | Escape dynamic text, render trusted versioned Jinja2/LaTeX templates, compile safely, export text and report. |
@@ -175,7 +196,8 @@ Create these modules only as their features are implemented:
 7. Once history is implemented, persist provenance, validation, decisions, versions and artifact
    references. Failed generations must not masquerade as approved final resumes.
 
-Profile/job schemas exist now; plan/resume schemas remain deferred to their implementing phases.
+Profile/job/selection schemas and draft-plan snapshots exist now; resume wording schemas remain
+deferred to Phase 4.
 Pydantic validates profile input and untrusted structured job responses, which fail actionably.
 `config/resume_rules.md` holds writing policy; planned `config/layout.yaml` will separately
 hold machine-readable page, spacing, and minimum-readability constraints.
