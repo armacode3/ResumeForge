@@ -75,7 +75,10 @@ def test_seed_copies_whole_source_statements_with_no_profile_mutation_or_network
     with patch("socket.socket", side_effect=AssertionError("Offline")):
         review = inputs.review()
     assert review.mode == "source_seed" and review.status == "needs_review"
-    assert review.review_version == "resume-draft-review-v1"
+    assert review.review_version == "resume-draft-review-v2"
+    assert review.findings_version == "literal-claim-findings-v1"
+    assert all(b.findings == () for b in review.bullets)
+    assert len(review.findings_sha256) == 64
     assert review.document.status == "needs_review"
     assert review.document.sections[0].entries[0].bullets == ()
     assert (
@@ -106,6 +109,42 @@ def test_submitted_roundtrip_keeps_all_wording_pending_and_has_same_document_ide
     assert submitted.mode == "submitted_draft"
     assert submitted.document == seed.document and submitted.document_sha256 == seed.document_sha256
     assert all(b.review_status == "pending_review" for b in submitted.bullets)
+    assert submitted.findings_sha256 == seed.findings_sha256
+
+
+def test_finding_scope_is_only_selected_statement_not_other_profile_or_job_fields(
+    inputs: ReviewInputs,
+) -> None:
+    seed = inputs.review()
+    data = seed.document.model_dump(mode="json")
+    # SQLite exists in a different selected accomplishment, not this bullet's evidence.
+    # 12 exists in this bullet; no metrics/parent lists or job text can justify 99.
+    first_bullet(data)["text"] = "Owned 99 SQLite systems."
+    review = inputs.review(parse_resume_document(json.dumps(data)))
+    assert [f.code for f in review.bullets[0].findings] == [
+        "numeric_token_absent_from_source",
+        "source_caveat_cue_not_retained",
+    ]
+    assert review.bullets[1].findings == ()
+    assert review.bullets[1].caveats == ("parent_entry_in_progress",)
+    assert review.findings_sha256 != seed.findings_sha256
+    # No technology/ownership detector is claimed, even with no new digits.
+    first_bullet(data)["text"] = seed.bullets[0].source_statement + " Owned Kubernetes."
+    blind_spot = inputs.review(parse_resume_document(json.dumps(data)))
+    assert blind_spot.bullets[0].findings == ()
+    assert blind_spot.bullets[0].wording_status == "edited_requires_review"
+    assert blind_spot.findings_sha256 != seed.findings_sha256
+
+
+def test_total_finding_budget_fails_safely_not_partially(
+    inputs: ReviewInputs, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    seed = inputs.review()
+    data = seed.document.model_dump(mode="json")
+    first_bullet(data)["text"] = "99 98 97"
+    monkeypatch.setattr("resumeforge.resume.engine.MAX_REVIEW_FINDINGS", 2)
+    with pytest.raises(ResumeError, match="finding limit"):
+        inputs.review(parse_resume_document(json.dumps(data)))
 
 
 @pytest.mark.parametrize(

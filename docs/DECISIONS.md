@@ -322,3 +322,27 @@ Extend the existing offline command with optional decisions and separate confirm
 option combinations before I/O, preserve safe failures and bounded JSON, write no input files,
 and call no model. No new dependency or profile/draft schema rewrite is needed. See
 `docs/REVIEW_DECISIONS.md` for exact status/exit behavior, snapshot limitations and privacy.
+
+## ADR-016 — Finite literal findings with explicit snapshot-bound acknowledgement
+
+**Status:** Implemented in 0.11.0. Semantic proof and model-assisted wording remain deferred.
+
+Observe numeric-token additions and removal of a published finite caveat vocabulary against only
+the selected accomplishment statement. Preserve exact Unicode string spans, full source context,
+independent finding policy, deterministic provenance-bound IDs and an ordered snapshot fingerprint.
+Do not classify factual support, inherit other fields as evidence, rewrite wording, or treat an
+empty finding list as safety. Synthetic characterization includes false alarms and deliberate misses;
+it measures literal-rule behavior, not semantic precision/recall. Fail on excessive observations,
+never truncate them. No model, dependency, source migration or retrieval change is required.
+
+Bump inspection/decision policy to v2 and decision schema to 2; draft/profile schemas stay intact.
+Require current findings fingerprint and explicit per-bullet acknowledged IDs. Reject old formats,
+stale fingerprints, duplicate/unknown/cross-bullet acknowledgements. Requested approvals with any
+unacknowledged finding remain pending. Missing decisions, rejection and plan-conflict precedence
+remain intact. Applied records expose acknowledged/unacknowledged IDs; findings stay visible even
+on user approval. Acknowledgement is an unsigned attestation, never resolution or semantic proof.
+
+This conservative contract is preferable to a broad unsupported-claim classifier without measured
+quality or an LLM judge treated as truth. Full-resume/metadata approval and rendering remain outside
+scope. Changed observation policies need explicit versioning; do not mechanically upgrade historical
+decisions. See `docs/CLAIM_FINDINGS.md` and `docs/REVIEW_DECISIONS.md`.

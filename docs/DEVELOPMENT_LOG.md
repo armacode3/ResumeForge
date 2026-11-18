@@ -552,3 +552,46 @@
   guidance. Next: measured claim-review findings, then controlled wording assistance under explicit
   model/data policy. Semantic proof, complete metadata/resume review, rendering/PDF/readability,
   persistent history, automatic relevance ranking and cloud inference remain unimplemented.
+
+## Session 017 — Literal claim-review findings and acknowledgement gates
+
+- User confirmed PR #9 was merged and authorized the next small step. Fetched `main` at `d52af70`,
+  fast-forwarded local main and created clean `feat/literal-claim-review-findings` from that base.
+  No private input, unrelated branch or history was changed.
+- Defined finite deterministic observations rather than unsupported-claim verdicts: ASCII
+  numeric tokens not present as whole tokens in the cited accomplishment statement, and source
+  occurrences of 14 published caveat cues absent everywhere in the edited wording. Matching is
+  literal; membership ignores context/frequency. Number words, units/signs, ownership/technology,
+  unlisted qualifiers and same-token/cue semantic changes are documented blind spots. Harmless
+  formatting changes and paraphrases can flag. Other profile fields/job data never supply evidence.
+- Added frozen exact Unicode string spans, provenance-bound finding IDs, independent
+  `literal-claim-findings-v1` policy and ordered finding fingerprint. Reports preserve full source
+  statements, parent-status caveats, selected structure and unchanged wording; all inspections
+  stay pending. Excessive observations fail safely (1,024/bullet, 4,096/inspection), never truncate.
+- Bumped inspection/decision policy to v2 and decision schema to 2. Require current finding hash
+  and explicit per-bullet acknowledged IDs. Missing acknowledgements keep requested approvals
+  pending. Unknown/cross-bullet, duplicate/malformed and stale acknowledgements fail. Old version-1
+  attestations are rejected, not migrated. Profile/draft schema 1 remains valid without rewrite.
+- Applied results expose acknowledged/unacknowledged IDs. Findings remain visible even on narrow
+  user approval; acknowledgement is not resolution, semantic support or promoted biography. Missing
+  decisions stay pending, rejection preserves content, plan conflicts block approvals (with or
+  without acknowledgements), and empty documents cannot pass. Rendering authorization stays false.
+- Added 20 synthetic rule-characterization pairs with 10 numeric and 11 missing-cue occurrences;
+  all agree with exact literal expectations, including explicit false alarms and deliberate misses.
+  This is not semantic accuracy/precision/recall. Tests additionally cover all 14 cues, Unicode
+  offsets, immutable observations, identity/provenance changes, budgets, stale formats, finding
+  gates, installed CLI, source scope, privacy and unchanged eligibility boundaries.
+- Updated CI runtime-wheel smoke for the versioned schema and synthetic pending-to-acknowledged
+  gate, preserving its intentional plan-conflict test. Added the finding guide/ADR-016 and updated
+  actual-status documentation and canonical agent guidance. Application version is 0.11.0; no new
+  dependency, provider activation, inference, migration, automatic rewriting or private-data use.
+- Final local Python 3.12.3 verification passed 662 unit + 93 integration = 755 tests with 99.95%
+  branch-aware coverage, Ruff lint/format, strict mypy (61 files) and dependency checks. Fresh locked
+  editable and runtime-only wheel installs passed; all 755 tests also passed against the installed
+  wheel outside the repository. Source/wheel builds and the exact runtime-wheel CI smoke passed,
+  including plan-conflict and finding-acknowledgement gates. Reviewed 19 public staged files and
+  distribution contents/secret patterns; private/runtime artifacts are excluded. Hosted checks are
+  checked after push, not claimed by local tests.
+- Next: controlled wording assistance under the existing explicit local-only model/data policy,
+  still requiring fresh inspection/user review. Semantic proof, metadata/full-resume approval,
+  rendering/PDF/readability, automatic ranking, history and cloud inference remain unimplemented.

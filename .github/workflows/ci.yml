@@ -98,11 +98,13 @@ jobs:
           assert all(b["review_status"] == "pending_review" for b in review["bullets"])
           Path("resume-draft.json").write_text(json.dumps(review["document"]))
           Path("review-decisions.json").write_text(json.dumps({
-              "schema_version": 1,
+              "schema_version": 2,
               "review_version": review["review_version"],
               "plan_sha256": review["document"]["plan_sha256"],
               "document_sha256": review["document_sha256"],
+              "findings_sha256": review["findings_sha256"],
               "bullets": [{"bullet_id": b["bullet_id"], "decision": "approve",
+                           "acknowledged_finding_ids": [],
                            "reason": "Fictional CI assertion: plan conflicts must block approval."}
                           for b in review["bullets"]],
           }))
@@ -125,4 +127,55 @@ jobs:
           assert result["status"] == "blocked_by_plan"
           assert result["scope"] == "bullet_wording_only" and not result["rendering_authorized"]
           assert all(b["review_status"] == "blocked_by_plan" for b in result["bullets"])
+          PY
+          "$RUNNER_TEMP/resumeforge-smoke/bin/python" - <<'PY'
+          import json
+          import os
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          root = Path(os.environ["GITHUB_WORKSPACE"])
+          profile = Path("finding-profile.md").resolve()
+          profile.write_text((root / "examples/profiles/sample.md").read_text().replace(
+              "min_bullets_per_entry: 1", "min_bullets_per_entry: 0"))
+          args = [sys.executable, "-m", "resumeforge", "review-resume", "--profile", str(profile),
+                  "--job", str(root / "examples/jobs/backend_intern.md"),
+                  "--requirements", str(root / "examples/jobs/backend_intern.response.json"),
+                  "--selection", str(root / "examples/plans/backend_intern.selection.json"),
+                  "--confirm-review"]
+
+          def run(options, expected):
+              process = subprocess.run(args + options, capture_output=True, text=True,
+                                       check=False, timeout=10)
+              assert process.returncode == expected, process.stderr
+              return json.loads(process.stdout)
+
+          seed = run([], 0)
+          draft = seed["document"]
+          draft["sections"][1]["entries"][0]["bullets"][0]["text"] = "Owned 99 endpoints."
+          Path("finding-draft.json").write_text(json.dumps(draft))
+          draft_args = ["--draft", "finding-draft.json"]
+          review = run(draft_args, 0)
+          assert review["findings_version"] == "literal-claim-findings-v1"
+          assert len(review["bullets"][0]["findings"]) == 2
+          decisions = {"schema_version": 2, "review_version": review["review_version"],
+                       "plan_sha256": review["document"]["plan_sha256"],
+                       "document_sha256": review["document_sha256"],
+                       "findings_sha256": review["findings_sha256"],
+                       "bullets": [{"bullet_id": b["bullet_id"], "decision": "approve",
+                                    "reason": "Synthetic gate assertion, not factual proof.",
+                                    "acknowledged_finding_ids": []} for b in review["bullets"]]}
+          for acknowledged in (False, True):
+              if acknowledged:
+                  decisions["bullets"][0]["acknowledged_finding_ids"] = [
+                      f["id"] for f in review["bullets"][0]["findings"]]
+              Path("finding-decisions.json").write_text(json.dumps(decisions))
+              result = run(draft_args + ["--decisions", "finding-decisions.json",
+                                         "--confirm-decisions"], 0 if acknowledged else 3)
+              assert result["status"] == (
+                  "bullet_wording_approved_by_user" if acknowledged else "needs_review")
+              assert result["review"]["document"] == draft
+              assert result["review"]["bullets"][0]["findings"] == review["bullets"][0]["findings"]
+              assert not result["rendering_authorized"]
           PY

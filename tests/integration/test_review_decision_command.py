@@ -45,15 +45,17 @@ def decision_args(
     decisions.write_text(
         json.dumps(
             {
-                "schema_version": 1,
+                "schema_version": 2,
                 "review_version": review["review_version"],
                 "plan_sha256": review["document"]["plan_sha256"],
                 "document_sha256": review["document_sha256"],
+                "findings_sha256": review["findings_sha256"],
                 "bullets": [
                     {
                         "bullet_id": b["bullet_id"],
                         "decision": "approve",
                         "reason": "Fictional user reviewed source scope and wording.",
+                        "acknowledged_finding_ids": [],
                     }
                     for b in review["bullets"]
                 ],
@@ -150,7 +152,18 @@ def test_incomplete_decision_usage_fails_before_any_input_io(mode: str) -> None:
     assert "requires" in result.stderr or "--confirm-review" in Text.from_ansi(result.stderr).plain
 
 
-@pytest.mark.parametrize("mode", ["stale", "malformed", "missing_file", "unknown_bullet"])
+@pytest.mark.parametrize(
+    "mode",
+    [
+        "stale",
+        "malformed",
+        "missing_file",
+        "unknown_bullet",
+        "stale_findings",
+        "old_format",
+        "invalid_ack",
+    ],
+)
 def test_bad_decisions_never_emit_a_partial_approval_or_raw_input(
     decision_args: list[str], mode: str
 ) -> None:
@@ -162,6 +175,12 @@ def test_bad_decisions_never_emit_a_partial_approval_or_raw_input(
         data = {"fictional-private-field": "fictional-private-value"}
     elif mode == "unknown_bullet":
         data["bullets"][0]["bullet_id"] = "bullet_private_unknown"
+    elif mode == "stale_findings":
+        data["findings_sha256"] = "0" * 64
+    elif mode == "old_format":
+        data["schema_version"] = 1
+    elif mode == "invalid_ack":
+        data["bullets"][0]["acknowledged_finding_ids"] = ["0" * 64]
     else:
         decision_args[decision_args.index("--decisions") + 1] = str(path.with_name("missing.json"))
     path.write_text(json.dumps(data))
@@ -198,7 +217,9 @@ def test_plan_conflicts_cannot_be_approved_through_the_cli(decision_args: list[s
     path = Path(decision_args[decision_args.index("--decisions") + 1])
     data = json.loads(path.read_text())
     data.update(
-        plan_sha256=review["document"]["plan_sha256"], document_sha256=review["document_sha256"]
+        plan_sha256=review["document"]["plan_sha256"],
+        document_sha256=review["document_sha256"],
+        findings_sha256=review["findings_sha256"],
     )
     path.write_text(json.dumps(data))
     result = runner.invoke(app, decision_args)
@@ -214,3 +235,45 @@ def test_help_explains_explicit_decision_options() -> None:
     text = Text.from_ansi(result.stdout).plain
     assert "--decisions" in text and "--confirm-decisions" in text
     assert "--provider" not in text
+
+
+def test_installed_findings_gate_preserves_wording_until_acknowledged(
+    decision_args: list[str], tmp_path: Path
+) -> None:
+    draft_path = Path(decision_args[decision_args.index("--draft") + 1])
+    draft = json.loads(draft_path.read_text())
+    draft["sections"][1]["entries"][0]["bullets"][0]["text"] = "Owned 99 endpoints."
+    draft_path.write_text(json.dumps(draft))
+    inspect_args = decision_args[: decision_args.index("--decisions")]
+    inspected = runner.invoke(app, inspect_args)
+    assert inspected.exit_code == 0, inspected.output
+    review = json.loads(inspected.stdout)
+    assert len(review["bullets"][0]["findings"]) == 2
+    path = Path(decision_args[decision_args.index("--decisions") + 1])
+    choices = json.loads(path.read_text())
+    choices.update(
+        document_sha256=review["document_sha256"], findings_sha256=review["findings_sha256"]
+    )
+    path.write_text(json.dumps(choices))
+    for acknowledge in (False, True):
+        if acknowledge:
+            choices["bullets"][0]["acknowledged_finding_ids"] = [
+                finding["id"] for finding in review["bullets"][0]["findings"]
+            ]
+            path.write_text(json.dumps(choices))
+        result = subprocess.run(
+            [sys.executable, "-m", "resumeforge", *decision_args],
+            cwd=tmp_path,
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=10,
+        )
+        assert result.returncode == (0 if acknowledge else 3), result.stderr
+        report = json.loads(result.stdout)
+        assert report["status"] == (
+            "bullet_wording_approved_by_user" if acknowledge else "needs_review"
+        )
+        assert report["review"]["document"] == draft
+        assert report["rendering_authorized"] is False
+        assert report["review"]["bullets"][0]["findings"] == review["bullets"][0]["findings"]

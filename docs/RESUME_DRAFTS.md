@@ -1,4 +1,4 @@
-# Evidence-linked wording drafts — 0.9.0
+# Evidence-linked wording drafts — updated for 0.11.0
 
 This first Phase 4 slice adds `ResumeDocument` and `review-resume`: an offline boundary for
 structured bullet wording and pending review. **Inspection does not generate polished wording,
@@ -82,10 +82,13 @@ in-progress-parent caveat where applicable, and one literal wording observation:
   lost qualifiers. No edits are repaired, normalized or silently approved.
 
 **Both remain `pending_review`.** Literal equality does not prove factual truth or fit in a resume.
-Edited wording is not automatically semantically false or supported. This slice does not classify
-unsupported metrics/tools/ownership or detect every lost caveat; it conservatively flags every
-change and preserves source context for a human. Invented numbers/technology/ownership examples
-in tests demonstrate pending-review behavior, not a semantic detection guarantee.
+Edited wording is not automatically semantically false or supported. Inspection version
+`resume-draft-review-v2` adds per-bullet `findings`, outer `findings_version` and `findings_sha256`:
+literal numeric tokens absent from the statement and missing cues from a finite caveat vocabulary.
+Exact spans, policy, characterization and blind spots are documented in `docs/CLAIM_FINDINGS.md`.
+Empty findings are not support; technology/ownership and many qualifier changes remain undetected.
+The document itself stays schema version 1. Decision files now require version 2 and explicit
+finding acknowledgements; no historical attestation is automatically upgraded.
 
 The outer review is `blocked_by_plan` when count/evidence/required-content conflicts remain;
 otherwise it is `needs_review`. Neither state is generation-ready or approved. Full job categories,
@@ -119,6 +122,6 @@ is a `ResumeDocument`. `parse_resume_document`/`load_resume_document` validate p
 Safe boundary failures raise `ResumeError` (file loading may also raise `InputError`).
 
 Separate snapshot-bound human bullet-wording decisions are now available; pending document/
-inspection states remain unchanged. Next: measured claim-review findings and controlled wording
-assistance. Full-resume approval, model-assisted generation, PDF/layout/rendering, history,
+inspection states remain unchanged. Literal claim-review findings are now available; next is
+controlled wording assistance. Full-resume approval, model-assisted generation, PDF/layout/rendering, history,
 automatic ranking and cloud inference remain unimplemented.

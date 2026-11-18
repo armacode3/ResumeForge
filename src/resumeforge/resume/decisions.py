@@ -16,7 +16,7 @@ from resumeforge.resume.models import (
     ReviewDecisions,
 )
 
-DECISION_VERSION = "snapshot-bound-decisions-v1"
+DECISION_VERSION = "snapshot-bound-decisions-v2"
 
 
 def apply_review_decisions(
@@ -79,11 +79,24 @@ def apply_review_decisions(
             "review current wording and evidence."
         )
     choices = {choice.bullet_id: choice for choice in decisions.bullets}
+    if decisions.findings_sha256 != review.findings_sha256:
+        raise ResumeError(
+            "Review decisions belong to different findings; inspect and review again."
+        )
     if not choices.keys() <= {bullet.bullet_id for bullet in review.bullets}:
         raise ResumeError("Review decisions reference a bullet absent from the current draft.")
     resolved = []
     for bullet in review.bullets:
         choice = choices.get(bullet.bullet_id)
+        finding_ids = tuple(finding.id for finding in bullet.findings)
+        acknowledged = choice.acknowledged_finding_ids if choice else ()
+        if not set(acknowledged) <= set(finding_ids):
+            raise ResumeError(
+                "Finding acknowledgements must reference current findings on that bullet."
+            )
+        unacknowledged = tuple(
+            identifier for identifier in finding_ids if identifier not in acknowledged
+        )
         state: Literal["pending_review", "approved_by_user", "rejected_by_user", "blocked_by_plan"]
         if choice is None:
             state = "pending_review"
@@ -91,6 +104,8 @@ def apply_review_decisions(
             state = "rejected_by_user"
         elif review.status == "blocked_by_plan":
             state = "blocked_by_plan"
+        elif unacknowledged:
+            state = "pending_review"
         else:
             state = "approved_by_user"
         resolved.append(
@@ -99,6 +114,8 @@ def apply_review_decisions(
                 accomplishment_id=bullet.accomplishment_id,
                 decision=choice.decision if choice else None,
                 reason=choice.reason if choice else None,
+                acknowledged_finding_ids=acknowledged,
+                unacknowledged_finding_ids=unacknowledged,
                 review_status=state,
             )
         )
@@ -121,6 +138,7 @@ def apply_review_decisions(
         bullets=tuple(resolved),
         warnings=(
             "Decisions are local user attestations, not authenticated identity or semantic proof.",
+            "Acknowledging literal findings is not evidence of claim support or issue resolution.",
             "Scope is bullet wording only; metadata, unscoped sections, "
             "job fit and layout remain unapproved.",
             "Underlying draft/inspection states stay pending; "
