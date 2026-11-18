@@ -150,9 +150,17 @@ guarded local Ollama requires separate selected-source data-use acknowledgement.
 plans skip wording calls. Suggestions are never approvals, and wording quality is not evaluated.
 See `docs/WORDING_ASSISTANCE.md` and ADR-017. Profile/draft/decision formats are unchanged.
 
-**Next:** an explicitly opted-in synthetic wording-quality evaluation before claiming real-model
-utility. Model/data policy stays explicit; semantic proof, complete resume/metadata review,
-rendering and automatic ranking remain unimplemented.
+Implemented in 0.13.0: fixed six-case/seven-bullet wording evaluation with source-seed replay as
+default, independent response replay, explicit guarded live opt-in, private exclusive capture,
+full failure denominators and separate source-fidelity review. The separately authorized single
+Qwen3:4b pass produced **6/6 structurally valid responses, 7/7 verbatim bullets**, no demonstrated
+rewriting benefit. See `docs/WORDING_EVALUATION.md`, `docs/evaluations/qwen3-4b-wording-v1.md` and
+ADR-018. No prompt/validator change or second live pass was made.
+
+**Next:** a separate measured wording-usefulness iteration with a versioned objective and held-out
+rougher sources, retaining truthful copy fallback and review gates. Model/data policy stays
+explicit; semantic proof, complete resume/metadata review, rendering and automatic ranking remain
+unimplemented. Valid copied output does not justify moving to rendering or unattended use.
 
 Generate structured bullets with accomplishment IDs, check unsupported tools/metrics/ownership,
 dates and contradictions, report gaps, and implement review/approval. Gate: fabricated-claim

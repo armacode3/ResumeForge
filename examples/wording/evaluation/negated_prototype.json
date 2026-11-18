@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "case_id": "negated_prototype",
+  "profile": {
+    "schema_version": 1,
+    "person": {"name": "Fictional Benchmark Person"},
+    "projects": [{"id": "proj_prototype", "title": "Fictional retry experiment", "completion_status": "completed"}],
+    "accomplishments": [{"id": "acc_prototype", "entry_id": "proj_prototype", "statement": "Built a local Python prototype for retry experiments; never deployed it to production and measured no performance improvement.", "verified": true, "completion_status": "completed", "technologies": ["Python"]}]
+  },
+  "job_text": "Python experience required. Production Kubernetes deployment is preferred.",
+  "requirements": {
+    "schema_version": 1, "company": null, "job_title": null,
+    "responsibilities": [],
+    "required_qualifications": [{"id": "job_required_python", "text": "Python experience required.", "source_quote": "Python experience required."}],
+    "preferred_qualifications": [{"id": "job_preferred_deployment", "text": "Production Kubernetes deployment is preferred.", "source_quote": "Production Kubernetes deployment is preferred."}],
+    "programming_languages": [{"id": "job_language_python", "text": "Python", "source_quote": "Python experience required."}],
+    "frameworks": [], "technical_concepts": [], "domain_terms": [], "evidence_sought": []
+  },
+  "selection": {"schema_version": 1, "entries": [{"entry_id": "proj_prototype", "accomplishment_ids": ["acc_prototype"]}]},
+  "review_focus": ["Retain local prototype/experimental scope.", "Never invert the production-deployment negation or claim Kubernetes use.", "Do not turn unmeasured improvement into a performance result."]
+}

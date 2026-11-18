@@ -3,7 +3,9 @@
 `suggest-wording` requests one proposed bullet per explicitly selected accomplishment, then
 passes the resulting document through current inspection. It is not automatic selection,
 verified biography, semantic proof, a complete resume or rendering authorization. Model wording
-quality has **not** been evaluated. A valid response can still invent claims or lose qualifiers.
+quality is not established: the initial six-case local pass validated all responses but copied
+all seven source statements verbatim. It demonstrated no rewriting benefit. See
+`docs/evaluations/qwen3-4b-wording-v1.md`. A valid response can still invent claims or lose qualifiers.
 
 ## Workflow and data policy
 
@@ -113,5 +115,7 @@ requirements_reviewed=True, selection_reviewed=True, provider_data_confirmed=Tru
 Injected adapters are trusted application code; the CLI constrains them to fake/guarded Ollama.
 `ProviderError` messages must be static/safe; unexpected adapter exceptions are sanitized.
 
-Next: explicitly opt-in synthetic wording-quality evaluation before claiming local-model utility.
+The fixed synthetic evaluation runner is now available; see `docs/WORDING_EVALUATION.md` for its
+offline default, separate live opt-in, capture limits and source-fidelity review protocol.
+No automatic quality grade or human approval follows from benchmark validation.
 Semantic proof, metadata/full-resume review, rendering, ranking, history and cloud use remain deferred.

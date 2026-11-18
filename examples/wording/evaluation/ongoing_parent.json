@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "case_id": "ongoing_parent",
+  "profile": {
+    "schema_version": 1,
+    "person": {"name": "Fictional Benchmark Person"},
+    "projects": [{"id": "proj_ongoing", "title": "Fictional ongoing queue", "completion_status": "in_progress"}],
+    "accomplishments": [{"id": "acc_retry_tests", "entry_id": "proj_ongoing", "statement": "Completed Python retry tests for 8 failure cases in a task queue; the larger project remains in progress.", "verified": true, "completion_status": "completed", "technologies": ["Python"]}]
+  },
+  "job_text": "Python testing experience required. Completed production services are preferred.",
+  "requirements": {
+    "schema_version": 1, "company": null, "job_title": null,
+    "responsibilities": [],
+    "required_qualifications": [{"id": "job_required_python", "text": "Python testing experience required.", "source_quote": "Python testing experience required."}],
+    "preferred_qualifications": [{"id": "job_preferred_services", "text": "Completed production services are preferred.", "source_quote": "Completed production services are preferred."}],
+    "programming_languages": [{"id": "job_language_python", "text": "Python", "source_quote": "Python testing experience required."}],
+    "frameworks": [], "technical_concepts": [], "domain_terms": [], "evidence_sought": []
+  },
+  "selection": {"schema_version": 1, "entries": [{"entry_id": "proj_ongoing", "accomplishment_ids": ["acc_retry_tests"]}]},
+  "review_focus": ["Distinguish completed tests from the ongoing parent project.", "Keep the 8-case scope and do not claim a complete production service.", "Check both wording and preserved parent_entry_in_progress context; they are not semantic proof."]
+}

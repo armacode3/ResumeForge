@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "case_id": "cross_evidence",
+  "profile": {
+    "schema_version": 1,
+    "person": {"name": "Fictional Benchmark Person"},
+    "projects": [
+      {"id": "proj_parser", "title": "Fictional parser", "completion_status": "completed"},
+      {"id": "proj_queue", "title": "Fictional queue", "completion_status": "completed"}
+    ],
+    "accomplishments": [
+      {"id": "acc_parser", "entry_id": "proj_parser", "statement": "Implemented Python tests for 5 parser cases; did not work on deployment.", "verified": true, "completion_status": "completed", "technologies": ["Python"]},
+      {"id": "acc_queue", "entry_id": "proj_queue", "statement": "Built a local SQLite queue for 20 synthetic tasks; did not implement the parser.", "verified": true, "completion_status": "completed", "technologies": ["SQLite"]}
+    ]
+  },
+  "job_text": "Python and SQLite experience required. Kubernetes deployment is preferred.",
+  "requirements": {
+    "schema_version": 1, "company": null, "job_title": null,
+    "responsibilities": [],
+    "required_qualifications": [{"id": "job_required_tools", "text": "Python and SQLite experience required.", "source_quote": "Python and SQLite experience required."}],
+    "preferred_qualifications": [{"id": "job_preferred_deployment", "text": "Kubernetes deployment is preferred.", "source_quote": "Kubernetes deployment is preferred."}],
+    "programming_languages": [{"id": "job_language_python", "text": "Python", "source_quote": "Python and SQLite experience required."}],
+    "frameworks": [],
+    "technical_concepts": [{"id": "job_concept_sqlite", "text": "SQLite", "source_quote": "Python and SQLite experience required."}],
+    "domain_terms": [], "evidence_sought": []
+  },
+  "selection": {"schema_version": 1, "entries": [
+    {"entry_id": "proj_parser", "accomplishment_ids": ["acc_parser"]},
+    {"entry_id": "proj_queue", "accomplishment_ids": ["acc_queue"]}
+  ]},
+  "review_focus": ["Keep 5 parser tests with acc_parser and 20 synthetic tasks with acc_queue.", "Do not transfer SQLite to the parser or Python/parser implementation to the queue.", "Do not merge slots, erase negative scope, or import Kubernetes from job preferences."]
+}

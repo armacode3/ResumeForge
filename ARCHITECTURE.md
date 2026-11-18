@@ -10,7 +10,8 @@ pending review and exact plan binding. Separate snapshot-bound human decisions c
 to individual bullet wording. Literal numeric/caveat observations now require explicit finding
 acknowledgements before user approval. Controlled wording assistance now supports explicit fake
 replay or opted-in local Ollama proposals with minimized source/job data and fresh inspection.
-Wording quality is unevaluated. Relevance ranking, semantic claim proof and full-resume/rendering
+The initial local wording pass validated all six responses but copied all seven statements;
+useful rewriting remains unproven. Relevance ranking, semantic claim proof and full-resume/rendering
 approval are not implemented.
 No cloud provider is enabled.
 Everything below labeled **planned** is a design boundary, not a
@@ -56,12 +57,13 @@ src/resumeforge/
     decisions.py    snapshot-bound user attestations, never full-resume/rendering approval
     findings.py     versioned finite numeric/caveat observations and provenance-bound fingerprints
     wording.py      source-bound provider proposals, minimized inputs, exact slots and fresh review
+    benchmark.py    fixed synthetic wording replay/live harness, no automatic quality verdicts
 tests/
   unit/             CLI/schema/parser/gap contracts and invalid inputs
   integration/      installed entry points, profile validation, privacy safeguards
 examples/profiles/   fictional comprehensive profile; shared test fixture
 examples/jobs/       fictional job and hand-authored fake response; shared smoke fixtures
-scripts/             repository-only synthetic evaluation runner, offline by default
+scripts/             repository-only job/wording evaluation runners, offline by default
 config/
   resume_rules.md   documented writing policy (not yet consumed)
 docs/               decisions, roadmap, development log
@@ -217,6 +219,14 @@ missing, extra, reordered, self-approved, malformed or excessive responses fail 
 success/retry. All proposals stay pending; old decisions do not transfer to changed wording.
 Reports record provider/model, prompt/policy versions and request/raw-response hashes, not raw
 prompt logs or semantic truth. No persistence/rendering is added. See `docs/WORDING_ASSISTANCE.md`.
+
+`resume.benchmark` preflights a fixed fictional six-case/seven-bullet corpus and invokes the same
+wording engine. Source-seed replay is the default, independent-response replay is explicit, and
+guarded local mode needs a separate data acknowledgement. Invalid outputs stay in totals; reports
+separate structural validation, literal findings and pending manual review, never an automatic
+quality/factuality score. Optional bounded response capture uses new private paths and exclusive
+writes; default operation writes nothing. Corpus data remains repository-only, not wheel-bundled
+candidate evidence. See `docs/WORDING_EVALUATION.md` and ADR-018.
 
 ## Planned module responsibilities
 

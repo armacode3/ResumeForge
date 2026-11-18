@@ -52,8 +52,16 @@ acknowledged findings are not proof of support. See [docs/CLAIM_FINDINGS.md](doc
 Ollama suggestions for selected source statements. It preserves all slots and sends every proposal
 through fresh inspection; no suggestion self-approves. Local mode additionally requires
 `--confirm-local-data` for selected statements/caveats and reviewed job items, excluding contact,
-notes and historical wording. **Wording quality has not been evaluated.** See
+notes and historical wording. The initial local review produced **6/6 valid responses but 7/7
+verbatim bullets**; useful rewriting remains unproven. See
 [docs/WORDING_ASSISTANCE.md](docs/WORDING_ASSISTANCE.md).
+
+`python scripts/evaluate_wording.py` now exercises six fixed fictional wording cases with
+**source-seed replay, not model-quality scoring**. Failures remain in totals and all results stay
+pending review. Live local evaluation requires explicit opt-in; see
+[docs/WORDING_EVALUATION.md](docs/WORDING_EVALUATION.md).
+The [single-pass local results](docs/evaluations/qwen3-4b-wording-v1.md) are review observations,
+not approval for unattended generation.
 
 **End-to-end resume generation is not implemented.** There is no cloud provider, relevance-ranking engine,
 database, template renderer, PDF compiler, API, or browser extension yet.
