@@ -493,3 +493,19 @@
   agent guidance. Next: explicit human review decisions bound to exact wording/evidence snapshots,
   then measured claim checks and controlled wording assistance. Human approval, semantic proof,
   PDF/rendering/layout, history, automatic ranking and cloud inference remain unimplemented.
+
+## Session 015 — Resolve wording-draft branch conflicts after planning squash merge
+
+- User requested conflict resolution on `feat/resume-draft-contracts`. The starting tree was
+  clean. Fetched target main at `2b0b646` (planning PR #7) and verified its tree exactly matches
+  the original planning commit `ed6e542`; squash ancestry, not new implementation changes,
+  caused the conflicts with the stacked wording-draft branch.
+- Merged origin/main into the existing branch without rebasing, force-pushing or merging the
+  feature into main. Resolved twelve conflicted files by retaining both the planning feature
+  and the newer 0.9.0 draft contract, CLI, tests, CI smoke and actual-status documentation.
+  Before this log addition, the resolved tree exactly matched pre-merge feature tip `087d280`.
+  No application behavior, source contracts, dependency, private input or model activation changed.
+- Local Python 3.12.3: all 618 tests passed with GitHub-like colors and 99.94% branch-aware
+  coverage. Ruff lint/format, strict mypy (56 files), dependency checks and source/wheel builds
+  passed; no unmerged paths remain. Staged content/privacy and hosted checks are verified before
+  completion. The next feature remains snapshot-bound human review decisions, not new generation.
