@@ -220,6 +220,16 @@ success/retry. All proposals stay pending; old decisions do not transfer to chan
 Reports record provider/model, prompt/policy versions and request/raw-response hashes, not raw
 prompt logs or semantic truth. No persistence/rendering is added. See `docs/WORDING_ASSISTANCE.md`.
 
+The default `source_faithful` objective retains exact v1 instructions/request bytes. Opt-in
+`concise_rewrite` adds a separately versioned redundancy-reduction objective, with no forced edit
+or length quota. `wording_policy` accepts only the two known objectives; response/source schemas,
+slots and all review/approval boundaries are identical. Results label objective/policy/prompt.
+The benchmark has separate development/rough-source evaluation suites and descriptive character
+counts, never automated quality grades. See `docs/WORDING_REWRITE_EVALUATION.md` and ADR-019.
+The paired local pass shortened four bullets but changed source qualifiers/relationships, so the
+candidate stays experimental and opt-in. No semantic quality or full-resume approval is inferred;
+see `docs/evaluations/qwen3-4b-wording-v2-comparison.md`.
+
 `resume.benchmark` preflights a fixed fictional six-case/seven-bullet corpus and invokes the same
 wording engine. Source-seed replay is the default, independent-response replay is explicit, and
 guarded local mode needs a separate data acknowledgement. Invalid outputs stay in totals; reports

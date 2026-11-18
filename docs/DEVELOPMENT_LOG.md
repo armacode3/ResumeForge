@@ -703,3 +703,67 @@
   measured wording-usefulness iteration on held-out rougher statements with versioned objectives,
   not rendering or unattended generation. Seven unchanged bullets do not exercise transformed-wording
   fidelity, general injection resistance, repeated stability or semantic proof.
+
+## Session 020 — Opt-in concise rewrite objective and frozen rough-source comparison
+
+- User confirmed evaluation was merged. Fetched `main` at `6e0a56a`, fast-forwarded local main and
+  created `feat/concise-wording-objective`. Asked before another live run; user explicitly approved
+  implementing the objective plus comparing both objectives once on each of three new cases,
+  six local Qwen3:4b calls total. No downloads, private profile use or automatic retries authorized.
+- Kept `source_faithful` as default with original v1 instructions and exact structured request
+  bytes. Added explicit `concise_rewrite` wording/prompt v2, asking to combine redundant clauses
+  and remove repeated setup/narration without losing distinct material facts or qualifiers. There
+  is no forced edit, length quota or shorter-is-better score. Copy fallback stays, including for
+  already concise or uncertain wording. No claim-support verdict or approval is inferred.
+- Added a small typed policy selector and `--objective` on `suggest-wording`; unknown objectives
+  fail before source/provider use. Results expose requested objective and actual policy/prompt
+  versions. Both paths use the same minimized data, response schema, selected slots, source/seed
+  references, bounds, fresh inspection, finding acknowledgements and human-decision gates. Profile,
+  draft, response and decision schemas and rendering prohibition are unchanged.
+- Added three offline development fixtures and three separate rough-source evaluation fixtures
+  (four evaluation bullets), with explicit material-fact/qualifier review focus outside model input.
+  Fixed the candidate prompt before authoring evaluation fixtures; evaluation outputs are held out
+  from output-driven tuning, not independently curated/hidden from the coding agent. The original
+  six-case corpus, frozen protocol and result note are untouched. New suites are explicit in the
+  existing runner and mismatched suite/case choices fail before I/O. Descriptive source/draft
+  character counts apply only to validated results, never a quality grade or failure-hiding ratio.
+- Added regressions for six original live request digests, opt-in policy/data/schema isolation,
+  pending copies/findings/conflicts, malformed objective ordering, separate suite identities,
+  inert length observations, installed CLI selection and styled help. CI wheel smoke only replays
+  the new suite, asserting four unchanged pending bullets under requested v2, no model inference.
+- Application 0.14.0, no new dependency. Final local Python 3.12.3 full suite passed 776 unit +
+  119 integration = 895 tests with 99.96% branch-aware coverage. Ruff lint/format, strict mypy
+  (68 files), editable install and dependency checks passed. Fresh locked editable/runtime-only
+  installs, distributions, all 895 tests against the installed wheel outside the repository,
+  exact CI smoke for both replay suites and staged/distribution privacy checks passed. Hosted CI
+  is verified after push, not inferred from local success.
+- Reused cached official Ollama v0.40.16 and the previously approved Qwen3:4b digest
+  `359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7`, no downloads or system
+  service changes. Started a separate temporary-home, cloud-disabled loopback server on 11435.
+  New manifests/captures/reports stay outside Git under
+  `/tmp/opencode/resumeforge-wording-rewrite.9k8xtH/`; cached model files remain in the prior
+  isolated runtime directory. No private profile/notes or historical wording enters provider data.
+- Froze candidate/legacy instructions, response schema, both new suites and original corpus,
+  source/inspection code, review protocol and six expected request hashes before inference. The
+  declared order is v1 across three evaluation cases, then v2 across the same cases, one request
+  per case/objective, 16,384 context / 4,096 output, temperature/seed 0, non-thinking/no-tools,
+  unload after each call and 600-second budget. No live development-case run, prompt tuning,
+  validator weakening, correction or repeated measurement belongs to this comparison.
+  Actual comparison: both objectives validated 3/3 cases, four bullets each. V1 copied all sources;
+  v2 edited all four, 1,262 to 633 characters, with three literal cue findings. The source-by-source
+  agent review found changed project relationship/negative scope and lost qualifiers, not a
+  faithful-rewriting quality pass. In particular, incomplete whole-project work became work not
+  part of that project. Character reduction is not a support verdict or human approval.
+- Checked frozen corpus/code/instructions/schema/protocol and request/response identities after
+  completion. Offline replay reproduced all six inspections and hashes without more inference.
+  Stopped the temporary server; runtime/model/captures remain outside Git. Documented exact
+  per-bullet review, limitations, hashes and observed elapsed time (221.75 seconds v1, 205.00 v2,
+  426.75 total) in `docs/evaluations/qwen3-4b-wording-v2-comparison.md`. No raw outputs are committed.
+- Keep the original default, with v2 experimental/opt-in; no tuning, repair or rerun followed.
+  The CLI now warns explicitly that the experimental objective may distort claims; this notice
+  does not alter the frozen instructions, schema or inspection. Final installed-wheel tests and
+  exact CI smoke passed; 26 staged public files/distribution contents passed privacy review and
+  published evaluation hashes matched the actual frozen captures. No private/runtime data is tracked.
+  Next: explicit source-fragment omission/qualifier review bound to source/draft snapshots, not
+  length-based semantic judgments, automatic approval or rendering. Agent evaluation remains
+  fallible and is not a human factual/wording attestation.

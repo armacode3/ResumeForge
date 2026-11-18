@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "case_id": "eval_survey",
+  "profile": {
+    "schema_version": 1,
+    "person": {"name": "Fictional Rewrite Evaluation Person"},
+    "research": [{"id": "res_eval_survey", "title": "Fictional café survey", "completion_status": "completed"}],
+    "accomplishments": [{"id": "acc_eval_survey", "entry_id": "res_eval_survey", "statement": "Contributed Python missing-value checks to a café survey with a bilingual team. The checks I contributed were checks for missing values in the survey responses, and I contributed them as a team member. I did not lead the study. No numeric improvement was measured, and there is no measured numeric impact to report from these checks.", "verified": true, "completion_status": "completed", "technologies": ["Python"]}]
+  },
+  "job_text": "Python data-cleaning experience required. Leadership and measurable numeric impact are preferred.",
+  "requirements": {
+    "schema_version": 1, "company": null, "job_title": null,
+    "responsibilities": [],
+    "required_qualifications": [{"id": "job_required_python", "text": "Python data-cleaning experience required.", "source_quote": "Python data-cleaning experience required."}],
+    "preferred_qualifications": [{"id": "job_preferred_impact", "text": "Leadership and measurable numeric impact are preferred.", "source_quote": "Leadership and measurable numeric impact are preferred."}],
+    "programming_languages": [{"id": "job_language_python", "text": "Python", "source_quote": "Python data-cleaning experience required."}],
+    "frameworks": [], "technical_concepts": [], "domain_terms": [], "evidence_sought": []
+  },
+  "selection": {"schema_version": 1, "entries": [{"entry_id": "res_eval_survey", "accomplishment_ids": ["acc_eval_survey"]}]},
+  "review_focus": ["Retain contribution rather than leadership, Python missing-value checks, café survey and bilingual team.", "Preserve explicit non-leadership and absence of measured numeric improvement/impact while removing repeated prose.", "Assess readable wording separately from character reduction; never infer job-preferred leadership or gains."]
+}

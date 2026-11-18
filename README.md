@@ -63,6 +63,15 @@ pending review. Live local evaluation requires explicit opt-in; see
 The [single-pass local results](docs/evaluations/qwen3-4b-wording-v1.md) are review observations,
 not approval for unattended generation.
 
+An opt-in `suggest-wording --objective concise_rewrite` objective now requests less redundant
+wording without dropping distinct facts or qualifiers. The original `source_faithful` behavior
+remains the default; both keep copy fallback, exact source/slot bindings and pending review.
+Separate rough-source suites and the comparison protocol are described in
+[docs/WORDING_REWRITE_EVALUATION.md](docs/WORDING_REWRITE_EVALUATION.md). Selecting an objective
+is not evidence of wording quality or approval. The [frozen paired comparison](docs/evaluations/qwen3-4b-wording-v2-comparison.md)
+produced shorter text but distorted qualifiers/project scope. The concise objective is experimental;
+the conservative default remains unchanged.
+
 **End-to-end resume generation is not implemented.** There is no cloud provider, relevance-ranking engine,
 database, template renderer, PDF compiler, API, or browser extension yet.
 Local verification and hosted CI results are reported separately.

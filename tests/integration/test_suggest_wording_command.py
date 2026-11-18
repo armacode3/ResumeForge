@@ -233,3 +233,21 @@ def test_invalid_selection_is_a_safe_cli_error_before_profile_access(
         result = runner.invoke(app, wording_args)
     assert result.exit_code == 1 and result.stdout == ""
     assert "private-value" not in result.output and "Traceback" not in result.output
+
+
+def test_cli_concise_objective_is_explicit_and_still_pending(wording_args: list[str]) -> None:
+    result = runner.invoke(app, [*wording_args, "--objective", "concise_rewrite"])
+    assert result.exit_code == 0, result.output
+    report = json.loads(result.stdout)
+    assert report["objective"] == "concise_rewrite"
+    assert report["prompt_version"] == "source-bound-wording-prompt-v2"
+    assert report["attempt"]["provider"] == "fake"
+    assert report["review"]["document"]["status"] == "needs_review"
+    assert not report["rendering_authorized"]
+    assert "Experimental objective" in result.stderr
+
+
+def test_unknown_cli_objective_cannot_read_sources(wording_args: list[str]) -> None:
+    with patch("resumeforge.cli.load_job", side_effect=AssertionError("No IO")):
+        result = runner.invoke(app, [*wording_args, "--objective", "unknown"])
+    assert result.exit_code == 2 and result.stdout == ""

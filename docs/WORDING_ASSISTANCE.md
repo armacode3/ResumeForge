@@ -9,6 +9,33 @@ all seven source statements verbatim. It demonstrated no rewriting benefit. See
 
 ## Workflow and data policy
 
+### Optional concise-rewrite objective (0.14.0)
+
+`--objective source_faithful` remains the default with the original v1 instructions and exact
+request bytes. `--objective concise_rewrite` explicitly selects wording/prompt v2, asking to
+combine redundant clauses and repeated setup without losing any distinct material fact or
+qualifier. There is no forced-edit/length quota or shorter-is-better approval. Full-source copying
+remains a fallback; the original response schema, source payload, ordered slots, bounds and fresh
+inspection are identical. This changes instructions only, not facts or approval scope.
+
+```text
+resumeforge suggest-wording ... --objective concise_rewrite
+```
+
+The ellipsis means the same four required source paths and existing review/provider options
+shown below, not a runnable placeholder command. Fake mode still replays supplied JSON and
+cannot demonstrate rewrite usefulness. Local mode still requires explicit `--confirm-local-data`.
+Results expose the requested `objective` and actual policy/prompt versions; replay labels do not
+establish what prompt originally authored a fixture. Unknown objectives fail before input reads
+in the CLI, or before source/provider access in the engine. Original profile/draft/decision and
+wording response schemas are unchanged. See `docs/WORDING_REWRITE_EVALUATION.md` for the separate
+development/evaluation suites and predeclared comparison; the original benchmark is not edited.
+
+The authorized [paired local comparison](evaluations/qwen3-4b-wording-v2-comparison.md) shortened
+all four evaluation bullets but changed negative qualifiers and project relationships. This
+objective is **experimental, not approved for unattended use**. The default remains unchanged;
+zero literal findings or acknowledged findings do not make a rewrite semantically supported.
+
 Supply the same four original source paths as `review-resume` and acknowledge requirements/
 selection review. No prior draft, decision receipt or historical bullet text is an evidence input.
 The engine revalidates sources and builds a fresh source seed before any wording-provider call.
@@ -88,7 +115,8 @@ markup, executable-looking content or instructions; nothing compiles, executes o
 
 ## Result, review and provenance
 
-`WordingResult` identifies `source-bound-wording-v1` and `source-bound-wording-prompt-v1`, has
+`WordingResult` identifies requested `objective`, wording/prompt versions (v1 by default, v2 for
+`concise_rewrite`), has
 `status: needs_review` or `blocked_by_plan`, and always `rendering_authorized: false`. `review`
 contains the current document, full source context, plan/caveats and literal findings. If no
 wording call was made, `attempt` is null; otherwise it records adapter-reported provider/model,
@@ -110,7 +138,8 @@ stderr has safe notices/errors. There is no write-back, history, automatic resum
 page/readability check. Keep real profiles/responses/results under ignored private storage.
 
 Python API: `suggest_wording(profile, job, requirements, selection, provider,
-requirements_reviewed=True, selection_reviewed=True, provider_data_confirmed=True)` returns
+requirements_reviewed=True, selection_reviewed=True, provider_data_confirmed=True,
+objective="source_faithful")` returns
 `WordingResult`. `parse_wording_response` and `WordingResponse` are exported from `resumeforge.resume`.
 Injected adapters are trusted application code; the CLI constrains them to fake/guarded Ollama.
 `ProviderError` messages must be static/safe; unexpected adapter exceptions are sanitized.

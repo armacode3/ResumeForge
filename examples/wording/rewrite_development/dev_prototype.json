@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "case_id": "dev_prototype",
+  "profile": {
+    "schema_version": 1,
+    "person": {"name": "Fictional Rewrite Development Person"},
+    "projects": [{"id": "proj_dev_retry", "title": "Fictional retry prototype", "completion_status": "completed"}],
+    "accomplishments": [{"id": "acc_dev_retry", "entry_id": "proj_dev_retry", "statement": "Built a local Python prototype to experiment with retries. This prototype was local, and experimenting with retries was its purpose. It was never deployed to production. No performance improvement was measured, so I have no measured performance result to report from this local prototype.", "verified": true, "completion_status": "completed", "technologies": ["Python"]}]
+  },
+  "job_text": "Python experience required. Production deployment preferred.",
+  "requirements": {
+    "schema_version": 1, "company": null, "job_title": null,
+    "responsibilities": [],
+    "required_qualifications": [{"id": "job_required_python", "text": "Python experience required.", "source_quote": "Python experience required."}],
+    "preferred_qualifications": [{"id": "job_preferred_deployment", "text": "Production deployment preferred.", "source_quote": "Production deployment preferred."}],
+    "programming_languages": [{"id": "job_language_python", "text": "Python", "source_quote": "Python experience required."}],
+    "frameworks": [], "technical_concepts": [], "domain_terms": [], "evidence_sought": []
+  },
+  "selection": {"schema_version": 1, "entries": [{"entry_id": "proj_dev_retry", "accomplishment_ids": ["acc_dev_retry"]}]},
+  "review_focus": ["Repeated local/prototype/retry wording can be condensed without adding impact.", "Retain never deployed and no measured improvement, not just the technical method.", "Do not convert lack of measurements into an inferred improvement."]
+}

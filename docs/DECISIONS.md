@@ -405,3 +405,28 @@ and readability separately from schema validity. Evaluation notes, including age
 not user wording attestations or semantic proof. All documents stay pending and rendering stays
 unauthorized. The narrow corpus is not a representative benchmark or injection-resistance proof.
 See `docs/WORDING_EVALUATION.md` for the frozen protocol, modes and interpretation.
+
+## ADR-019 — Explicit rewrite objective without replacing the conservative default
+
+**Status:** Implemented in 0.14.0; any live comparison requires separate opt-in.
+
+Keep `source_faithful` as the default v1 instructions/request contract and preserve the frozen
+baseline corpus/protocol/results. Add opt-in `concise_rewrite` wording/prompt v2, asking for less
+redundant narration while retaining every material claim/qualifier. Never force an edit, impose a
+length quota, remove inconvenient caveats or equate shorter text with truth. Copy fallback stays.
+Use exactly the same minimized provider data, strict response schema, slots, snapshot references,
+fresh inspection, finding/user-decision gates and rendering prohibition. Unknown objectives fail
+before source/provider use. Report objective and prompt/policy provenance rather than assuming an
+external replay fixture was authored by the selected policy.
+
+Use separate development and rough-source evaluation suites. The candidate prompt is fixed
+before evaluation inference; do not tune on the held-out outputs, replace failures or rerun until
+green. Compare v1 and v2 on the same three cases in declared order, with all failures visible.
+Source/draft character counts and edit counts are observations, never automatic fidelity or
+usefulness scores. Review all material facts, qualifiers, cross-slot/job-data transfer and readable
+wording separately; agent evaluation is not human approval. These agent-authored evaluation cases
+are held out from output-driven tuning, not independently curated representative evidence.
+
+No provider guard, inference activation policy, dependency, response/profile/draft/decision schema,
+semantic approval or layout feature changes. Old default request digests have regression coverage.
+See `docs/WORDING_REWRITE_EVALUATION.md` for the frozen comparison protocol and explicit commands.
