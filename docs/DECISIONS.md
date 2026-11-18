@@ -297,3 +297,28 @@ Next, human review decisions must bind exact wording and evidence snapshots; nei
 review flags can transfer approval to changed content. No new dependency/profile migration,
 automatic relevance ranking, semantic entailment guarantee or live-provider activation is added.
 See `docs/RESUME_DRAFTS.md` for the exact contract, hashes, limitations and privacy boundaries.
+
+## ADR-015 — Separate user attestations bind current bullet wording, not a whole resume
+
+**Status:** Implemented in 0.10.0; semantic checks, metadata review and rendering remain deferred.
+
+Accept a distinct strict decision file with inspection version, canonical plan/document hashes,
+unique bullet IDs, approve/reject choices and required reasons. Require separate explicit caller
+confirmation, original sources and an explicit draft; do not approve implicit seeds, trust prior
+reports or let draft text declare itself approved. Rebuild inspection before applying decisions.
+
+Whole-document binding conservatively invalidates earlier decisions after any wording/source/
+plan change. Unknown, duplicate, stale or detached references fail closed. Missing decisions stay
+pending, even for verbatim wording. Rejections retain content rather than silently dropping required
+material. Plan conflicts block every attempted approval. Empty documents never pass by vacuity.
+
+Keep pending draft/inspection records unchanged and return immutable, separate applied-decision
+records. Only nonempty wholly approved wording under a conflict-free plan yields
+`bullet_wording_approved_by_user`; scope is always `bullet_wording_only` and rendering authorization
+is always false. This represents local unsigned user attestations, not authenticated identity,
+semantic truth, promoted biography, metadata/job-fit review, final-resume approval or a history DB.
+
+Extend the existing offline command with optional decisions and separate confirmation. Validate
+option combinations before I/O, preserve safe failures and bounded JSON, write no input files,
+and call no model. No new dependency or profile/draft schema rewrite is needed. See
+`docs/REVIEW_DECISIONS.md` for exact status/exit behavior, snapshot limitations and privacy.

@@ -4,7 +4,7 @@ An evidence-first resume tailoring application, built incrementally. The goal is
 a verified Markdown profile and a job description into a reviewable, one-page resume
 without inventing experience, technologies, or metrics.
 
-## Current status: Phase 4 prerequisite — evidence-linked wording drafts
+## Current status: Phase 4 — wording drafts and snapshot-bound human decisions
 
 Implemented: an installable Typer CLI with help/version output, unit and installed-entry-point
 tests, privacy-ignore regression coverage, linting, formatting, strict typing, packaging checks,
@@ -37,6 +37,11 @@ rank/select evidence or generate wording. All plans remain unapproved and need r
 an edited structured draft against a freshly recomputed plan. Broken/stale references fail;
 all wording changes require review, and even verbatim bullets stay unapproved. This is a draft
 contract, not semantic claim validation or polished wording generation.
+
+With an explicit draft, `--decisions` and separate `--confirm-decisions`, it can now apply human
+approve/reject attestations to exact bullet wording/evidence snapshots. Missing decisions stay
+pending, stale decisions fail, and plan conflicts block approvals. This narrow user attestation
+does not approve metadata, prove claim support or authorize rendering.
 
 **Resume generation is not implemented.** There is no cloud provider, relevance-ranking engine,
 database, template renderer, PDF compiler, API, or browser extension yet.
@@ -118,7 +123,8 @@ budgets, findings, privacy and exit codes.
 `review-resume` uses the same explicit inputs and confirmation; optional `--draft` accepts only
 the inner `ResumeDocument`, not an outer review report. Without it, source statements are copied
 unchanged into pending wording records. Plan conflicts still exit 3. No output approves facts or
-wording. See [docs/RESUME_DRAFTS.md](docs/RESUME_DRAFTS.md).
+wording in inspection mode. See [docs/RESUME_DRAFTS.md](docs/RESUME_DRAFTS.md).
+For explicit human bullet decisions, see [docs/REVIEW_DECISIONS.md](docs/REVIEW_DECISIONS.md).
 
 ### Create your private profile
 

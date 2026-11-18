@@ -90,3 +90,48 @@ class ResumeReview(ResumeModel):
     plan: ResumePlan
     bullets: tuple[BulletReview, ...]
     warnings: tuple[str, ...]
+
+
+class BulletDecision(ResumeModel):
+    bullet_id: BulletId
+    decision: Literal["approve", "reject"]
+    reason: DraftText
+
+
+class ReviewDecisions(ResumeModel):
+    """Local user attestations, not signed proof of identity, truth or semantic support."""
+
+    schema_version: Annotated[int, Field(ge=1, le=1)]
+    review_version: Literal["resume-draft-review-v1"]
+    plan_sha256: Digest
+    document_sha256: Digest
+    bullets: tuple[BulletDecision, ...]
+
+    @model_validator(mode="after")
+    def distinct_bullets(self) -> Self:
+        if len({bullet.bullet_id for bullet in self.bullets}) != len(self.bullets):
+            raise ValueError("Each bullet may have only one review decision.")
+        return self
+
+
+class AppliedBulletDecision(ResumeModel):
+    bullet_id: str
+    accomplishment_id: str
+    decision: Literal["approve", "reject"] | None
+    reason: str | None
+    review_status: Literal[
+        "pending_review", "approved_by_user", "rejected_by_user", "blocked_by_plan"
+    ]
+
+
+class ReviewDecisionResult(ResumeModel):
+    decision_version: str
+    scope: Literal["bullet_wording_only"] = "bullet_wording_only"
+    rendering_authorized: Literal[False] = False
+    status: Literal[
+        "blocked_by_plan", "has_rejections", "needs_review", "bullet_wording_approved_by_user"
+    ]
+    decisions_model_sha256: Digest
+    review: ResumeReview
+    bullets: tuple[AppliedBulletDecision, ...]
+    warnings: tuple[str, ...]

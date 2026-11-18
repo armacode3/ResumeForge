@@ -15,8 +15,9 @@ guarded local Ollama inference, structured requirements, quotation checks and `a
 Phase 3 includes optional completion states/preferences and offline evidence eligibility/lexical
 retrieval with source-backed candidate review signals and explicit reviewed-selection count plans,
 not relevance ranking, wording generation or layout feasibility.
-Phase 4 has plan-bound wording drafts/source seeds and pending literal-change observations,
-not semantic claim proof or human approval workflows. Read `docs/RESUME_DRAFTS.md`.
+Phase 4 has plan-bound wording drafts/source seeds, pending literal-change observations and
+snapshot-bound user bullet-wording decisions, not semantic proof or full-resume approval.
+Read `docs/RESUME_DRAFTS.md` and `docs/REVIEW_DECISIONS.md`.
 Omitted states stay unknown; version-1 files need no rewrite. Read `docs/MATCHING.md` for the
 retrieval boundary.
 Read `docs/PROFILE_FORMAT.md`, `docs/JOB_ANALYSIS.md`, and `docs/OLLAMA.md` as applicable.
@@ -33,7 +34,7 @@ cloud inference, resume generation, semantic claim proof, PDFs or history alread
 - `src/resumeforge/matching/`: reviewed-input gate, eligibility, lexical candidates and review findings.
   Candidate signals preserve literal statement mentions and scoped metric records, not scores.
 - `src/resumeforge/planning/`: strict explicit selections, immutable draft plans and count conflicts.
-- `src/resumeforge/resume/`: strict frozen wording drafts, plan binding and pending review observations.
+- `src/resumeforge/resume/`: strict frozen drafts, plan binding, inspection and narrow user decisions.
 - `src/resumeforge/inputs.py`: bounded local text input for job/response files.
 - `examples/profiles/sample.md`: fictional fixture used by `tests/` and the CI smoke test.
 - `examples/jobs/`: fictional job and manually authored JSON response, not real application data.
@@ -43,7 +44,7 @@ cloud inference, resume generation, semantic claim proof, PDFs or history alread
 - `config/resume_rules.md`: policy only, not currently loaded by code.
 - `docs/`: decisions, roadmap, development log; `.github/workflows/ci.yml`: checks.
 - `data/profile/user_information.md`: default private input, ignored; never create real data in Git.
-- Planned only: relevance ranking/automatic selection, assisted wording/claim checks/approval,
+- Planned only: relevance ranking/automatic selection, assisted wording/claim checks/metadata approval,
   Jinja2, LaTeX/PyMuPDF, SQLite,
   then Docker, FastAPI, and a Manifest V3 extension. Add dependencies when needed.
 
@@ -83,7 +84,11 @@ Wording drafts must bind a freshly recomputed plan and exactly preserve selected
 Source seeds copy entire statements, never historical bullet wording. All bullets remain pending,
 including verbatim text; every wording edit needs review, not an inferred support verdict. Never
 accept self-declared approval, stale hashes, unselected evidence or silent omission/reordering.
-No semantic detection/approval or rendering exists yet; keep that limitation explicit.
+Applied human decisions are separate attestations, not draft self-approval: require original
+sources, explicit draft/decision confirmation, current policy and exact document/plan bindings.
+Missing stays pending, rejection preserves content, and plan conflicts block approvals. Keep
+scope bullet-wording-only and rendering authorization false; no semantic proof or metadata/
+full-resume approval exists yet. See `docs/REVIEW_DECISIONS.md`.
 Job analysis accepts no candidate profile. Keep trusted instructions separate from job data.
 Response text and its quote must be literal source substrings; that is provenance, not proof of
 classification/completeness. Preserve required/preferred distinctions and explicit unknowns.

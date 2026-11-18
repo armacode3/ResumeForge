@@ -26,7 +26,15 @@ from resumeforge.providers.ollama import (
     DEFAULT_PORT,
     DEFAULT_TIMEOUT,
 )
-from resumeforge.resume import ResumeError, load_resume_document, review_resume
+from resumeforge.resume import (
+    ResumeError,
+    ResumeReview,
+    ReviewDecisionResult,
+    apply_review_decisions,
+    load_resume_document,
+    load_review_decisions,
+    review_resume,
+)
 
 
 class ProviderChoice(StrEnum):
@@ -240,6 +248,16 @@ def review_resume_command(
             "--draft", help="Edited ResumeDocument JSON; omit to seed verbatim pending wording."
         ),
     ] = None,
+    decisions: Annotated[
+        Path | None,
+        typer.Option("--decisions", help="Explicit human bullet decisions for this exact draft."),
+    ] = None,
+    confirm_decisions: Annotated[
+        bool,
+        typer.Option(
+            "--confirm-decisions", help="Attest that you reviewed the submitted bullet decisions."
+        ),
+    ] = False,
     confirm_review: Annotated[
         bool,
         typer.Option(
@@ -248,34 +266,61 @@ def review_resume_command(
         ),
     ] = False,
 ) -> None:
-    """Inspect an evidence-linked wording draft; all bullets remain pending review."""
+    """Inspect pending review drafts or apply snapshot-bound user decisions."""
     if not confirm_review:
         raise typer.BadParameter(
             "Review requirements and selection, then pass --confirm-review; "
             "this does not approve wording."
         )
+    if decisions is not None and (draft is None or not confirm_decisions):
+        raise typer.BadParameter("--decisions requires --draft and explicit --confirm-decisions.")
+    if confirm_decisions and decisions is None:
+        raise typer.BadParameter("--confirm-decisions requires --decisions.")
     try:
         document = load_job(job)
         analysis = analyze_job(document, FakeProvider.from_file(requirements))
         choices = load_selection(selection)
         proposed = load_resume_document(draft) if draft is not None else None
+        choices_review = load_review_decisions(decisions) if decisions is not None else None
         candidate = load_profile(profile)
-        review = review_resume(
-            candidate.profile,
-            document,
-            analysis.requirements,
-            choices,
-            proposed,
-            requirements_reviewed=True,
-            selection_reviewed=True,
-        )
+        result: ResumeReview | ReviewDecisionResult
+        if choices_review is not None:
+            assert proposed is not None
+            result = apply_review_decisions(
+                candidate.profile,
+                document,
+                analysis.requirements,
+                choices,
+                proposed,
+                choices_review,
+                requirements_reviewed=True,
+                selection_reviewed=True,
+                decisions_confirmed=confirm_decisions,
+            )
+            blocked = result.status != "bullet_wording_approved_by_user"
+        else:
+            result = review_resume(
+                candidate.profile,
+                document,
+                analysis.requirements,
+                choices,
+                proposed,
+                requirements_reviewed=True,
+                selection_reviewed=True,
+            )
+            blocked = result.status == "blocked_by_plan"
     except (ProfileError, InputError, JobAnalysisError, PlanningError, ResumeError) as error:
         typer.echo(f"Resume draft review failed:\n{error}", err=True)
         raise typer.Exit(code=1) from None
-    typer.echo(
-        "Offline draft inspection; no inference, semantic proof or claim approval.", err=True
+    notice = (
+        "Offline user decision snapshot; no inference, semantic proof or rendering authorization."
+        if decisions is not None
+        else "Offline draft inspection; no inference, semantic proof or claim approval."
     )
-    typer.echo(review.model_dump_json(indent=2))
-    if review.status == "blocked_by_plan":
-        typer.echo("Draft is blocked by plan conflicts; inspect the plan findings.", err=True)
+    typer.echo(notice, err=True)
+    typer.echo(result.model_dump_json(indent=2))
+    if blocked:
+        typer.echo(
+            "Review remains pending, rejected or plan-blocked; inspect the result.", err=True
+        )
         raise typer.Exit(code=3)

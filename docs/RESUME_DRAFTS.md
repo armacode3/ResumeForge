@@ -1,8 +1,8 @@
 # Evidence-linked wording drafts — 0.9.0
 
 This first Phase 4 slice adds `ResumeDocument` and `review-resume`: an offline boundary for
-structured bullet wording and pending review. **It does not generate polished wording, approve
-claims, prove semantic support or render a resume.** The document is a narrow wording draft,
+structured bullet wording and pending review. **Inspection does not generate polished wording,
+approve claims, prove semantic support or render a resume.** The document is a narrow wording draft,
 not a complete renderable resume: contact/entry metadata and skills/coursework remain references
 or review placeholders in the accompanying plan.
 
@@ -39,9 +39,10 @@ a private JSON file, edit wording there, then pass the same four inputs plus:
 
 The outer review envelope, plan report, selection and historical profile bullets are not accepted
 as draft input. No filename has implicit approval meaning. Four source paths remain explicit;
-`--draft` is the only optional input. Confirmation acknowledges review of requirements and
-selection, **not bullet approval**, and is required before any input I/O. There is no provider or
-approval option, network access, automatic profile read, write-back or model call.
+`--draft` is optional for inspection. Confirmation acknowledges review of requirements and
+selection, **not bullet approval**, and is required before any input I/O. There is no provider,
+network access, automatic profile read, write-back or model call. Version 0.10.0 adds a separate
+`--decisions`/`--confirm-decisions` mode requiring an explicit draft; see `docs/REVIEW_DECISIONS.md`.
 
 ## Version-1 document contract
 
@@ -117,6 +118,7 @@ requirements_reviewed=True, selection_reviewed=True)` returns `ResumeReview`; op
 is a `ResumeDocument`. `parse_resume_document`/`load_resume_document` validate private draft JSON.
 Safe boundary failures raise `ResumeError` (file loading may also raise `InputError`).
 
-Next: explicit human review decisions bound to the exact document/evidence snapshot, then measured
-claim checks and controlled wording assistance. No approval workflow, model-assisted generation,
-PDF/layout/rendering, history, automatic ranking or cloud inference is implemented by this slice.
+Separate snapshot-bound human bullet-wording decisions are now available; pending document/
+inspection states remain unchanged. Next: measured claim-review findings and controlled wording
+assistance. Full-resume approval, model-assisted generation, PDF/layout/rendering, history,
+automatic ranking and cloud inference remain unimplemented.
