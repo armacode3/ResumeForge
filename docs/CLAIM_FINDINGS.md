@@ -7,7 +7,7 @@ with `rendering_authorized: false`.
 
 ## Versioned contract
 
-Inspection policy: `resume-draft-review-v2`. Finding policy: `literal-claim-findings-v1`, exposed
+Current inspection policy: `resume-draft-review-v3`. Finding policy: `literal-claim-findings-v1`, exposed
 as `findings_version`. Each bullet retains its complete scoped statement, caveats and wording
 status, plus `findings`. Each finding has:
 
@@ -88,14 +88,20 @@ a model evaluation or a guarantee against fabricated claims.
 
 ## Acknowledgements, limits and privacy
 
-Inspect edits before deciding. Version-2 decision files bind `findings_sha256` and require an
+Inspect edits before deciding. Current version-3 decision files bind `findings_sha256` and require an
 explicit `acknowledged_finding_ids` list per decision (even empty). Copy only IDs actually reviewed
 from that bullet's current findings; reasons remain required. Unknown/cross-bullet, duplicate,
-malformed or stale acknowledgements fail. Version-1 decisions must be reviewed and authored anew,
+malformed or stale acknowledgements fail. Version-1/2 decisions must be reviewed and authored anew,
 not mechanically upgraded. See `docs/REVIEW_DECISIONS.md` for schema/status/exit details.
 
+The additional source-fragment policy is independent and does not change any rules/counts in
+this document. Version 3 also requires `fragments_sha256` and explicit fragment dispositions;
+see `docs/SOURCE_FRAGMENT_REVIEW.md`. Missing/revision fragment reviews block approval even when
+all literal findings are acknowledged. Source fragments are not inferred semantic omissions.
+
 Approval with any unacknowledged finding stays pending. The result shows acknowledged and
-unacknowledged IDs. All acknowledged permits only the existing narrow user-attestation state under
+unacknowledged IDs. With fragment gates also satisfied, all acknowledged permits only the existing
+narrow user-attestation state under
 a conflict-free plan, **not issue resolution, semantic support, fact promotion or rendering**.
 Findings stay visible unchanged. Rejection needs no acknowledgement and preserves content;
 missing decisions stay pending, and plan conflicts take precedence.
@@ -107,6 +113,6 @@ No network, downloads, write-back or history persistence occurs. Spans/IDs/hashe
 decision reasons remain private. Untrusted text cannot activate tools or grant approval.
 
 Source-bound wording assistance now uses these same inspection gates; see `docs/WORDING_ASSISTANCE.md`.
-Next: explicitly opted-in synthetic wording-quality evaluation. Semantic proof,
+The frozen comparisons remain unchanged; no new inference is implicit. Semantic proof,
 metadata/full-resume approval, rendering, automatic ranking and cloud inference remain out of
 scope. Changed observation policies must be versioned to invalidate prior attestations.

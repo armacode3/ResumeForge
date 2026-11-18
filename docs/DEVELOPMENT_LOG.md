@@ -767,3 +767,50 @@
   Next: explicit source-fragment omission/qualifier review bound to source/draft snapshots, not
   length-based semantic judgments, automatic approval or rendering. Agent evaluation remains
   fallible and is not a human factual/wording attestation.
+
+## Session 021 — Offline source-fragment observations and explicit user dispositions
+
+- User confirmed the concise-objective branch was merged and authorized the next step. Fetched
+  merged `main` at `a00e577`, fast-forwarded local main and created `feat/source-fragment-review`
+  from a clean tree. Prior `a75e7a0` hosted Python 3.12/3.13 checks passed. No private source or
+  decision files were read, migrated or approved; no model/runtime was started or downloaded.
+- Defined a conservative omission/qualifier review aid, not semantic omission detection. Split
+  selected accomplishment statements at documented punctuation/line boundaries, preserve trimmed
+  exact Unicode spans and expose fragments absent as case-sensitive substrings of the same bullet.
+  This flags missing production/measurement qualifiers even when a cue remains, but harmless
+  paraphrases also flag. Literal retention cannot certify scope, repetition, order, equivalence or
+  source coverage. Other evidence/job fields do not supply fragment support. No length/quality score.
+- Added independent `literal-source-fragments-v1` IDs/fingerprint, source-ordered observations and
+  separate fail-closed caps (1,024/bullet, 4,096/inspection). Full source statements, caveats,
+  numeric/cue findings, required content and conflicts remain visible; no wording is auto-repaired.
+- Inspection v3 and decision schema/policy v3 bind current fragment snapshots. Each observed
+  fragment needs a deliberate user disposition/reason before approval: represented by an exact
+  draft passage, accepted omission, or needs revision. Code validates passage offsets/text, never
+  equivalent meaning or safe qualifier removal. Missing/revision dispositions keep approvals
+  pending, independently of old finding acknowledgements. Unknown/cross-bullet/duplicate/stale
+  fragment IDs, invalid spans and malformed records fail without partial approval. Applied records
+  retain source-ordered dispositions and unreviewed/revision IDs, with observations unchanged.
+- Retained rejection/missing-decision/plan-conflict precedence, pending draft/inspection states and
+  `rendering_authorized: false`. Old decision versions 1/2 require fresh review, not mechanical
+  upgrades. Profile/draft/wording-response schema 1, provider data/instructions and source-faithful
+  default are unchanged. Original request-digest regressions pass. Frozen corpora, protocols and
+  historical result notes are untouched; no model tuning, live/replacement evaluation or response
+  captures were performed. Concise rewrite remains experimental/opt-in.
+- Added synthetic characterization for sentence/clause boundaries, decimals/versions, Unicode,
+  harmless paraphrases and deliberate misses; snapshot/provenance/policy checks; missing/partial/
+  revision/accepted/linked decisions; exact and invalid/cross-bullet passages; stale copied hashes;
+  old formats; limits; source ordering; and installed CLI privacy/read-only/offline gates. CI wheel
+  smoke now verifies that acknowledging numeric/cue findings alone cannot bypass fragment review.
+- Application 0.15.0, no new dependency. Local Python 3.12.3: 963 tests passed with GitHub-like
+  colors and 99.96% branch-aware coverage. Ruff lint/format, strict mypy (70 files), dependency
+  checks and source/wheel builds passed. Fresh locked editable/runtime-only installs, all 963
+  tests against the installed wheel outside the repository, and the exact CI runtime-wheel smoke
+  passed. Reviewed all 23 staged public files and both distribution contents/secret patterns;
+  private/runtime artifacts are excluded. Frozen corpora/protocols/results, provider instructions,
+  literal-finding policy and dependencies are unchanged. Hosted outcomes are checked after push,
+  not inferred from local success.
+- Documented exact contracts/blind spots in `docs/SOURCE_FRAGMENT_REVIEW.md`, updated decision/
+  draft/finding/wording guides, actual-status docs and ADR-020. Next separate slice: an offline
+  pending review worksheet to make deliberate user review easier, not bulk approvals or an
+  implicit live run. Semantic proof, full-resume/metadata review, rendering/PDFs, ranking, history
+  and cloud inference remain unimplemented.

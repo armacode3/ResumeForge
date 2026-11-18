@@ -27,7 +27,7 @@ shown below, not a runnable placeholder command. Fake mode still replays supplie
 cannot demonstrate rewrite usefulness. Local mode still requires explicit `--confirm-local-data`.
 Results expose the requested `objective` and actual policy/prompt versions; replay labels do not
 establish what prompt originally authored a fixture. Unknown objectives fail before input reads
-in the CLI, or before source/provider access in the engine. Original profile/draft/decision and
+in the CLI, or before source/provider access in the engine. Original profile/draft and
 wording response schemas are unchanged. See `docs/WORDING_REWRITE_EVALUATION.md` for the separate
 development/evaluation suites and predeclared comparison; the original benchmark is not edited.
 
@@ -126,9 +126,14 @@ JSON of the structured instructions/input/schema request. Hashes are not authent
 of review, pinned model weights or semantic support. Raw prompts/responses are not logged/stored.
 
 Save only `result.review.document` privately for further `review-resume --draft` inspection and
-separate version-2 human decisions. There is no approval input or automatic decision carry-forward.
+separate version-3 human decisions. There is no approval input or automatic decision carry-forward.
 Changed wording invalidates old document-bound decisions; identical wording has the same document
 identity but does not acquire a new approval. Missing finding acknowledgements remain pending.
+Current inspection also exposes source fragments not retained verbatim; every such observation
+needs a user disposition before approval. Exact draft passage links are user assertions, not proof
+of semantic equivalence; missing reviews or revision requests keep approval pending. Models cannot
+author these decisions. See `docs/SOURCE_FRAGMENT_REVIEW.md`. Old decision formats are not upgraded;
+neither provider objective, instruction bytes, minimized payload nor response schema changes here.
 Even all acknowledged/user-approved bullet wording cannot authorize rendering or full-resume use.
 
 Exit **0** emits an unapproved result, even with literal findings; **3** emits a blocked plan without

@@ -33,7 +33,14 @@ original frozen benchmark/protocol/results. Length/edit counts are not quality o
 The paired local comparison shortened all four evaluation bullets but distorted negative qualifiers/
 project relationships. Keep v2 experimental/opt-in and v1 default; see
 `docs/evaluations/qwen3-4b-wording-v2-comparison.md`. Do not tune/rerun this frozen comparison or
-treat zero findings/acknowledgements as semantic support. Next: explicit source-fragment omission review.
+treat zero findings/acknowledgements as semantic support.
+Offline inspection v3 now includes independent literal source-fragment absence observations, not
+semantic omissions. Read `docs/SOURCE_FRAGMENT_REVIEW.md`. Decision schema/policy v3 binds fragments
+and requires per-fragment user dispositions: exact draft passage, accepted omission with rationale,
+or needs revision. Missing/revision dispositions stay pending even with all old findings acknowledged.
+Exact spans do not prove equivalence; accepted omissions do not prove qualifier safety. Keep source
+observations visible, reject old attestations without automatic upgrade, and preserve prompt/data/
+response contracts. Next: offline pending-review worksheet ergonomics, not model inference/rendering.
 Omitted states stay unknown; version-1 profile/draft files need no rewrite (not old decisions).
 Read `docs/MATCHING.md` for the
 retrieval boundary.
@@ -109,7 +116,7 @@ scope bullet-wording-only and rendering authorization false; no semantic proof o
 full-resume approval exists yet. See `docs/REVIEW_DECISIONS.md`.
 Finding policy is finite literal observation, not a support verdict; preserve exact spans and
 documented blind spots. Compare only selected statements, not other source fields or job text.
-Version-2 decisions bind current finding fingerprints and explicit per-bullet acknowledgements;
+Version-3 decisions retain current finding fingerprints and explicit per-bullet acknowledgements;
 missing acknowledgements stay pending, unknown/cross-bullet IDs fail, and findings remain visible
 even when acknowledged. Never automatically upgrade old attestations or truncate excessive findings.
 Wording assistance starts from freshly revalidated source seeds, not old drafts/decisions. Code

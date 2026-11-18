@@ -445,17 +445,19 @@ def test_proposed_wording_invalidates_old_decisions_and_cannot_bypass_findings(
         selection_reviewed=True,
     )
     data: dict[str, Any] = {
-        "schema_version": 2,
+        "schema_version": 3,
         "review_version": seed.review_version,
         "plan_sha256": seed.document.plan_sha256,
         "document_sha256": seed.document_sha256,
         "findings_sha256": seed.findings_sha256,
+        "fragments_sha256": seed.fragments_sha256,
         "bullets": [
             {
                 "bullet_id": b.bullet_id,
                 "decision": "approve",
                 "reason": "Fictional source review.",
                 "acknowledged_finding_ids": [],
+                "fragment_decisions": [],
             }
             for b in seed.bullets
         ],
@@ -476,12 +478,23 @@ def test_proposed_wording_invalidates_old_decisions_and_cannot_bypass_findings(
             decisions_confirmed=True,
         )
     data.update(
-        document_sha256=result.review.document_sha256, findings_sha256=result.review.findings_sha256
+        document_sha256=result.review.document_sha256,
+        findings_sha256=result.review.findings_sha256,
+        fragments_sha256=result.review.fragments_sha256,
     )
     for acknowledged in (False, True):
         if acknowledged:
             data["bullets"][0]["acknowledged_finding_ids"] = [
                 f.id for f in result.review.bullets[0].findings
+            ]
+            data["bullets"][0]["fragment_decisions"] = [
+                {
+                    "fragment_id": f.id,
+                    "disposition": "omission_accepted",
+                    "reason": "Synthetic gate assertion, not factual approval.",
+                    "draft_span": None,
+                }
+                for f in result.review.bullets[0].source_fragments
             ]
         current = parse_review_decisions(json.dumps(data))
         applied = apply_review_decisions(

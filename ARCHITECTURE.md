@@ -56,6 +56,7 @@ src/resumeforge/
     engine.py       source seeds, fresh plan binding and literal wording-change observations
     decisions.py    snapshot-bound user attestations, never full-resume/rendering approval
     findings.py     versioned finite numeric/caveat observations and provenance-bound fingerprints
+    fragments.py    literal source-segment absence with exact spans and snapshot-bound fingerprints
     wording.py      source-bound provider proposals, minimized inputs, exact slots and fresh review
     benchmark.py    fixed synthetic wording replay/live harness, no automatic quality verdicts
 tests/
@@ -198,7 +199,7 @@ document/plan hashes and every referenced bullet. Missing decisions stay pending
 content visible, and plan conflicts block approvals. No input report supplies trusted approval.
 The output records narrow user attestations separately from pending draft/inspection state, with
 mandatory `rendering_authorized: false`. This is not identity authentication, semantic proof or
-metadata/job-fit approval. Version-2 decisions additionally bind the current finding fingerprint;
+metadata/job-fit approval. Current decisions retain the v2 finding fingerprint binding;
 unknown/cross-bullet acknowledgements fail and unacknowledged findings keep approvals pending.
 `resume.findings` compares only selected statements with draft wording, using literal numeric
 tokens and a finite cue vocabulary. Exact spans and empty/acknowledged findings are observations,
@@ -229,6 +230,17 @@ counts, never automated quality grades. See `docs/WORDING_REWRITE_EVALUATION.md`
 The paired local pass shortened four bullets but changed source qualifiers/relationships, so the
 candidate stays experimental and opt-in. No semantic quality or full-resume approval is inferred;
 see `docs/evaluations/qwen3-4b-wording-v2-comparison.md`.
+
+Inspection v3 adds independent `literal-source-fragments-v1` observations: trimmed source
+sentences/semicolon clauses/lines absent as exact substrings of that bullet's draft. This is
+literal membership, not linguistic parsing, semantic omission or source-coverage scoring. V3
+decisions additionally bind the fragment fingerprint and require each observation to have a user
+disposition: represented by an exact draft passage, intentionally omitted with a reason, or needing
+revision. Missing/revision dispositions keep approval pending; code validates spans, not semantic
+equivalence or safe qualifier removal. Supplied invalid/stale/cross-bullet references fail closed.
+Source observations remain visible on approval/rejection. Profile/draft/wording response schemas,
+provider instructions and request data remain unchanged; old attestations are not auto-upgraded.
+See `docs/SOURCE_FRAGMENT_REVIEW.md`, `docs/REVIEW_DECISIONS.md` and ADR-020.
 
 `resume.benchmark` preflights a fixed fictional six-case/seven-bullet corpus and invokes the same
 wording engine. Source-seed replay is the default, independent-response replay is explicit, and

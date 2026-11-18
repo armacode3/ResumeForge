@@ -430,3 +430,29 @@ are held out from output-driven tuning, not independently curated representative
 No provider guard, inference activation policy, dependency, response/profile/draft/decision schema,
 semantic approval or layout feature changes. Old default request digests have regression coverage.
 See `docs/WORDING_REWRITE_EVALUATION.md` for the frozen comparison protocol and explicit commands.
+
+## ADR-020 — Explicit source-fragment dispositions, not inferred semantic omission
+
+**Status:** Implemented in 0.15.0, offline only.
+
+The paired rewrite comparison exposed qualifier loss even with a retained cue. Add a separate
+literal source-fragment policy instead of changing the finite cue vocabulary, using length as a
+support score, adding an LLM truth judge or tuning the frozen prompts. Split selected source text
+at documented punctuation/line boundaries, preserve exact trimmed spans and expose fragments
+absent as exact substrings of that same draft bullet. This deliberately flags harmless paraphrases
+and can miss incorrect scope/order/repetition or copied text in false context. It is not semantic
+claim extraction, equivalence, coverage or omission proof. Preserve full source/context for review.
+
+Require explicit per-fragment user dispositions with reasons. A representation needs an exact
+draft passage (code validates offsets/text, never equivalent meaning); accepted omission records
+user intent, not safe qualifier removal; needs-revision or missing dispositions keep requested
+approval pending. Old numeric/cue acknowledgements remain independently required. Keep rejection,
+missing-decision and plan-conflict precedence. Retain all observations and original content on
+every outcome; never auto-repair, silently trim or promote source facts.
+
+Add independent fragment IDs/fingerprint and fail-closed per-bullet/document caps. Bump inspection,
+decision schema and decision policy to v3; reject old formats rather than carry old attestations
+forward. Frozen profile/draft/wording-response schema 1 and exact provider instructions/payloads
+remain unchanged. No new provider, dependency, command, migration, model call or rendering authority.
+Synthetic tests characterize literal limits and snapshot/decision invariants, not semantic quality.
+See `docs/SOURCE_FRAGMENT_REVIEW.md` and `docs/REVIEW_DECISIONS.md` for contracts and blind spots.

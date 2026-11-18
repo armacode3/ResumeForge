@@ -45,17 +45,19 @@ def decision_args(
     decisions.write_text(
         json.dumps(
             {
-                "schema_version": 2,
+                "schema_version": 3,
                 "review_version": review["review_version"],
                 "plan_sha256": review["document"]["plan_sha256"],
                 "document_sha256": review["document_sha256"],
                 "findings_sha256": review["findings_sha256"],
+                "fragments_sha256": review["fragments_sha256"],
                 "bullets": [
                     {
                         "bullet_id": b["bullet_id"],
                         "decision": "approve",
                         "reason": "Fictional user reviewed source scope and wording.",
                         "acknowledged_finding_ids": [],
+                        "fragment_decisions": [],
                     }
                     for b in review["bullets"]
                 ],
@@ -220,6 +222,7 @@ def test_plan_conflicts_cannot_be_approved_through_the_cli(decision_args: list[s
         plan_sha256=review["document"]["plan_sha256"],
         document_sha256=review["document_sha256"],
         findings_sha256=review["findings_sha256"],
+        fragments_sha256=review["fragments_sha256"],
     )
     path.write_text(json.dumps(data))
     result = runner.invoke(app, decision_args)
@@ -252,13 +255,24 @@ def test_installed_findings_gate_preserves_wording_until_acknowledged(
     path = Path(decision_args[decision_args.index("--decisions") + 1])
     choices = json.loads(path.read_text())
     choices.update(
-        document_sha256=review["document_sha256"], findings_sha256=review["findings_sha256"]
+        document_sha256=review["document_sha256"],
+        findings_sha256=review["findings_sha256"],
+        fragments_sha256=review["fragments_sha256"],
     )
     path.write_text(json.dumps(choices))
     for acknowledge in (False, True):
         if acknowledge:
             choices["bullets"][0]["acknowledged_finding_ids"] = [
                 finding["id"] for finding in review["bullets"][0]["findings"]
+            ]
+            choices["bullets"][0]["fragment_decisions"] = [
+                {
+                    "fragment_id": f["id"],
+                    "disposition": "omission_accepted",
+                    "reason": "Synthetic gate assertion, not factual approval.",
+                    "draft_span": None,
+                }
+                for f in review["bullets"][0]["source_fragments"]
             ]
             path.write_text(json.dumps(choices))
         result = subprocess.run(
@@ -277,3 +291,96 @@ def test_installed_findings_gate_preserves_wording_until_acknowledged(
         assert report["review"]["document"] == draft
         assert report["rendering_authorized"] is False
         assert report["review"]["bullets"][0]["findings"] == review["bullets"][0]["findings"]
+
+
+def test_installed_fragment_gate_requires_review_even_without_literal_findings(
+    decision_args: list[str],
+    tmp_path: Path,
+) -> None:
+    draft_path = Path(decision_args[decision_args.index("--draft") + 1])
+    draft = json.loads(draft_path.read_text())
+    text = "Implemented tests for 12 endpoints under a mentor's review."
+    draft["sections"][1]["entries"][0]["bullets"][0]["text"] = text
+    draft_path.write_text(json.dumps(draft))
+    inspected = runner.invoke(app, decision_args[: decision_args.index("--decisions")])
+    assert inspected.exit_code == 0, inspected.output
+    review = json.loads(inspected.stdout)
+    assert not review["bullets"][0]["findings"]
+    assert len(review["bullets"][0]["source_fragments"]) == 1
+    path = Path(decision_args[decision_args.index("--decisions") + 1])
+    choices = json.loads(path.read_text())
+    choices.update(
+        document_sha256=review["document_sha256"],
+        findings_sha256=review["findings_sha256"],
+        fragments_sha256=review["fragments_sha256"],
+    )
+    fragment_id = review["bullets"][0]["source_fragments"][0]["id"]
+    for disposition in (None, "needs_revision", "represented_in_draft", "omission_accepted"):
+        choices["bullets"][0]["fragment_decisions"] = (
+            []
+            if disposition is None
+            else [
+                {
+                    "fragment_id": fragment_id,
+                    "disposition": disposition,
+                    "reason": "Fictional user assertion only, not semantic proof.",
+                    "draft_span": {"start": 0, "end": len(text), "text": text}
+                    if disposition == "represented_in_draft"
+                    else None,
+                }
+            ]
+        )
+        path.write_text(json.dumps(choices))
+        before = {p: p.read_bytes() for p in tmp_path.iterdir()}
+        process = subprocess.run(
+            [sys.executable, "-m", "resumeforge", *decision_args],
+            cwd=tmp_path,
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=10,
+        )
+        approved = disposition in ("represented_in_draft", "omission_accepted")
+        assert process.returncode == (0 if approved else 3), process.stderr
+        result = json.loads(process.stdout)
+        assert result["status"] == (
+            "bullet_wording_approved_by_user" if approved else "needs_review"
+        )
+        assert result["review"]["document"] == draft
+        assert (
+            result["review"]["bullets"][0]["source_fragments"]
+            == review["bullets"][0]["source_fragments"]
+        )
+        assert not result["rendering_authorized"]
+        assert before == {p: p.read_bytes() for p in tmp_path.iterdir()}
+
+
+@pytest.mark.parametrize("mode", ["old_version", "stale_fragments", "unknown_fragment"])
+def test_cli_rejects_old_fragment_formats_and_invalid_bindings_safely(
+    decision_args: list[str],
+    mode: str,
+) -> None:
+    path = Path(decision_args[decision_args.index("--decisions") + 1])
+    choices = json.loads(path.read_text())
+    if mode == "old_version":
+        choices.update(schema_version=2, review_version="resume-draft-review-v2")
+    elif mode == "stale_fragments":
+        choices["fragments_sha256"] = "0" * 64
+    else:
+        # Unknown fragment IDs fail even for a rejected choice; nothing is partially applied.
+        choices["bullets"][0].update(
+            decision="reject",
+            fragment_decisions=[
+                {
+                    "fragment_id": "0" * 64,
+                    "disposition": "represented_in_draft",
+                    "reason": "private-value",
+                    "draft_span": {"start": 0, "end": 1, "text": "private-value"},
+                }
+            ],
+        )
+    path.write_text(json.dumps(choices))
+    with patch("socket.socket", side_effect=AssertionError("No network")):
+        result = runner.invoke(app, decision_args)
+    assert result.exit_code == 1 and result.stdout == ""
+    assert "private-value" not in result.output and "Traceback" not in result.output

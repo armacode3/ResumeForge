@@ -165,10 +165,19 @@ v2 shortened all four (1,262 to 633 characters) but distorted negative qualifier
 It remains experimental/opt-in, not a replacement default. See `docs/WORDING_REWRITE_EVALUATION.md`,
 `docs/evaluations/qwen3-4b-wording-v2-comparison.md` and ADR-019. No prompt tuning/reruns followed.
 
-**Next:** explicit source-fragment omission/qualifier review with source/draft-bound observations,
-not a length-based support verdict or LLM truth judge. Keep copy fallback and the conservative
-default; semantic proof, full-resume/metadata approval, rendering and automatic ranking remain
-unimplemented. Shorter structurally valid text did not establish reliable faithful rewriting.
+Implemented in 0.15.0: independent literal source-fragment observations with exact spans and
+snapshot fingerprints. Inspection v3 and decision schema/policy v3 require explicit per-fragment
+user dispositions: linked draft passage, accepted omission with rationale, or needs revision.
+Unreviewed/revision fragments keep approval pending even with all numeric/cue findings acknowledged.
+This is sentence/clause substring membership, not semantic omission detection, safe qualifier removal
+or source-coverage scoring. Profiles/drafts/responses and prompts remain unchanged; old attestations
+require fresh review. No frozen comparison artifacts were changed or live evaluation run. See
+`docs/SOURCE_FRAGMENT_REVIEW.md`, `docs/REVIEW_DECISIONS.md` and ADR-020.
+
+**Next:** improve offline review ergonomics with a pending review worksheet, not bulk approvals or
+another implicit model run. Keep copy fallback and the conservative default; semantic proof,
+full-resume/metadata approval, rendering and automatic ranking remain unimplemented. Shorter
+structurally valid text did not establish reliable faithful rewriting.
 
 Generate structured bullets with accomplishment IDs, check unsupported tools/metrics/ownership,
 dates and contradictions, report gaps, and implement review/approval. Gate: fabricated-claim

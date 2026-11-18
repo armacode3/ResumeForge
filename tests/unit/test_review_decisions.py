@@ -32,17 +32,19 @@ def decisions_for(review: ResumeReview) -> ReviewDecisions:
     return parse_review_decisions(
         json.dumps(
             {
-                "schema_version": 2,
+                "schema_version": 3,
                 "review_version": review.review_version,
                 "plan_sha256": review.document.plan_sha256,
                 "document_sha256": review.document_sha256,
                 "findings_sha256": review.findings_sha256,
+                "fragments_sha256": review.fragments_sha256,
                 "bullets": [
                     {
                         "bullet_id": bullet.bullet_id,
                         "decision": "approve",
                         "reason": "Fictional reviewer checked wording and evidence in context.",
                         "acknowledged_finding_ids": [],
+                        "fragment_decisions": [],
                     }
                     for bullet in review.bullets
                 ],
@@ -118,7 +120,7 @@ def test_all_explicit_decisions_are_narrow_immutable_attestations_not_full_appro
     before = decision_inputs.profile.model_dump_json()
     with patch("socket.socket", side_effect=AssertionError("Offline")):
         result = decision_inputs.apply()
-    assert result.decision_version == "snapshot-bound-decisions-v2"
+    assert result.decision_version == "snapshot-bound-decisions-v3"
     assert result.status == "bullet_wording_approved_by_user"
     assert result.scope == "bullet_wording_only" and result.rendering_authorized is False
     assert len(result.decisions_model_sha256) == 64
@@ -275,6 +277,21 @@ def test_edited_wording_requires_new_explicit_attestation_not_an_inferred_semant
         selection_reviewed=True,
     )
     decision_inputs.decisions = decisions_for(review)
+    choices = decision_inputs.decisions.model_dump(mode="json")
+    choices["bullets"][0]["fragment_decisions"] = [
+        {
+            "fragment_id": fragment.id,
+            "disposition": "represented_in_draft",
+            "reason": "Fictional user linked the rephrasing; not semantic proof.",
+            "draft_span": {
+                "start": 0,
+                "end": len("Added tests under a mentor's review."),
+                "text": "Added tests under a mentor's review.",
+            },
+        }
+        for fragment in review.bullets[0].source_fragments
+    ]
+    decision_inputs.decisions = parse_review_decisions(json.dumps(choices))
     result = decision_inputs.apply()
     assert result.review.bullets[0].wording_status == "edited_requires_review"
     assert result.bullets[0].review_status == "approved_by_user"
@@ -460,6 +477,7 @@ def test_copied_current_hashes_cannot_reintroduce_old_ineligible_approved_bullet
             "plan_sha256": current.plan_sha256,
             "document_sha256": current.document_sha256,
             "findings_sha256": current.findings_sha256,
+            "fragments_sha256": current.fragments_sha256,
         }
     )
     with pytest.raises(ResumeError, match="absent"):
@@ -485,6 +503,20 @@ def edited_review(inputs: DecisionInputs) -> ResumeReview:
     return review
 
 
+def accept_fragments(data: dict[str, Any], review: ResumeReview) -> None:
+    """Fictional assertions to isolate another gate, never advice to accept these omissions."""
+    for choice, bullet in zip(data["bullets"], review.bullets, strict=True):
+        choice["fragment_decisions"] = [
+            {
+                "fragment_id": f.id,
+                "disposition": "omission_accepted",
+                "reason": "Synthetic gate assertion only; not a factual recommendation.",
+                "draft_span": None,
+            }
+            for f in bullet.source_fragments
+        ]
+
+
 @pytest.mark.parametrize("acknowledge", ["none", "partial", "all"])
 def test_approval_requires_each_current_finding_acknowledgement(
     decision_inputs: DecisionInputs, acknowledge: str
@@ -492,6 +524,7 @@ def test_approval_requires_each_current_finding_acknowledgement(
     review = edited_review(decision_inputs)
     assert len(review.bullets[0].findings) == 2
     data = decision_inputs.decisions.model_dump(mode="json")
+    accept_fragments(data, review)
     for choice, bullet in zip(data["bullets"], review.bullets, strict=True):
         ids = [f.id for f in bullet.findings]
         choice["acknowledged_finding_ids"] = (
@@ -614,3 +647,330 @@ def test_copied_current_hashes_cannot_transfer_old_finding_acknowledgements(
     decision_inputs.decisions = parse_review_decisions(json.dumps(decisions))
     with pytest.raises(ResumeError, match="current findings on that bullet"):
         decision_inputs.apply()
+
+
+def fragment_review(inputs: DecisionInputs) -> ResumeReview:
+    """New fictional pairs expose lost qualifiers without changing frozen evaluation fixtures."""
+    inputs.profile.accomplishments[
+        0
+    ].statement = (
+        "Built Python checks. Never deployed to production. No performance gain was measured."
+    )
+    queue = next(a for a in inputs.profile.accomplishments if a.id == "acc_queue")
+    queue.statement = "Built SQLite checks. Never deployed to production."
+    inputs.reseed()
+    data = inputs.draft.model_dump(mode="json")
+    data["sections"][1]["entries"][0]["bullets"][0]["text"] = (
+        "Built Python checks. Never deployed. No performance gain."
+    )
+    data["sections"][2]["entries"][0]["bullets"][0]["text"] = "Built SQLite checks. Never deployed."
+    inputs.draft = parse_resume_document(json.dumps(data))
+    review = review_resume(
+        inputs.profile,
+        inputs.job,
+        inputs.requirements,
+        inputs.selection,
+        inputs.draft,
+        requirements_reviewed=True,
+        selection_reviewed=True,
+    )
+    assert all(not b.findings for b in review.bullets)
+    inputs.decisions = decisions_for(review)
+    return review
+
+
+@pytest.mark.parametrize("mode", ["missing", "partial", "revision", "accepted", "represented"])
+def test_every_fragment_requires_an_explicit_disposition_before_user_approval(
+    decision_inputs: DecisionInputs,
+    mode: str,
+) -> None:
+    review = fragment_review(decision_inputs)
+    data = decision_inputs.decisions.model_dump(mode="json")
+    accept_fragments(data, review)
+    first = data["bullets"][0]
+    if mode == "missing":
+        first["fragment_decisions"] = []
+    elif mode == "partial":
+        first["fragment_decisions"] = first["fragment_decisions"][:1]
+    elif mode == "revision":
+        first["fragment_decisions"][0]["disposition"] = "needs_revision"
+    elif mode == "represented":
+        text = review.document.sections[1].entries[0].bullets[0].text
+        for record in first["fragment_decisions"]:
+            record.update(
+                disposition="represented_in_draft",
+                draft_span={
+                    "start": 0,
+                    "end": len(text),
+                    "text": text,
+                },
+                reason="Synthetic user linkage; software cannot certify this equivalence.",
+            )
+    decision_inputs.decisions = parse_review_decisions(json.dumps(data))
+    result = decision_inputs.apply()
+    approved = mode in ("accepted", "represented")
+    assert result.status == ("bullet_wording_approved_by_user" if approved else "needs_review")
+    assert result.bullets[0].review_status == ("approved_by_user" if approved else "pending_review")
+    assert bool(result.bullets[0].unreviewed_fragment_ids) == (mode in ("missing", "partial"))
+    assert bool(result.bullets[0].revision_fragment_ids) == (mode == "revision")
+    assert result.review == review and result.review.bullets[0].source_fragments
+    assert result.review.document == decision_inputs.draft and not result.rendering_authorized
+    assert all(b.review_status == "pending_review" for b in result.review.bullets)
+    assert result.review.bullets[1].caveats == ("parent_entry_in_progress",)
+
+
+@pytest.mark.parametrize(
+    "mode",
+    [
+        "unknown",
+        "cross_bullet",
+        "fingerprint",
+        "duplicate",
+        "missing_field",
+        "missing_reason",
+        "blank_reason",
+        "bad_disposition",
+        "bad_id",
+        "missing_span",
+        "extra_span",
+        "empty_span",
+        "reversed_span",
+        "wrong_text",
+        "outside",
+        "bool_offset",
+        "bad_offset",
+        "cross_bullet_span",
+        "missing_fingerprint",
+        "missing_span_field",
+        "unknown_field",
+    ],
+)
+def test_invalid_fragment_decisions_fail_without_partial_approval_or_input_disclosure(
+    decision_inputs: DecisionInputs,
+    mode: str,
+) -> None:
+    review = fragment_review(decision_inputs)
+    data = decision_inputs.decisions.model_dump(mode="json")
+    accept_fragments(data, review)
+    first = data["bullets"][0]
+    record = first["fragment_decisions"][0]
+    if mode == "unknown":
+        record["fragment_id"] = "0" * 64
+    elif mode == "cross_bullet":
+        record["fragment_id"] = review.bullets[1].source_fragments[0].id
+    elif mode == "fingerprint":
+        data["fragments_sha256"] = "0" * 64
+    elif mode == "missing_fingerprint":
+        data.pop("fragments_sha256")
+    elif mode == "duplicate":
+        first["fragment_decisions"].append(record)
+    elif mode == "missing_field":
+        first.pop("fragment_decisions")
+    elif mode == "missing_reason":
+        record.pop("reason")
+    elif mode == "blank_reason":
+        record["reason"] = " \t"
+    elif mode == "bad_disposition":
+        record["disposition"] = "automatically_supported"
+    elif mode == "bad_id":
+        record["fragment_id"] = "private-invalid"
+    elif mode == "missing_span":
+        record["disposition"] = "represented_in_draft"
+    elif mode == "extra_span":
+        record["draft_span"] = {"start": 0, "end": 5, "text": "Built"}
+    elif mode == "missing_span_field":
+        record.pop("draft_span")
+    elif mode == "unknown_field":
+        record["private-field"] = "private-value"
+    else:
+        text = review.document.sections[1].entries[0].bullets[0].text
+        span: dict[str, Any] = {"start": 0, "end": len(text), "text": text}
+        if mode == "empty_span":
+            span.update(end=1, text=" ")
+        elif mode == "reversed_span":
+            span.update(start=2, end=1, text="x")
+        elif mode == "wrong_text":
+            span["text"] = "private-value"
+        elif mode == "outside":
+            span["end"] += 1
+        elif mode == "bool_offset":
+            span["start"] = False
+        elif mode == "bad_offset":
+            span["start"] = -1
+        else:
+            other = review.document.sections[2].entries[0].bullets[0].text
+            span.update(end=len(other), text=other)
+        record.update(disposition="represented_in_draft", draft_span=span)
+    with pytest.raises(ResumeError) as error:
+        decision_inputs.decisions = parse_review_decisions(json.dumps(data))
+        decision_inputs.apply()
+    assert "private" not in str(error.value)
+
+
+@pytest.mark.parametrize("state", ["missing", "reject", "plan_conflict"])
+def test_fragment_reviews_preserve_missing_rejection_and_plan_conflict_precedence(
+    decision_inputs: DecisionInputs,
+    state: str,
+) -> None:
+    if state == "plan_conflict":
+        decision_inputs.profile.resume_preferences.min_bullets_per_entry = 1
+    review = fragment_review(decision_inputs)
+    data = decision_inputs.decisions.model_dump(mode="json")
+    if state == "missing":
+        data["bullets"] = []
+    elif state == "reject":
+        data["bullets"][0]["decision"] = "reject"
+    decision_inputs.decisions = parse_review_decisions(json.dumps(data))
+    result = decision_inputs.apply()
+    assert (
+        result.status
+        == {
+            "missing": "needs_review",
+            "reject": "has_rejections",
+            "plan_conflict": "blocked_by_plan",
+        }[state]
+    )
+    assert result.bullets[0].unreviewed_fragment_ids
+    assert result.review.bullets[0].source_fragments == review.bullets[0].source_fragments
+
+
+def test_fragment_choices_follow_source_order_not_decision_order(
+    decision_inputs: DecisionInputs,
+) -> None:
+    review = fragment_review(decision_inputs)
+    data = decision_inputs.decisions.model_dump(mode="json")
+    accept_fragments(data, review)
+    decision_inputs.decisions = parse_review_decisions(json.dumps(data))
+    ordered = decision_inputs.apply()
+    data["bullets"][0]["fragment_decisions"].reverse()
+    decision_inputs.decisions = parse_review_decisions(json.dumps(data))
+    reversed_result = decision_inputs.apply()
+    assert ordered.bullets == reversed_result.bullets
+    assert ordered.decisions_model_sha256 != reversed_result.decisions_model_sha256
+
+
+def test_fragment_policy_and_copied_hashes_cannot_transfer_old_dispositions(
+    decision_inputs: DecisionInputs,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    review = fragment_review(decision_inputs)
+    data = decision_inputs.decisions.model_dump(mode="json")
+    accept_fragments(data, review)
+    decision_inputs.decisions = parse_review_decisions(json.dumps(data))
+    monkeypatch.setattr("resumeforge.resume.fragments.FRAGMENTS_VERSION", "future-policy")
+    with pytest.raises(ResumeError, match="different source fragments"):
+        decision_inputs.apply()
+    new_review = review_resume(
+        decision_inputs.profile,
+        decision_inputs.job,
+        decision_inputs.requirements,
+        decision_inputs.selection,
+        decision_inputs.draft,
+        requirements_reviewed=True,
+        selection_reviewed=True,
+    )
+    data["fragments_sha256"] = new_review.fragments_sha256
+    decision_inputs.decisions = parse_review_decisions(json.dumps(data))
+    with pytest.raises(ResumeError, match="current fragments on that bullet"):
+        decision_inputs.apply()
+
+
+def test_version_two_attestations_require_fresh_fragment_review(
+    decision_inputs: DecisionInputs,
+) -> None:
+    data = decision_inputs.decisions.model_dump(mode="json")
+    data.update(schema_version=2, review_version="resume-draft-review-v2")
+    data.pop("fragments_sha256")
+    for choice in data["bullets"]:
+        choice.pop("fragment_decisions")
+    with pytest.raises(ResumeError, match="fields"):
+        parse_review_decisions(json.dumps(data))
+
+
+def test_fragment_inspection_total_limit_fails_closed(
+    decision_inputs: DecisionInputs,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    fragment_review(decision_inputs)
+    monkeypatch.setattr("resumeforge.resume.engine.MAX_REVIEW_FRAGMENTS", 2)
+    with pytest.raises(ResumeError, match="source fragment limit"):
+        decision_inputs.apply()
+
+
+@pytest.mark.parametrize("change", ["draft", "source"])
+def test_copied_snapshot_hashes_do_not_reuse_fragment_dispositions_after_text_changes(
+    decision_inputs: DecisionInputs,
+    change: str,
+) -> None:
+    review = fragment_review(decision_inputs)
+    data = decision_inputs.decisions.model_dump(mode="json")
+    accept_fragments(data, review)
+    if change == "draft":
+        proposed = decision_inputs.draft.model_dump(mode="json")
+        proposed["sections"][1]["entries"][0]["bullets"][0]["text"] += " More context."
+        decision_inputs.draft = parse_resume_document(json.dumps(proposed))
+    else:
+        decision_inputs.profile.accomplishments[0].statement += " More context."
+        seed = review_resume(
+            decision_inputs.profile,
+            decision_inputs.job,
+            decision_inputs.requirements,
+            decision_inputs.selection,
+            requirements_reviewed=True,
+            selection_reviewed=True,
+        )
+        decision_inputs.draft = decision_inputs.draft.model_copy(
+            update={"plan_sha256": seed.document.plan_sha256}
+        )
+    current = review_resume(
+        decision_inputs.profile,
+        decision_inputs.job,
+        decision_inputs.requirements,
+        decision_inputs.selection,
+        decision_inputs.draft,
+        requirements_reviewed=True,
+        selection_reviewed=True,
+    )
+    data.update(
+        plan_sha256=current.document.plan_sha256,
+        document_sha256=current.document_sha256,
+        findings_sha256=current.findings_sha256,
+        fragments_sha256=current.fragments_sha256,
+    )
+    decision_inputs.decisions = parse_review_decisions(json.dumps(data))
+    with pytest.raises(ResumeError, match="current fragments on that bullet"):
+        decision_inputs.apply()
+
+
+def test_fragment_draft_passages_use_exact_unicode_offsets(decision_inputs: DecisionInputs) -> None:
+    fragment_review(decision_inputs)
+    draft = decision_inputs.draft.model_dump(mode="json")
+    text = "😀 " + draft["sections"][1]["entries"][0]["bullets"][0]["text"]
+    draft["sections"][1]["entries"][0]["bullets"][0]["text"] = text
+    decision_inputs.draft = parse_resume_document(json.dumps(draft))
+    review = review_resume(
+        decision_inputs.profile,
+        decision_inputs.job,
+        decision_inputs.requirements,
+        decision_inputs.selection,
+        decision_inputs.draft,
+        requirements_reviewed=True,
+        selection_reviewed=True,
+    )
+    data = decisions_for(review).model_dump(mode="json")
+    accept_fragments(data, review)
+    for record in data["bullets"][0]["fragment_decisions"]:
+        record.update(
+            disposition="represented_in_draft",
+            draft_span={
+                "start": 2,
+                "end": len(text),
+                "text": text[2:],
+            },
+        )
+    decision_inputs.decisions = parse_review_decisions(json.dumps(data))
+    result = decision_inputs.apply()
+    assert result.status == "bullet_wording_approved_by_user"
+    assert result.bullets[0].fragment_decisions[0].draft_span is not None
+    assert result.bullets[0].fragment_decisions[0].draft_span.start == 2
+    assert not result.rendering_authorized
