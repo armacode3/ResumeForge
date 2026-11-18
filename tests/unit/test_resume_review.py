@@ -75,7 +75,7 @@ def test_seed_copies_whole_source_statements_with_no_profile_mutation_or_network
     with patch("socket.socket", side_effect=AssertionError("Offline")):
         review = inputs.review()
     assert review.mode == "source_seed" and review.status == "needs_review"
-    assert review.review_version == "resume-draft-review-v2"
+    assert review.review_version == "resume-draft-review-v3"
     assert review.findings_version == "literal-claim-findings-v1"
     assert all(b.findings == () for b in review.bullets)
     assert len(review.findings_sha256) == 64

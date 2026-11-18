@@ -8,6 +8,7 @@ from resumeforge.inputs import MAX_INPUT_BYTES
 from resumeforge.jobs import JobDocument, JobRequirements
 from resumeforge.planning import PlanningError, PlanSelection, ResumePlan, plan_resume
 from resumeforge.profile import UserProfile
+from resumeforge.resume import fragments
 from resumeforge.resume.findings import FINDINGS_VERSION, findings_digest, inspect_claims
 from resumeforge.resume.models import (
     BulletReview,
@@ -19,8 +20,9 @@ from resumeforge.resume.models import (
     ResumeSectionDraft,
 )
 
-REVIEW_VERSION = "resume-draft-review-v2"
+REVIEW_VERSION = "resume-draft-review-v3"
 MAX_REVIEW_FINDINGS = 4096
+MAX_REVIEW_FRAGMENTS = 4096
 
 
 def _plan_digest(plan: ResumePlan) -> str:
@@ -133,6 +135,9 @@ def review_resume(
             findings=inspect_claims(
                 bullet.id, bullet.accomplishment_id, slot.statement, bullet.text
             ),
+            source_fragments=fragments.inspect_source_fragments(
+                bullet.id, bullet.accomplishment_id, slot.statement, bullet.text
+            ),
         )
         for section, planned_section in zip(document.sections, plan.sections, strict=True)
         for entry, planned_entry in zip(section.entries, planned_section.entries, strict=True)
@@ -140,10 +145,14 @@ def review_resume(
     )
     collected: list[BulletReview] = []
     finding_count = 0
+    fragment_count = 0
     for bullet_review in reviews_iter:
         finding_count += len(bullet_review.findings)
         if finding_count > MAX_REVIEW_FINDINGS:
             raise ResumeError("Draft exceeds the literal finding limit; shorten and review again.")
+        fragment_count += len(bullet_review.source_fragments)
+        if fragment_count > MAX_REVIEW_FRAGMENTS:
+            raise ResumeError("Draft exceeds the source fragment limit; shorten and review again.")
         collected.append(bullet_review)
     reviews = tuple(collected)
     document_digest = sha256(encoded).hexdigest()
@@ -151,6 +160,8 @@ def review_resume(
         review_version=REVIEW_VERSION,
         findings_version=FINDINGS_VERSION,
         findings_sha256=findings_digest(digest, document_digest, reviews),
+        fragments_version=fragments.FRAGMENTS_VERSION,
+        fragments_sha256=fragments.fragments_digest(digest, document_digest, reviews),
         mode="source_seed" if draft is None else "submitted_draft",
         status="blocked_by_plan" if plan.constraint_status == "conflicts" else "needs_review",
         document_sha256=document_digest,
@@ -163,6 +174,8 @@ def review_resume(
             "no semantic support check was performed.",
             "No detection guarantee for invented metrics, technology use, "
             "ownership or lost qualifiers.",
+            "Source fragments not retained verbatim may be paraphrased or omitted; "
+            "only user review can record their disposition, not prove semantic equivalence.",
             "Inspection itself performs no approval, model inference, rendering "
             "or page/readability validation.",
         ),

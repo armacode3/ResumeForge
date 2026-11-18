@@ -1,4 +1,4 @@
-# Evidence-linked wording drafts — updated for 0.11.0
+# Evidence-linked wording drafts — updated for 0.15.0
 
 This first Phase 4 slice adds `ResumeDocument` and `review-resume`: an offline boundary for
 structured bullet wording and pending review. **Inspection does not generate polished wording,
@@ -83,12 +83,16 @@ in-progress-parent caveat where applicable, and one literal wording observation:
 
 **Both remain `pending_review`.** Literal equality does not prove factual truth or fit in a resume.
 Edited wording is not automatically semantically false or supported. Inspection version
-`resume-draft-review-v2` adds per-bullet `findings`, outer `findings_version` and `findings_sha256`:
+`resume-draft-review-v3` retains per-bullet `findings`, outer `findings_version` and `findings_sha256`:
 literal numeric tokens absent from the statement and missing cues from a finite caveat vocabulary.
 Exact spans, policy, characterization and blind spots are documented in `docs/CLAIM_FINDINGS.md`.
 Empty findings are not support; technology/ownership and many qualifier changes remain undetected.
-The document itself stays schema version 1. Decision files now require version 2 and explicit
-finding acknowledgements; no historical attestation is automatically upgraded.
+Inspection also adds per-bullet `source_fragments` and outer `fragments_version`/`fragments_sha256`:
+source sentences/clauses absent as exact substrings of this draft, not semantic omissions.
+Harmless paraphrases can flag; unchanged text used in a false context can escape. See
+`docs/SOURCE_FRAGMENT_REVIEW.md`. The document itself stays schema version 1. Decision files now
+require version 3, explicit finding acknowledgements and fragment dispositions. No historical
+attestation is automatically upgraded; unreviewed fragments or revision requests keep approval pending.
 
 The outer review is `blocked_by_plan` when count/evidence/required-content conflicts remain;
 otherwise it is `needs_review`. Neither state is generation-ready or approved. Full job categories,
@@ -122,8 +126,8 @@ is a `ResumeDocument`. `parse_resume_document`/`load_resume_document` validate p
 Safe boundary failures raise `ResumeError` (file loading may also raise `InputError`).
 
 Separate snapshot-bound human bullet-wording decisions are now available; pending document/
-inspection states remain unchanged. Literal claim-review findings are now available; next is
-controlled wording quality evaluation. Source-bound `suggest-wording` proposals are available in
+inspection states remain unchanged. Literal findings and explicit source-fragment review are now
+available. Source-bound `suggest-wording` proposals are available in
 0.12.0 with fake replay or explicitly acknowledged guarded local inference; see
 `docs/WORDING_ASSISTANCE.md`. Full-resume approval, PDF/layout/rendering, history, automatic ranking
 and cloud inference remain unimplemented.

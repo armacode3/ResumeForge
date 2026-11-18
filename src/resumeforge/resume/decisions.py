@@ -16,7 +16,7 @@ from resumeforge.resume.models import (
     ReviewDecisions,
 )
 
-DECISION_VERSION = "snapshot-bound-decisions-v2"
+DECISION_VERSION = "snapshot-bound-decisions-v3"
 
 
 def apply_review_decisions(
@@ -83,9 +83,19 @@ def apply_review_decisions(
         raise ResumeError(
             "Review decisions belong to different findings; inspect and review again."
         )
+    if decisions.fragments_sha256 != review.fragments_sha256:
+        raise ResumeError(
+            "Review decisions belong to different source fragments; inspect and review again."
+        )
     if not choices.keys() <= {bullet.bullet_id for bullet in review.bullets}:
         raise ResumeError("Review decisions reference a bullet absent from the current draft.")
     resolved = []
+    draft_texts = {
+        bullet.id: bullet.text
+        for section in review.document.sections
+        for entry in section.entries
+        for bullet in entry.bullets
+    }
     for bullet in review.bullets:
         choice = choices.get(bullet.bullet_id)
         finding_ids = tuple(finding.id for finding in bullet.findings)
@@ -97,6 +107,26 @@ def apply_review_decisions(
         unacknowledged = tuple(
             identifier for identifier in finding_ids if identifier not in acknowledged
         )
+        fragment_ids = tuple(fragment.id for fragment in bullet.source_fragments)
+        fragment_choices = choice.fragment_decisions if choice else ()
+        by_fragment = {record.fragment_id: record for record in fragment_choices}
+        if not by_fragment.keys() <= set(fragment_ids):
+            raise ResumeError("Fragment decisions must reference current fragments on that bullet.")
+        for record in fragment_choices:
+            span = record.draft_span
+            text = draft_texts[bullet.bullet_id]
+            if span is not None and (
+                span.end > len(text) or text[span.start : span.end] != span.text
+            ):
+                raise ResumeError(
+                    "Fragment draft passages must exactly match that bullet's wording."
+                )
+        # Preserve source order in applied records, irrespective of decision input order.
+        ordered_fragments = tuple(by_fragment[f] for f in fragment_ids if f in by_fragment)
+        unreviewed = tuple(f for f in fragment_ids if f not in by_fragment)
+        revisions = tuple(
+            f.fragment_id for f in ordered_fragments if f.disposition == "needs_revision"
+        )
         state: Literal["pending_review", "approved_by_user", "rejected_by_user", "blocked_by_plan"]
         if choice is None:
             state = "pending_review"
@@ -104,7 +134,7 @@ def apply_review_decisions(
             state = "rejected_by_user"
         elif review.status == "blocked_by_plan":
             state = "blocked_by_plan"
-        elif unacknowledged:
+        elif unacknowledged or unreviewed or revisions:
             state = "pending_review"
         else:
             state = "approved_by_user"
@@ -116,6 +146,9 @@ def apply_review_decisions(
                 reason=choice.reason if choice else None,
                 acknowledged_finding_ids=acknowledged,
                 unacknowledged_finding_ids=unacknowledged,
+                fragment_decisions=ordered_fragments,
+                unreviewed_fragment_ids=unreviewed,
+                revision_fragment_ids=revisions,
                 review_status=state,
             )
         )
@@ -139,6 +172,8 @@ def apply_review_decisions(
         warnings=(
             "Decisions are local user attestations, not authenticated identity or semantic proof.",
             "Acknowledging literal findings is not evidence of claim support or issue resolution.",
+            "Fragment representations and accepted omissions are user attestations, "
+            "not semantic equivalence, qualifier safety or proof of source coverage.",
             "Scope is bullet wording only; metadata, unscoped sections, "
             "job fit and layout remain unapproved.",
             "Underlying draft/inspection states stay pending; "

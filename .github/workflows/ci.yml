@@ -98,13 +98,15 @@ jobs:
           assert all(b["review_status"] == "pending_review" for b in review["bullets"])
           Path("resume-draft.json").write_text(json.dumps(review["document"]))
           Path("review-decisions.json").write_text(json.dumps({
-              "schema_version": 2,
+              "schema_version": 3,
               "review_version": review["review_version"],
               "plan_sha256": review["document"]["plan_sha256"],
               "document_sha256": review["document_sha256"],
               "findings_sha256": review["findings_sha256"],
+              "fragments_sha256": review["fragments_sha256"],
               "bullets": [{"bullet_id": b["bullet_id"], "decision": "approve",
                            "acknowledged_finding_ids": [],
+                           "fragment_decisions": [],
                            "reason": "Fictional CI assertion: plan conflicts must block approval."}
                           for b in review["bullets"]],
           }))
@@ -159,25 +161,38 @@ jobs:
           review = run(draft_args, 0)
           assert review["findings_version"] == "literal-claim-findings-v1"
           assert len(review["bullets"][0]["findings"]) == 2
-          decisions = {"schema_version": 2, "review_version": review["review_version"],
+          decisions = {"schema_version": 3, "review_version": review["review_version"],
                        "plan_sha256": review["document"]["plan_sha256"],
                        "document_sha256": review["document_sha256"],
                        "findings_sha256": review["findings_sha256"],
+                       "fragments_sha256": review["fragments_sha256"],
                        "bullets": [{"bullet_id": b["bullet_id"], "decision": "approve",
                                     "reason": "Synthetic gate assertion, not factual proof.",
-                                    "acknowledged_finding_ids": []} for b in review["bullets"]]}
+                                    "acknowledged_finding_ids": [],
+                                    "fragment_decisions": []} for b in review["bullets"]]}
           for acknowledged in (False, True):
               if acknowledged:
                   decisions["bullets"][0]["acknowledged_finding_ids"] = [
                       f["id"] for f in review["bullets"][0]["findings"]]
               Path("finding-decisions.json").write_text(json.dumps(decisions))
               result = run(draft_args + ["--decisions", "finding-decisions.json",
-                                         "--confirm-decisions"], 0 if acknowledged else 3)
-              assert result["status"] == (
-                  "bullet_wording_approved_by_user" if acknowledged else "needs_review")
+                                         "--confirm-decisions"], 3)
+              assert result["status"] == "needs_review"
+              assert result["bullets"][0]["unreviewed_fragment_ids"]
               assert result["review"]["document"] == draft
               assert result["review"]["bullets"][0]["findings"] == review["bullets"][0]["findings"]
               assert not result["rendering_authorized"]
+          for choice, bullet in zip(decisions["bullets"], review["bullets"], strict=True):
+              choice["fragment_decisions"] = [{"fragment_id": f["id"],
+                  "disposition": "omission_accepted", "draft_span": None,
+                  "reason": "Synthetic gate assertion only, not factual approval."}
+                  for f in bullet["source_fragments"]]
+          Path("finding-decisions.json").write_text(json.dumps(decisions))
+          result = run(draft_args + ["--decisions", "finding-decisions.json",
+                                    "--confirm-decisions"], 0)
+          assert result["status"] == "bullet_wording_approved_by_user"
+          assert result["review"]["bullets"][0]["source_fragments"]
+          assert not result["rendering_authorized"]
           seed = run([], 0)
           response = {"schema_version": 1,
                       "plan_sha256": seed["document"]["plan_sha256"],

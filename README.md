@@ -72,6 +72,13 @@ is not evidence of wording quality or approval. The [frozen paired comparison](d
 produced shorter text but distorted qualifiers/project scope. The concise objective is experimental;
 the conservative default remains unchanged.
 
+Wording inspection now exposes source sentences/clauses **not retained verbatim**. These may be
+paraphrases or omissions, not automatically unsupported claims. Version-3 human decisions must
+account for each observed fragment: link a draft passage, deliberately accept an omission, or
+request revision. Missing reviews/revision requests keep approval pending, independently of literal
+finding acknowledgements. See [docs/SOURCE_FRAGMENT_REVIEW.md](docs/SOURCE_FRAGMENT_REVIEW.md).
+Old decision files require fresh review; version-1 profiles/drafts/responses need no rewrite.
+
 **End-to-end resume generation is not implemented.** There is no cloud provider, relevance-ranking engine,
 database, template renderer, PDF compiler, API, or browser extension yet.
 Local verification and hosted CI results are reported separately.

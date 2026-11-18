@@ -372,7 +372,9 @@ def review_resume_command(
     ] = None,
     decisions: Annotated[
         Path | None,
-        typer.Option("--decisions", help="Explicit human bullet decisions for this exact draft."),
+        typer.Option(
+            "--decisions", help="Version-3 human wording/fragment decisions for this draft."
+        ),
     ] = None,
     confirm_decisions: Annotated[
         bool,
