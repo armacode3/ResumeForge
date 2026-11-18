@@ -156,3 +156,7 @@ exported from `resumeforge.resume`. Safe failures raise `ResumeError` (file read
 `InputError`). Source-bound wording proposals are available separately in 0.12.0; see
 `docs/WORDING_ASSISTANCE.md`. They cannot author or carry forward decisions. Source-fragment review
 is offline and does not alter the frozen model comparisons or authorize another live run.
+
+Separate `review-metadata` inspection now exposes only explicitly selected source-bound metadata
+in pending records; it does not consume these bullet decisions or approve dates/contact/entry
+fields. See `docs/METADATA_REVIEW.md`. The v3 bullet decision contract above is unchanged.

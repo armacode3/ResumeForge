@@ -58,6 +58,8 @@ src/resumeforge/
     findings.py     versioned finite numeric/caveat observations and provenance-bound fingerprints
     fragments.py    literal source-segment absence with exact spans and snapshot-bound fingerprints
     worksheet.py    fresh review and null-only decision scaffolds, never automatic attestations
+    metadata_models.py explicit field exposure and pending source-bound metadata snapshots
+    metadata.py     selected contact/entry inspection with draft binding, no metadata approvals
     wording.py      source-bound provider proposals, minimized inputs, exact slots and fresh review
     benchmark.py    fixed synthetic wording replay/live harness, no automatic quality verdicts
 tests/
@@ -253,6 +255,16 @@ to applying explicitly confirmed user attestations. No previous receipt is impor
 mutually exclusive `review-resume --worksheet`, requiring an explicit draft; no provider, writer,
 policy/schema migration or interactive framework is added. See `docs/REVIEW_WORKSHEETS.md` and ADR-021.
 
+`resume.review_metadata` is a separate offline disclosure boundary requiring original sources,
+an explicit wording draft, explicit whitelisted field selection and three exact review flags.
+It snapshots the profile model, recomputes inspection, rejects entries outside the non-excluded
+plan, and copies only chosen contact/entry values with logical source refs and pending states.
+Missing values stay null/empty; dates and completion context remain independent. A bounded
+metadata document binds policy, plan, wording and field-selection identity; full wording/plan
+context remains visible in the outer report. Ordinary reviews and provider requests acquire no
+contact/entry values. No metadata input draft, edit/approval path or bullet-approval import is
+added. See `docs/METADATA_REVIEW.md` and ADR-022.
+
 `resume.benchmark` preflights a fixed fictional six-case/seven-bullet corpus and invokes the same
 wording engine. Source-seed replay is the default, independent-response replay is explicit, and
 guarded local mode needs a separate data acknowledgement. Invalid outputs stay in totals; reports
@@ -293,8 +305,9 @@ Create these modules only as their features are implemented:
    references. Failed generations must not masquerade as approved final resumes.
 
 Profile/job/selection schemas, draft-plan snapshots and narrow evidence-linked wording-draft
-schemas and narrow human bullet-wording decisions now exist. Complete renderable resume content,
-metadata review and rendering authorization remain deferred.
+schemas and narrow human bullet-wording decisions now exist. Pending selected metadata inspection
+also exists. Metadata attestations, complete renderable resume content and rendering authorization
+remain deferred.
 Pydantic validates profile input and untrusted structured job responses, which fail actionably.
 `config/resume_rules.md` holds writing policy; planned `config/layout.yaml` will separately
 hold machine-readable page, spacing, and minimum-readability constraints.

@@ -46,8 +46,15 @@ decision template. Read `docs/REVIEW_WORKSHEETS.md`. Never prefill choices, reas
 acknowledgements, fragment dispositions or draft links; copy only current bindings/IDs. The envelope
 is not draft/decision input. Users extract/complete/remove pending records and still use explicit
 decision confirmation and unchanged v3 gates. No prior approvals are imported or migrated. Keep
-the complete default worksheet bounded and private. Next: define source-bound metadata review/
-structured-resume completion, not implicit inference or rendering authorization.
+the complete default worksheet bounded and private.
+Separate offline `review-metadata` now exposes only explicitly selected contact/planned-entry
+fields as pending source copies bound to current wording and field selection. Read
+`docs/METADATA_REVIEW.md`. Require all original sources, explicit draft and all three review flags;
+reject unknown/unselected/excluded entries. No implicit name/contact disclosure in other commands
+or providers, no metadata editing/approval or transfer from bullet decisions. Missing values stay
+null/empty; recorded present and completion status stay independent. Links are model-normalized,
+never fetched. Keep metadata private and bounded. Next: separate per-field metadata attestations,
+then structured-resume completion, not implicit inference or rendering authorization.
 Omitted states stay unknown; version-1 profile/draft files need no rewrite (not old decisions).
 Read `docs/MATCHING.md` for the
 retrieval boundary.
@@ -70,6 +77,7 @@ cloud inference, resume generation, semantic claim proof, PDFs or history alread
 - `examples/profiles/sample.md`: fictional fixture used by `tests/` and the CI smoke test.
 - `examples/jobs/`: fictional job and manually authored JSON response, not real application data.
 - `examples/plans/`: fictional explicit selections; the sample intentionally exposes a count conflict.
+- `examples/metadata/`: explicit fictional metadata-field exposure selection, not approved facts.
 - `scripts/evaluate_jobs.py`: repository-only six-case synthetic benchmark; defaults to reference replay.
 - `scripts/evaluate_wording.py`: fixed fictional wording corpus, source replay by default, no quality score.
 - `tests/unit/`, `tests/integration/`: deterministic schema/parser/CLI/privacy checks.
