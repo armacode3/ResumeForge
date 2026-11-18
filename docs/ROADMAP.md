@@ -117,13 +117,23 @@ Project/per-entry/total-slot count conflicts are reported without trimming manda
 inventing evidence. All plans need review; the sample intentionally exposes an education bullet
 minimum conflict. See `docs/PLANNING.md` and ADR-013.
 
-**Next:** a separate Phase 4 structured resume/claim-review contract using these evidence references,
-before wording generation or rendering. Relevance ordering/automatic selection still require
+Phase 4 now has a narrow wording-draft/review boundary using these evidence references (below).
+Relevance ordering/automatic selection still require
 justified policy and evaluation; this is not completion of the automated ranking/layout gates.
 Markdown notes are not enforced constraints. Count-based drafts do not guarantee sufficient
 evidence, job coverage, readable-one-page feasibility or truthful generated claims.
 
 ## Phase 4 — Bullets, claims and review
+
+Implemented prerequisite in 0.9.0: frozen `ResumeDocument` wording drafts with exact plan binding,
+strict selected evidence references, source seeds and pending per-bullet review observations.
+`review-resume` copies complete source statements or inspects edited JSON, preserving plan
+conflicts/context. All edits require review; even verbatim wording stays pending. This is not
+semantic claim proof, fabricated-claim detection or a human approval workflow. See
+`docs/RESUME_DRAFTS.md` and ADR-014.
+
+**Next:** explicit human review decisions bound to exact document/evidence snapshots, followed by
+measured claim checks and controlled wording assistance. Model/data policy must stay explicit.
 
 Generate structured bullets with accomplishment IDs, check unsupported tools/metrics/ownership,
 dates and contradictions, report gaps, and implement review/approval. Gate: fabricated-claim

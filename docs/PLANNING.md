@@ -121,7 +121,8 @@ Full job-item IDs, categories, text and quotes are preserved, with links only to
 accomplishments. Links are lexical associations, never requirement-satisfied verdicts. Unmatched
 job items stay present; no match is not proof of missing experience or absence from the full job.
 Company/title metadata are not planning targets. Source statements remain authoritative, not
-generated/historical wording. Semantic claim checks and review/approval are Phase 4 work.
+generated/historical wording. Phase 4 now has a narrow wording-draft boundary; see
+`docs/RESUME_DRAFTS.md`. Semantic claim checks and human approval workflows remain deferred.
 
 ## Output, errors and privacy
 

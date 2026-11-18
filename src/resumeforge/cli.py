@@ -26,6 +26,7 @@ from resumeforge.providers.ollama import (
     DEFAULT_PORT,
     DEFAULT_TIMEOUT,
 )
+from resumeforge.resume import ResumeError, load_resume_document, review_resume
 
 
 class ProviderChoice(StrEnum):
@@ -35,7 +36,7 @@ class ProviderChoice(StrEnum):
 
 app = typer.Typer(
     help="ResumeForge: evidence-first resumes. Profile validation, job analysis "
-    "and offline evidence retrieval/planning.",
+    "and offline evidence retrieval/planning/draft review.",
     add_completion=False,
     invoke_without_command=True,
     pretty_exceptions_enable=False,
@@ -220,4 +221,61 @@ def plan_resume_command(
     typer.echo(json.dumps(asdict(plan), ensure_ascii=False, indent=2))
     if plan.constraint_status == "conflicts":
         typer.echo("Plan has constraint conflicts; review findings before proceeding.", err=True)
+        raise typer.Exit(code=3)
+
+
+@app.command("review-resume")
+def review_resume_command(
+    profile: Annotated[Path, typer.Option("--profile", help="Explicit local Markdown profile.")],
+    job: Annotated[Path, typer.Option("--job", help="Exact local job source.")],
+    requirements: Annotated[
+        Path, typer.Option("--requirements", help="Reviewed JobRequirements JSON; no inference.")
+    ],
+    selection: Annotated[
+        Path, typer.Option("--selection", help="Reviewed version-1 entry/evidence selection JSON.")
+    ],
+    draft: Annotated[
+        Path | None,
+        typer.Option(
+            "--draft", help="Edited ResumeDocument JSON; omit to seed verbatim pending wording."
+        ),
+    ] = None,
+    confirm_review: Annotated[
+        bool,
+        typer.Option(
+            "--confirm-review",
+            help="Acknowledge requirements/selection review, not claim approval.",
+        ),
+    ] = False,
+) -> None:
+    """Inspect an evidence-linked wording draft; all bullets remain pending review."""
+    if not confirm_review:
+        raise typer.BadParameter(
+            "Review requirements and selection, then pass --confirm-review; "
+            "this does not approve wording."
+        )
+    try:
+        document = load_job(job)
+        analysis = analyze_job(document, FakeProvider.from_file(requirements))
+        choices = load_selection(selection)
+        proposed = load_resume_document(draft) if draft is not None else None
+        candidate = load_profile(profile)
+        review = review_resume(
+            candidate.profile,
+            document,
+            analysis.requirements,
+            choices,
+            proposed,
+            requirements_reviewed=True,
+            selection_reviewed=True,
+        )
+    except (ProfileError, InputError, JobAnalysisError, PlanningError, ResumeError) as error:
+        typer.echo(f"Resume draft review failed:\n{error}", err=True)
+        raise typer.Exit(code=1) from None
+    typer.echo(
+        "Offline draft inspection; no inference, semantic proof or claim approval.", err=True
+    )
+    typer.echo(review.model_dump_json(indent=2))
+    if review.status == "blocked_by_plan":
+        typer.echo("Draft is blocked by plan conflicts; inspect the plan findings.", err=True)
         raise typer.Exit(code=3)

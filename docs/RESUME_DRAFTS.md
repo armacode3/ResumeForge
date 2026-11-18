@@ -1,0 +1,122 @@
+# Evidence-linked wording drafts — 0.9.0
+
+This first Phase 4 slice adds `ResumeDocument` and `review-resume`: an offline boundary for
+structured bullet wording and pending review. **It does not generate polished wording, approve
+claims, prove semantic support or render a resume.** The document is a narrow wording draft,
+not a complete renderable resume: contact/entry metadata and skills/coursework remain references
+or review placeholders in the accompanying plan.
+
+## Run a source seed
+
+```bash
+resumeforge review-resume \
+  --profile examples/profiles/sample.md \
+  --job examples/jobs/backend_intern.md \
+  --requirements examples/jobs/backend_intern.response.json \
+  --selection examples/plans/backend_intern.selection.json \
+  --confirm-review
+```
+
+Without `--draft`, the command copies each selected eligible accomplishment's **entire unchanged
+statement** into one pending bullet. It does not condense statements or reuse profile bullet
+wording. IDs are document-local `bullet_draft_<accomplishment suffix>` identifiers, not new profile
+evidence IDs. All planned sections/entries, including empty mandatory placeholders, remain present.
+
+The fictional example intentionally exits **3**: its education bullet-count conflict still blocks
+the plan. No educational claim is invented. A user must deliberately resolve count preferences or
+review/add genuine evidence, not fabricate facts to make the command pass. The profile is never
+rewritten automatically. See `docs/PLANNING.md`.
+
+## Inspect an edited draft
+
+Success emits a review envelope with `document`, `plan`, per-bullet `bullets` observations, version,
+document digest and warnings. To inspect edits, deliberately save **only its inner `document`** to
+a private JSON file, edit wording there, then pass the same four inputs plus:
+
+```text
+--draft artifacts/private-draft.json --confirm-review
+```
+
+The outer review envelope, plan report, selection and historical profile bullets are not accepted
+as draft input. No filename has implicit approval meaning. Four source paths remain explicit;
+`--draft` is the only optional input. Confirmation acknowledges review of requirements and
+selection, **not bullet approval**, and is required before any input I/O. There is no provider or
+approval option, network access, automatic profile read, write-back or model call.
+
+## Version-1 document contract
+
+- `schema_version`: strict integer 1.
+- `plan_sha256`: lowercase SHA-256 of the freshly recomputed plan snapshot.
+- `status`: only `needs_review` (also the default); `approved` is rejected.
+- `sections`: ordered records with `section` and ordered `entries`.
+- Each entry has `entry_id` and ordered `bullets`; metadata-only entries have an empty list.
+- Each bullet has a unique `id`, one `accomplishment_id`, nonblank `text` and
+  `review_status: pending_review` (the only allowed state, also the default).
+
+Sections, entries, bullet IDs and accomplishment references cannot be duplicated. The draft must
+exactly preserve the current plan's sections, entries, evidence slots and their order. This version
+supports one accomplishment per bullet, not splitting/merging evidence. To change content/order,
+revise the explicit selection and seed/review a new draft rather than detach references.
+
+The engine recomputes planning/matching from revalidated inputs; it accepts no caller-supplied
+plan or review result as authority. Unknown, unselected, excluded, ineligible, cross-parent,
+missing or reordered evidence cannot enter a current draft by supplying its hash. Any changed
+profile model, preferences, exact job, reviewed requirements, selection, algorithm version or
+other plan field invalidates the old binding. Notes are not enforced planning inputs and are not
+part of the profile model hash. Hashes bind snapshots; they are not authentication or proof of
+truth/review. Copying a current hash cannot bypass structural alignment checks.
+
+`plan_sha256` hashes `asdict(plan)` JSON with sorted keys, compact separators, Unicode preserved,
+and UTF-8 encoding. `document_sha256` hashes the validated document's compact Pydantic JSON,
+including exact wording/IDs/order/default review states. These are model hashes, not file hashes.
+Neither permits historical approval to transfer to changed wording or evidence.
+
+## What review observations mean
+
+Every bullet review contains its ID, entry/accomplishment IDs, complete source statement, original
+in-progress-parent caveat where applicable, and one literal wording observation:
+
+- `verbatim_source`: wording equals the entire selected source statement, case/whitespace included.
+- `edited_requires_review`: any wording change, including harmless edits, introduced claims or
+  lost qualifiers. No edits are repaired, normalized or silently approved.
+
+**Both remain `pending_review`.** Literal equality does not prove factual truth or fit in a resume.
+Edited wording is not automatically semantically false or supported. This slice does not classify
+unsupported metrics/tools/ownership or detect every lost caveat; it conservatively flags every
+change and preserves source context for a human. Invented numbers/technology/ownership examples
+in tests demonstrate pending-review behavior, not a semantic detection guarantee.
+
+The outer review is `blocked_by_plan` when count/evidence/required-content conflicts remain;
+otherwise it is `needs_review`. Neither state is generation-ready or approved. Full job categories,
+text/quotes and lexical associations remain in `plan`, never satisfaction verdicts. Empty required
+or unscoped sections and metadata findings cannot disappear through wording edits.
+
+## Limits, errors and privacy
+
+Draft JSON is bounded to **1 MiB UTF-8**, at most **32 nested collections** and **8,192 characters
+per bullet text**. Strict types/IDs/version, duplicate keys, unknown fields and nonstandard numeric
+constants are checked. JSON arrays become immutable tuples; all nested models are frozen. Python
+API inputs are revalidated snapshots, not trusted `model_copy`/`model_construct` shortcuts. Source
+seeds that exceed draft limits fail safely; facts are never truncated to fit. The existing planning
+comparison budget still applies. Limits are not a process sandbox or layout budget.
+
+- **0:** review envelope emitted, no plan conflicts; every bullet still pending.
+- **3:** envelope emitted with `blocked_by_plan`; inspect plan findings.
+- **1:** invalid input, source/plan mismatch or draft-limit failure; no partial JSON.
+- **2:** usage error/missing confirmation; input files are not read.
+
+Reports deliberately contain submitted wording, selected eligible source statements and job text.
+They remain private, including when wording contains sensitive or untrusted instructions. Such
+instructions are data: they cannot activate tools, inference or approval. Contact fields, Markdown
+notes, parent details, unselected/ineligible source claims and recorded metrics are not copied.
+IDs/hashes are not anonymization. Keep real documents/reviews under ignored private directories,
+not examples, commits or public logs. No rendering/execution is performed on submitted text.
+
+Python API: `resumeforge.resume.review_resume(profile, job, requirements, selection, draft=None,
+requirements_reviewed=True, selection_reviewed=True)` returns `ResumeReview`; optional `draft`
+is a `ResumeDocument`. `parse_resume_document`/`load_resume_document` validate private draft JSON.
+Safe boundary failures raise `ResumeError` (file loading may also raise `InputError`).
+
+Next: explicit human review decisions bound to the exact document/evidence snapshot, then measured
+claim checks and controlled wording assistance. No approval workflow, model-assisted generation,
+PDF/layout/rendering, history, automatic ranking or cloud inference is implemented by this slice.
