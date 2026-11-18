@@ -19,6 +19,9 @@ Phase 4 has plan-bound wording drafts/source seeds, pending literal-change obser
 snapshot-bound user bullet-wording decisions plus literal numeric/caveat findings, not semantic
 proof or full-resume approval. Read `docs/RESUME_DRAFTS.md`, `docs/REVIEW_DECISIONS.md` and
 `docs/CLAIM_FINDINGS.md`.
+Controlled source-bound wording proposals now use fake replay or explicitly acknowledged local
+inference, always followed by fresh inspection. Read `docs/WORDING_ASSISTANCE.md`; wording quality
+is unevaluated. No live run is a normal test or implicit continuation step.
 Omitted states stay unknown; version-1 profile/draft files need no rewrite (not old decisions).
 Read `docs/MATCHING.md` for the
 retrieval boundary.
@@ -36,7 +39,7 @@ cloud inference, resume generation, semantic claim proof, PDFs or history alread
 - `src/resumeforge/matching/`: reviewed-input gate, eligibility, lexical candidates and review findings.
   Candidate signals preserve literal statement mentions and scoped metric records, not scores.
 - `src/resumeforge/planning/`: strict explicit selections, immutable draft plans and count conflicts.
-- `src/resumeforge/resume/`: strict frozen drafts, plan binding, inspection and narrow user decisions.
+- `src/resumeforge/resume/`: frozen drafts, source-bound wording, inspection and narrow user decisions.
 - `src/resumeforge/inputs.py`: bounded local text input for job/response files.
 - `examples/profiles/sample.md`: fictional fixture used by `tests/` and the CI smoke test.
 - `examples/jobs/`: fictional job and manually authored JSON response, not real application data.
@@ -46,7 +49,7 @@ cloud inference, resume generation, semantic claim proof, PDFs or history alread
 - `config/resume_rules.md`: policy only, not currently loaded by code.
 - `docs/`: decisions, roadmap, development log; `.github/workflows/ci.yml`: checks.
 - `data/profile/user_information.md`: default private input, ignored; never create real data in Git.
-- Planned only: relevance ranking/automatic selection, assisted wording/claim checks/metadata approval,
+- Planned only: relevance ranking/automatic selection, semantic claim checks/metadata approval,
   Jinja2, LaTeX/PyMuPDF, SQLite,
   then Docker, FastAPI, and a Manifest V3 extension. Add dependencies when needed.
 
@@ -96,6 +99,14 @@ documented blind spots. Compare only selected statements, not other source field
 Version-2 decisions bind current finding fingerprints and explicit per-bullet acknowledgements;
 missing acknowledgements stay pending, unknown/cross-bullet IDs fail, and findings remain visible
 even when acknowledged. Never automatically upgrade old attestations or truncate excessive findings.
+Wording assistance starts from freshly revalidated source seeds, not old drafts/decisions. Code
+owns all slots/structure/status; responses may only supply exactly ordered bullet/evidence IDs and
+text bound to current plan/seed hashes. Skip wording-provider calls for conflicted/empty plans.
+Minimize provider inputs to selected statements/IDs/caveats and complete reviewed job items; no
+contact fields, notes, metadata or historical wording. Local mode additionally requires explicit
+selected-source data-use acknowledgement. Keep fake replay truthful, no live quality claims from
+mocks, one call/no retry, bounded responses and fresh post-call inspection. No automatic approval
+transfer or source promotion; rendering remains unauthorized. See `docs/WORDING_ASSISTANCE.md`.
 Job analysis accepts no candidate profile. Keep trusted instructions separate from job data.
 Response text and its quote must be literal source substrings; that is provenance, not proof of
 classification/completeness. Preserve required/preferred distinctions and explicit unknowns.

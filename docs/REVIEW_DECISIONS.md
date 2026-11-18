@@ -130,4 +130,6 @@ Python API: `apply_review_decisions(profile, job, requirements, selection, draft
 requirements_reviewed=True, selection_reviewed=True, decisions_confirmed=True)` returns
 `ReviewDecisionResult`. `ReviewDecisions`, `parse_review_decisions` and `load_review_decisions` are
 exported from `resumeforge.resume`. Safe failures raise `ResumeError` (file reads may raise
-`InputError`). Next: controlled wording assistance, not rendering or semantic proof.
+`InputError`). Source-bound wording proposals are available separately in 0.12.0; see
+`docs/WORDING_ASSISTANCE.md`. They cannot author or carry forward decisions. Next: explicit
+synthetic wording-quality evaluation, not rendering or semantic proof.

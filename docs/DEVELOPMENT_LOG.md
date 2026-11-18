@@ -595,3 +595,55 @@
 - Next: controlled wording assistance under the existing explicit local-only model/data policy,
   still requiring fresh inspection/user review. Semantic proof, metadata/full-resume approval,
   rendering/PDF/readability, automatic ranking, history and cloud inference remain unimplemented.
+
+## Session 018 — Controlled source-bound wording assistance
+
+- User confirmed the literal-findings feature was merged and authorized the next step. Fetched
+  `main` at `bbf3e1e`, fast-forwarded local main and created `feat/controlled-wording-assistance`
+  from that clean base. No private input, historical branch or remote configuration was changed.
+- Defined a narrow wording-proposal boundary, not automatic selection or full-resume generation.
+  `suggest_wording` rebuilds the original reviewed-selection plan/source seed before provider use.
+  Conflicted/empty plans preserve their inspection and skip the wording provider. Only selected,
+  eligible statements, IDs/status caveats, snapshot hashes and complete reviewed job items/quotes/
+  categories/lexical associations enter the request. Contact, notes, parent metadata, metrics and
+  old bullets/decisions are excluded as separate fields; source prose may still identify people.
+- Reused the existing provider Protocol with separate versioned trusted instructions/schema and
+  untrusted data. Fake replay stays explicit and does not generate wording. Optional guarded local
+  Ollama requires separate `--confirm-local-data` plus source-review acknowledgement; existing
+  loopback, no-proxy/redirect/cloud/tool, model-metadata/context/output/deadline guards are intact.
+  No server/model setup, live inference, cloud activation or private-data evaluation was performed.
+- Added strict bounded `WordingResponse`: current plan/seed hashes and exactly ordered bullet/
+  accomplishment references with nonblank proposed text. Reject changed references, missing/extra/
+  repeated/reordered content, self-approval, unknown fields and malformed/excessive input. Code owns
+  document structure/metadata placeholders/pending states; substitute text only, then re-inspect
+  against freshly recomputed original sources. Concurrent source changes fail rather than mixing
+  snapshots. No silent trimming, provider retry, corrective model call or inferred semantic support.
+- Immutable `WordingResult` records policy/prompt versions, optional attempt provider/model and
+  request/raw-response hashes, plus the current inspection. It always keeps rendering unauthorized.
+  All suggestions remain pending, including verbatim text; source claims are never promoted.
+  Changed wording rejects old decisions, and current approvals still need finding acknowledgements.
+  Findings remain visible even after separate human attestations. Model wording quality remains
+  unevaluated; a schema-valid proposal may invent facts or lose qualifiers beyond literal checks.
+- Added the real `suggest-wording` CLI, fake default and explicit local mode/data-use gates before
+  input I/O. Exit 0 emits an unapproved result; 3 preserves a conflicted plan without a wording call;
+  1 rejects invalid/provider failures without partial JSON; 2 rejects invalid usage/acknowledgements.
+  Existing draft/profile/decision/inspection/finding schemas/policies are unchanged. Adapter failure
+  messages now refer to generic input rather than job-only usage; safe/static guards are unchanged.
+- Added synthetic schema, provenance/order, minimized payload, offline/privacy, source-instruction,
+  exact-boolean gate, budget/provider failure, concurrent-source, immutable/pending, human-decision
+  and mocked Ollama tests. Installed CLI tests cover fake/local gates, private-output failures,
+  conflict skipping, response-to-inspection round trips and fabricated wording retained for review.
+  Help regressions include plain/GitHub/forced-color modes. CI runtime-wheel smoke now replays a
+  synthetic wording proposal and asserts findings/pending states, without inference or downloads.
+- Application 0.12.0; no new dependency. Local Python 3.12.3 full suite passed 716 unit + 116
+  integration = 832 tests, 99.95% branch-aware coverage. Ruff lint/format, strict mypy (64 files),
+  editable install and dependency checks passed. Fresh locked editable/runtime-only installations,
+  source/wheel builds, all 832 tests against the installed wheel outside the repository and the
+  exact runtime-wheel CI smoke passed. Reviewed 23 public staged files and distribution contents/
+  secret patterns; private/runtime data is excluded. Hosted CI is checked after push rather than
+  inferred from local results.
+- Updated the wording/data-use guide, ADR-017, provider/draft/review/finding guides, actual-status
+  README/architecture/roadmap and canonical agent guidance. Next: explicitly opted-in synthetic
+  wording-quality evaluation before claiming real-model usefulness. No live evaluation is implied
+  by generic continuation. Semantic proof, full-resume/metadata review, rendering/PDF/readability,
+  ranking, history and cloud inference remain unimplemented.

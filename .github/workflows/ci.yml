@@ -178,4 +178,24 @@ jobs:
               assert result["review"]["document"] == draft
               assert result["review"]["bullets"][0]["findings"] == review["bullets"][0]["findings"]
               assert not result["rendering_authorized"]
+          seed = run([], 0)
+          response = {"schema_version": 1,
+                      "plan_sha256": seed["document"]["plan_sha256"],
+                      "seed_document_sha256": seed["document_sha256"],
+                      "bullets": [{"bullet_id": b["bullet_id"],
+                                   "accomplishment_id": b["accomplishment_id"],
+                                   "text": b["source_statement"]} for b in seed["bullets"]]}
+          response["bullets"][0]["text"] = "Owned 99 endpoints."
+          Path("wording-response.json").write_text(json.dumps(response))
+          wording_args = args.copy()
+          wording_args[3] = "suggest-wording"
+          process = subprocess.run(wording_args + ["--mock-response", "wording-response.json"],
+                                   capture_output=True, text=True, check=False, timeout=10)
+          assert process.returncode == 0, process.stderr
+          result = json.loads(process.stdout)
+          assert result["attempt"]["provider"] == "fake"
+          assert result["review"]["mode"] == "submitted_draft"
+          assert len(result["review"]["bullets"][0]["findings"]) == 2
+          assert all(b["review_status"] == "pending_review" for b in result["review"]["bullets"])
+          assert not result["rendering_authorized"]
           PY

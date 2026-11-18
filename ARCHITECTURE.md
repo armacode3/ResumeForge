@@ -8,8 +8,10 @@ candidate review signals. Reviewed-selection draft planning now checks count con
 preserves mandatory content. The first Phase 4 boundary adds structured wording drafts with
 pending review and exact plan binding. Separate snapshot-bound human decisions can now attest
 to individual bullet wording. Literal numeric/caveat observations now require explicit finding
-acknowledgements before user approval. Relevance ranking, model-assisted wording generation, semantic
-claim proof and full-resume/rendering approval are not implemented.
+acknowledgements before user approval. Controlled wording assistance now supports explicit fake
+replay or opted-in local Ollama proposals with minimized source/job data and fresh inspection.
+Wording quality is unevaluated. Relevance ranking, semantic claim proof and full-resume/rendering
+approval are not implemented.
 No cloud provider is enabled.
 Everything below labeled **planned** is a design boundary, not a
 working feature. Prefer a modular monolith: one Python package, with small components and
@@ -49,10 +51,11 @@ src/resumeforge/
     engine.py       explicit assembly, mandatory placeholders and count-conflict findings
   resume/
     models.py       frozen versioned wording drafts and pending review observations
-    documents.py    bounded strict local draft/decision JSON loaders
+    documents.py    bounded strict draft/decision/wording response JSON loaders
     engine.py       source seeds, fresh plan binding and literal wording-change observations
     decisions.py    snapshot-bound user attestations, never full-resume/rendering approval
     findings.py     versioned finite numeric/caveat observations and provenance-bound fingerprints
+    wording.py      source-bound provider proposals, minimized inputs, exact slots and fresh review
 tests/
   unit/             CLI/schema/parser/gap contracts and invalid inputs
   integration/      installed entry points, profile validation, privacy safeguards
@@ -183,8 +186,8 @@ slot in order. Frozen nested records use immutable tuples; no input can declare 
 Every bullet has one selected accomplishment reference and remains `pending_review`.
 
 Literal comparison distinguishes unchanged source text from edited wording, not supported from
-unsupported claims. Plan conflicts block the outer review; semantic proof and polished/model-
-assisted generation are deferred. The read-only `review-resume` command emits
+unsupported claims. Plan conflicts block the outer review; semantic proof remains deferred.
+The read-only `review-resume` command emits
 private documents/review context, not renderable output. See `docs/RESUME_DRAFTS.md`.
 
 `resume.apply_review_decisions` requires original inputs, an explicit draft, a strict decision file
@@ -200,6 +203,21 @@ tokens and a finite cue vocabulary. Exact spans and empty/acknowledged findings 
 never semantic verdicts. Limits fail closed, not truncated. See `docs/REVIEW_DECISIONS.md` and
 `docs/CLAIM_FINDINGS.md`.
 
+`resume.suggest_wording` first seeds a fresh reviewed plan from original sources. Conflicted or
+empty plans return that inspection without a provider call. Otherwise one structured request sends
+only selected source statements, stable bullet/evidence IDs, status caveats, snapshot hashes and
+complete reviewed job items/quotes/categories. Contact, notes, metadata fields and old wording are
+excluded. Separate trusted instructions prohibit fact invention/transfer; job data is not evidence.
+Explicit data-use confirmation precedes provider access; the CLI defaults to fake replay and
+requires separate `--confirm-local-data` for guarded local inference. No new cloud path exists.
+
+The provider returns only snapshot hashes and exactly ordered bullet IDs/evidence references/text.
+Code owns section/entry/status structure, replaces only wording and runs fresh inspection. Stale,
+missing, extra, reordered, self-approved, malformed or excessive responses fail without partial
+success/retry. All proposals stay pending; old decisions do not transfer to changed wording.
+Reports record provider/model, prompt/policy versions and request/raw-response hashes, not raw
+prompt logs or semantic truth. No persistence/rendering is added. See `docs/WORDING_ASSISTANCE.md`.
+
 ## Planned module responsibilities
 
 Create these modules only as their features are implemented:
@@ -209,7 +227,7 @@ Create these modules only as their features are implemented:
 | Other provider adapters | Add only when explicitly approved; retain structured interface, data disclosure, limits and safe failure policy. No automatic fallback. |
 | Matching ranking | Evaluate relevance ordering beyond the implemented source observations; never rank by keyword/metric counts alone. |
 | Planning extensions | Add evaluated automatic relevance selection and actual space/layout budgets beyond reviewed-selection count plans. |
-| `generation/` | Produce structured `ResumeDocument` and bullets with supporting accomplishment IDs; never raw model-authored LaTeX. |
+| Generation extensions | Extend current source-bound wording assistance only after evaluation; complete resume metadata and rendering authorization remain separate, never raw model-authored LaTeX. |
 | `validation/` | Validate references and factual claims; produce `ValidationResult` and blocking/review flags. Later inspect PDFs. |
 | `rendering/` | Escape dynamic text, render trusted versioned Jinja2/LaTeX templates, compile safely, export text and report. |
 | `engine/` | Orchestrate pipeline through explicit inputs/outputs; no dependence on CLI or HTTP frameworks. |

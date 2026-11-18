@@ -144,8 +144,15 @@ acknowledgement stays pending; findings never imply semantic support or disappea
 Synthetic characterization documents false alarms and deliberate misses, not real-world accuracy.
 See `docs/CLAIM_FINDINGS.md` and ADR-016. Draft/profile schemas are unchanged.
 
-**Next:** controlled wording assistance. Model/data policy must stay explicit; semantic proof and
-complete resume/metadata review remain unimplemented, as do rendering and automatic ranking.
+Implemented in 0.12.0: controlled `suggest-wording` using source seeds, exactly preserved slots,
+strict snapshot-bound provider responses and fresh inspection. Fake replay remains default;
+guarded local Ollama requires separate selected-source data-use acknowledgement. Conflicted/empty
+plans skip wording calls. Suggestions are never approvals, and wording quality is not evaluated.
+See `docs/WORDING_ASSISTANCE.md` and ADR-017. Profile/draft/decision formats are unchanged.
+
+**Next:** an explicitly opted-in synthetic wording-quality evaluation before claiming real-model
+utility. Model/data policy stays explicit; semantic proof, complete resume/metadata review,
+rendering and automatic ranking remain unimplemented.
 
 Generate structured bullets with accomplishment IDs, check unsupported tools/metrics/ownership,
 dates and contradictions, report gaps, and implement review/approval. Gate: fabricated-claim

@@ -4,7 +4,7 @@ An evidence-first resume tailoring application, built incrementally. The goal is
 a verified Markdown profile and a job description into a reviewable, one-page resume
 without inventing experience, technologies, or metrics.
 
-## Current status: Phase 4 — literal findings and snapshot-bound human decisions
+## Current status: Phase 4 — controlled wording proposals and snapshot-bound review
 
 Implemented: an installable Typer CLI with help/version output, unit and installed-entry-point
 tests, privacy-ignore regression coverage, linting, formatting, strict typing, packaging checks,
@@ -48,7 +48,14 @@ from a finite caveat vocabulary, with exact spans and documented blind spots. Ve
 must bind current findings and explicitly acknowledge them before approval can apply. Empty or
 acknowledged findings are not proof of support. See [docs/CLAIM_FINDINGS.md](docs/CLAIM_FINDINGS.md).
 
-**Resume generation is not implemented.** There is no cloud provider, relevance-ranking engine,
+`suggest-wording` now accepts snapshot-bound fake replay or explicitly opted-in guarded local
+Ollama suggestions for selected source statements. It preserves all slots and sends every proposal
+through fresh inspection; no suggestion self-approves. Local mode additionally requires
+`--confirm-local-data` for selected statements/caveats and reviewed job items, excluding contact,
+notes and historical wording. **Wording quality has not been evaluated.** See
+[docs/WORDING_ASSISTANCE.md](docs/WORDING_ASSISTANCE.md).
+
+**End-to-end resume generation is not implemented.** There is no cloud provider, relevance-ranking engine,
 database, template renderer, PDF compiler, API, or browser extension yet.
 Local verification and hosted CI results are reported separately.
 
@@ -130,6 +137,11 @@ the inner `ResumeDocument`, not an outer review report. Without it, source state
 unchanged into pending wording records. Plan conflicts still exit 3. No output approves facts or
 wording in inspection mode. See [docs/RESUME_DRAFTS.md](docs/RESUME_DRAFTS.md).
 For explicit human bullet decisions, see [docs/REVIEW_DECISIONS.md](docs/REVIEW_DECISIONS.md).
+For wording proposals, use `suggest-wording` with the same four sources and `--confirm-review`,
+plus an explicit snapshot-bound `--mock-response` for offline replay. Real local suggestions
+instead require `--provider ollama --confirm-local-data` and no mock response. Conflicted/empty
+plans make no wording call. Save only `result.review.document` privately for inspection/decisions;
+stdout can contain sensitive source-derived text. See the wording guide for response contracts.
 
 ### Create your private profile
 

@@ -1,11 +1,17 @@
-"""Bounded draft/decision JSON with duplicate-key, depth and strict-schema checks."""
+"""Bounded draft, decision and wording JSON with strict schema and nesting checks."""
 
 import json
 from pathlib import Path
 from typing import NoReturn
 
 from resumeforge.inputs import MAX_INPUT_BYTES, read_utf8_file
-from resumeforge.resume.models import ResumeDocument, ResumeError, ResumeModel, ReviewDecisions
+from resumeforge.resume.models import (
+    ResumeDocument,
+    ResumeError,
+    ResumeModel,
+    ReviewDecisions,
+    WordingResponse,
+)
 
 
 def _unique_object(pairs: list[tuple[str, object]], label: str) -> dict[str, object]:
@@ -71,3 +77,9 @@ def parse_review_decisions(text: str) -> ReviewDecisions:
 
 def load_review_decisions(path: Path) -> ReviewDecisions:
     return parse_review_decisions(read_utf8_file(path, label="Review decisions"))
+
+
+def parse_wording_response(text: str) -> WordingResponse:
+    if not isinstance(text, str):
+        raise ResumeError("Wording provider must return a JSON string.")
+    return _parse_resume_model(text, WordingResponse, label="Wording response")

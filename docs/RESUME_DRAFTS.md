@@ -123,5 +123,7 @@ Safe boundary failures raise `ResumeError` (file loading may also raise `InputEr
 
 Separate snapshot-bound human bullet-wording decisions are now available; pending document/
 inspection states remain unchanged. Literal claim-review findings are now available; next is
-controlled wording assistance. Full-resume approval, model-assisted generation, PDF/layout/rendering, history,
-automatic ranking and cloud inference remain unimplemented.
+controlled wording quality evaluation. Source-bound `suggest-wording` proposals are available in
+0.12.0 with fake replay or explicitly acknowledged guarded local inference; see
+`docs/WORDING_ASSISTANCE.md`. Full-resume approval, PDF/layout/rendering, history, automatic ranking
+and cloud inference remain unimplemented.
