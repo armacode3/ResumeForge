@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "case_id": "supervised_bounds",
+  "profile": {
+    "schema_version": 1,
+    "person": {"name": "Fictional Benchmark Person"},
+    "experiences": [{"id": "exp_supervised", "title": "Fictional supervised placement", "completion_status": "completed"}],
+    "accomplishments": [{"id": "acc_supervised", "entry_id": "exp_supervised", "statement": "Assisted with Python tests for at least 12 internal API endpoints under supervision; did not own the service.", "verified": true, "completion_status": "completed", "technologies": ["Python"]}]
+  },
+  "job_text": "Python testing experience required. Service ownership is preferred.",
+  "requirements": {
+    "schema_version": 1, "company": null, "job_title": null,
+    "responsibilities": [],
+    "required_qualifications": [{"id": "job_required_python", "text": "Python testing experience required.", "source_quote": "Python testing experience required."}],
+    "preferred_qualifications": [{"id": "job_preferred_ownership", "text": "Service ownership is preferred.", "source_quote": "Service ownership is preferred."}],
+    "programming_languages": [{"id": "job_language_python", "text": "Python", "source_quote": "Python testing experience required."}],
+    "frameworks": [], "technical_concepts": [], "domain_terms": [], "evidence_sought": []
+  },
+  "selection": {"schema_version": 1, "entries": [{"entry_id": "exp_supervised", "accomplishment_ids": ["acc_supervised"]}]},
+  "review_focus": ["Preserve assisted scope and supervision.", "Keep at least 12 as a lower bound, not an exact count or invented improvement.", "Do not claim service ownership from the preferred job requirement."]
+}

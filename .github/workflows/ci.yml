@@ -199,3 +199,17 @@ jobs:
           assert all(b["review_status"] == "pending_review" for b in result["review"]["bullets"])
           assert not result["rendering_authorized"]
           PY
+          "$RUNNER_TEMP/resumeforge-smoke/bin/python" \
+            "$GITHUB_WORKSPACE/scripts/evaluate_wording.py" > "$RUNNER_TEMP/wording-evaluation.json"
+          "$RUNNER_TEMP/resumeforge-smoke/bin/python" - <<'PY'
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("wording-evaluation.json").read_text())
+          assert report["mode"] == "source_seed_replay"
+          assert report["total_cases"] == report["validated_cases"] == 6
+          assert report["inspected_bullets"] == 7
+          assert report["edited_bullets"] == report["literal_findings"] == 0
+          assert report["manual_review_status"] == "not_performed"
+          assert not report["rendering_authorized"]
+          PY

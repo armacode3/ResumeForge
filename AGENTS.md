@@ -20,8 +20,12 @@ snapshot-bound user bullet-wording decisions plus literal numeric/caveat finding
 proof or full-resume approval. Read `docs/RESUME_DRAFTS.md`, `docs/REVIEW_DECISIONS.md` and
 `docs/CLAIM_FINDINGS.md`.
 Controlled source-bound wording proposals now use fake replay or explicitly acknowledged local
-inference, always followed by fresh inspection. Read `docs/WORDING_ASSISTANCE.md`; wording quality
-is unevaluated. No live run is a normal test or implicit continuation step.
+inference, always followed by fresh inspection. Read `docs/WORDING_ASSISTANCE.md`; the initial
+six-case local pass validated all responses but copied all seven statements, so useful rewriting
+remains unproven. See `docs/evaluations/qwen3-4b-wording-v1.md`. No live run is a normal test or
+implicit continuation step.
+The fixed synthetic wording evaluation runner defaults to source-seed replay, not model-quality
+scoring. Read `docs/WORDING_EVALUATION.md`; live runs and runtime/model setup need separate opt-in.
 Omitted states stay unknown; version-1 profile/draft files need no rewrite (not old decisions).
 Read `docs/MATCHING.md` for the
 retrieval boundary.
@@ -45,6 +49,7 @@ cloud inference, resume generation, semantic claim proof, PDFs or history alread
 - `examples/jobs/`: fictional job and manually authored JSON response, not real application data.
 - `examples/plans/`: fictional explicit selections; the sample intentionally exposes a count conflict.
 - `scripts/evaluate_jobs.py`: repository-only six-case synthetic benchmark; defaults to reference replay.
+- `scripts/evaluate_wording.py`: fixed fictional wording corpus, source replay by default, no quality score.
 - `tests/unit/`, `tests/integration/`: deterministic schema/parser/CLI/privacy checks.
 - `config/resume_rules.md`: policy only, not currently loaded by code.
 - `docs/`: decisions, roadmap, development log; `.github/workflows/ci.yml`: checks.
@@ -107,6 +112,11 @@ contact fields, notes, metadata or historical wording. Local mode additionally r
 selected-source data-use acknowledgement. Keep fake replay truthful, no live quality claims from
 mocks, one call/no retry, bounded responses and fresh post-call inspection. No automatic approval
 transfer or source promotion; rendering remains unauthorized. See `docs/WORDING_ASSISTANCE.md`.
+Wording evaluation preflights every fixed case before provider use, retains failures in totals,
+and separates schema validity/literal findings from source-fidelity review. Freeze sources/prompt/
+schema/settings before a live pass, no tuning/retries/cherry-picking. Optional explicit captures
+use new private directories/exclusive bounded files; no raw prompts/thinking or committed outputs.
+Evaluation/agent review notes are not user wording decisions, semantic proof or rendering approval.
 Job analysis accepts no candidate profile. Keep trusted instructions separate from job data.
 Response text and its quote must be literal source substrings; that is provenance, not proof of
 classification/completeness. Preserve required/preferred distinctions and explicit unknowns.

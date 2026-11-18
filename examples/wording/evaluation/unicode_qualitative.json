@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "case_id": "unicode_qualitative",
+  "profile": {
+    "schema_version": 1,
+    "person": {"name": "Fictional Benchmark Person"},
+    "research": [{"id": "res_survey", "title": "Fictional café survey", "completion_status": "completed"}],
+    "accomplishments": [{"id": "acc_survey", "entry_id": "res_survey", "statement": "Contributed Python data-cleaning checks for a café survey with a bilingual team; no numeric improvement was measured.", "verified": true, "completion_status": "completed", "technologies": ["Python"]}]
+  },
+  "job_text": "Python data-cleaning experience required. Quantified performance improvements are preferred.",
+  "requirements": {
+    "schema_version": 1, "company": null, "job_title": null,
+    "responsibilities": [],
+    "required_qualifications": [{"id": "job_required_python", "text": "Python data-cleaning experience required.", "source_quote": "Python data-cleaning experience required."}],
+    "preferred_qualifications": [{"id": "job_preferred_metrics", "text": "Quantified performance improvements are preferred.", "source_quote": "Quantified performance improvements are preferred."}],
+    "programming_languages": [{"id": "job_language_python", "text": "Python", "source_quote": "Python data-cleaning experience required."}],
+    "frameworks": [], "technical_concepts": [], "domain_terms": [], "evidence_sought": []
+  },
+  "selection": {"schema_version": 1, "entries": [{"entry_id": "res_survey", "accomplishment_ids": ["acc_survey"]}]},
+  "review_focus": ["Keep contribution/team scope and the café context without inventing leadership.", "Do not fabricate numeric gains merely because the job prefers quantified impact.", "Review readability and accent preservation separately from factual fidelity."]
+}

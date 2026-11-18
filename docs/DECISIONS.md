@@ -377,3 +377,31 @@ between bullets, hallucinate, lose qualifiers or fail strict schema/budgets. The
 findings cannot certify support. Full-resume/metadata approval, rendering, history and automatic
 ranking remain separate. Next is an explicitly opted-in synthetic wording-quality evaluation.
 See `docs/WORDING_ASSISTANCE.md`.
+
+## ADR-018 — Fixed synthetic wording evaluation separates validity from reviewed fidelity
+
+**Status:** Implemented in 0.13.0. A live pass requires explicit separate opt-in.
+
+Add a small repository-only six-case/seven-bullet corpus with explicit fictional sources,
+reviewed quoted job items, deliberate selections and a predeclared source-fidelity rubric. Use
+the unchanged wording/inspection engine. Default to verbatim source-seed replay to exercise the
+harness without implying model quality. Independently captured responses may be replayed without
+inferring their author/model identity. Normal tests and CI never run a model or install/pull one.
+
+Preflight all selected cases before provider use. Invalid corpus cases remain visible; valid
+cases are not run if any input fails. Keep provider/validation/replay failures in case totals.
+Report call counts, current input/request/response provenance, pending results and literal
+observations, not a preferred-wording exact-match score, factuality score or automatic approval.
+No LLM judge, keyword-derived truth verdict, or shorter-is-better quality ranking is justified.
+
+Live mode is explicitly local-only, acknowledged and guarded. Freeze corpus/prompt/schema/model/
+settings before a single sequential pass; do not silently tune/retry/drop failed outputs. Optional
+capture writes only bounded assistant text to new private directories with exclusive files, never
+prompts/thinking, raw API errors or Git. This is a developer evaluation artifact, not persistence
+of authoritative resume facts. Model/runtime downloads are separately approved operator actions.
+
+Review every bullet's source fidelity, qualifiers, cross-evidence transfer, job-data separation
+and readability separately from schema validity. Evaluation notes, including agent review, are
+not user wording attestations or semantic proof. All documents stay pending and rendering stays
+unauthorized. The narrow corpus is not a representative benchmark or injection-resistance proof.
+See `docs/WORDING_EVALUATION.md` for the frozen protocol, modes and interpretation.

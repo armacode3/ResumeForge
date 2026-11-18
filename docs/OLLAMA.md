@@ -12,8 +12,10 @@ source paths and requirements/selection review. Unlike job analysis, this sends 
 statements**, IDs/status caveats and all reviewed job items/quotes/categories, but no contact,
 notes, parent metadata or historical bullets. Statements/quotes can still identify people. This
 additional data flow needs separate acknowledgement each invocation. Conflicted/empty plans do not
-call the wording provider. No live wording-quality evaluation has been performed; all suggestions
-stay pending fresh inspection and human decisions. See `docs/WORDING_ASSISTANCE.md` for the complete
+call the wording provider. The initial live review validated six responses but copied all seven
+statements verbatim; rewriting usefulness remains unproven. All suggestions stay pending fresh
+inspection/human decisions. See `docs/evaluations/qwen3-4b-wording-v1.md` for results and
+`docs/WORDING_ASSISTANCE.md` for the complete
 disclosure, strict response contract, fake-first workflow and limitations.
 
 The initial target is **Qwen3:4b** (Q4_K_M, approximately 2.5 GB of weights). It requires more

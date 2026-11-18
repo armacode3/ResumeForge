@@ -647,3 +647,59 @@
   wording-quality evaluation before claiming real-model usefulness. No live evaluation is implied
   by generic continuation. Semantic proof, full-resume/metadata review, rendering/PDF/readability,
   ranking, history and cloud inference remain unimplemented.
+
+## Session 019 — Synthetic wording evaluation and separately authorized local pass
+
+- User confirmed wording assistance was merged. Fetched `main` at `d01659e`, fast-forwarded local
+  main and created clean `feat/synthetic-wording-evaluation`. Asked rather than inferring live
+  authorization from generic continuation; user selected benchmark plus a local run. The prior
+  runtime/server was unavailable in the checked locations/ports, so obtained separate permission
+  for an isolated runtime/model download before setup. No private profile or system service changed.
+- Added a fixed six-case/seven-bullet fictional corpus: supervised lower-bound metrics, negated
+  prototype/production scope, completed subtask under an ongoing parent, cross-evidence isolation,
+  Unicode qualitative work without invented gains, and an untrusted footer inside a job quote.
+  Each case has explicit schema-valid sources, quoted requirements, selections and a predeclared
+  review focus. The rubric separately covers structural validity, source/qualifier fidelity,
+  cross-slot/job-data transfer and useful wording, not one preferred string or shorter-is-better.
+- Added repository-only `scripts/evaluate_wording.py` backed by typed installed orchestration.
+  Default source-seed replay exercises the harness, not model quality. Independent response replay
+  cannot infer original model identity. All selected cases preflight before provider access;
+  invalid corpus cases remain visible and prevent live calls. Provider/validation/missing replay
+  failures stay in denominators. No LLM judge, automatic factuality/usefulness grade or approval.
+- Explicit local mode preserves existing guards and needs data acknowledgement. Optional capture
+  creates new private directories/exclusive bounded assistant-text files, never prompts/thinking,
+  raw API errors or overwritten results. Capture errors invalidate cases; oversized/unencodable
+  text is not persisted. Machine output keeps manual review unperformed and rendering unauthorized;
+  separate evaluation notes, including agent review, are not human wording attestations.
+- Added offline/source identity, immutable/pending state, failure-denominator, malformed corpus,
+  preflight/no-inference, activation ordering, capture/privacy, mocked provider and installed
+  runner tests. Runtime-wheel CI smoke runs only source-seed replay with six cases/seven pending
+  bullets; no normal test downloads a model, starts Ollama or runs inference.
+- Application 0.13.0; no new project dependency, wording prompt/schema/validator change or automatic
+  selection. Local Python 3.12.3 verification passed 754 unit + 117 integration = 871 tests,
+  99.96% branch-aware coverage, Ruff lint/format, strict mypy (68 files), dependency checks and
+  builds. Fresh locked editable/runtime-wheel installs passed; all 871 tests also passed against
+  the installed wheel outside the repository. Exact runtime-wheel CI smoke and staged/distribution
+  privacy checks passed; hosted results are verified separately after push.
+- Separately prepared official Ollama v0.40.16 in approved temporary storage, verifying archive
+  SHA-256 `87bfafb2acbc89b2e6a1be0a9043de6aa75fb450696f86bc426e65fc448f788d` before safe extraction.
+  User-approved Qwen3:4b digest is `359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7`.
+  The temporary server binds `127.0.0.1:11435` and reports cloud disabled; runtime/model/cache and
+  capture data stay outside Git under `/tmp/opencode/resumeforge-wording-live.kxmsAg/`.
+- Froze corpus, original wording/inspection/findings sources, schema, pre-run protocol and exact
+  request hashes before one sequential local pass: 16,384 context / 4,096 output tokens, temperature/
+  seed 0, non-thinking/no-tools, unload after each call, 600-second budget. No prompt tuning,
+  validator weakening, second pass, silent retries or private sources are permitted in this review.
+  Actual pass: 6/6 structurally valid responses, 7/7 verbatim source bullets, zero edits/findings,
+  about 356.21 seconds, no retries. Source/qualifier fidelity issues were not observed in the
+  source-by-source agent review, but useful rewriting was not demonstrated. This is not a human
+  factual/wording attestation or semantic quality approval. Every application bullet stays pending.
+- Verified frozen corpus/prompt/schema/protocol and expected request hashes after the pass.
+  Independent offline capture replay reproduced all six inspections/source/request/response hashes;
+  no second inference run was needed. Stopped the temporary user-owned server, retained downloads/
+  captures privately outside Git, and documented runtime/digests, per-case review and limitations
+  in `docs/evaluations/qwen3-4b-wording-v1.md`. No raw generated outputs are committed.
+- Updated actual-status guidance, ADR-018 and evaluation/provider/wording guides. Next: a separately
+  measured wording-usefulness iteration on held-out rougher statements with versioned objectives,
+  not rendering or unattended generation. Seven unchanged bullets do not exercise transformed-wording
+  fidelity, general injection resistance, repeated stability or semantic proof.
