@@ -450,3 +450,46 @@
   canonical agent guidance. Next separate feature: structured resume/claim-review contracts using
   current evidence references, before wording generation/rendering. Automatic relevance ranking/
   selection and actual layout/readability checks still require their own policy and evaluation.
+
+## Session 014 — Plan-bound wording drafts and pending review observations
+
+- User authorized the next Phase 4 step. Inspected a clean tree, fetched origin and confirmed
+  main was still `3abbb35`; the pushed planning feature at `ed6e542` had not been merged.
+  Started `feat/resume-draft-contracts` from that planning branch rather than merging it into
+  main, dropping its required code or rewriting history. This branch depends on that feature.
+  No private profile was read or changed, and no live provider was activated.
+- Defined the slice as a structured wording boundary, not semantic validation, claim approval,
+  polished generation or rendering. Added frozen version-1 `ResumeDocument`/section/entry/bullet
+  models with immutable tuples, one selected accomplishment per bullet, complete ordered plan
+  alignment and an exact canonical plan-snapshot hash. Duplicate/unknown/unselected/cross-parent/
+  ineligible evidence and stale bindings cannot enter submitted drafts; no input can self-approve.
+- Added offline `review_resume`: revalidate sources and rebuild planning/matching, then seed
+  complete unchanged source statements or inspect edited wording. Every bullet stays pending,
+  including verbatim text. Literal equality yields `verbatim_source`; every edit yields
+  `edited_requires_review`, not a claim-support verdict. Preserve source statements, caveats,
+  mandatory placeholders, job context and plan findings; remaining conflicts block the outer review.
+- Added bounded strict draft JSON (1 MiB, 32 collection levels, 8,192 characters per bullet),
+  duplicate-key/nonstandard-constant checks, safe errors and model revalidation. Seeds beyond
+  draft limits fail without truncating facts. Document identity includes exact wording/order/states;
+  hashes are provenance bindings, not authentication, factual proof or persistent approval.
+- Added read-only `review-resume` with four explicit source paths, optional inner-document
+  `--draft`, and review acknowledgement before all I/O. No default private-profile access,
+  profile edits, model calls, writes or dependencies. Exit 0 still means pending review, 3 emits
+  a plan-blocked envelope, 1 rejects unsafe/stale inputs without partial JSON, and 2 is usage.
+  Updated installed-wheel CI smoke to retain the sample conflict and pending statuses.
+- Tests cover source-seed/JSON round trips, immutable snapshots, privacy/offline behavior,
+  self-approval rejection, exact review gates, source/plan changes, altered required structure,
+  exclusions/eligibility, malformed/deep/oversized JSON, seed bounds and installed CLI paths.
+  Fabricated-tool/metric/ownership and lost-qualifier edits remain flagged and unapproved;
+  those tests do not claim semantic detection accuracy. Mypy caught duplicate test module names
+  across unit/integration directories; renamed the new integration module instead of excluding it.
+- Application 0.9.0. Local Python 3.12.3: 543 unit + 75 integration = 618 tests passed with
+  GitHub-like colors and 99.94% branch-aware coverage. Ruff lint/format, strict mypy (56 files),
+  dependency checks and source/wheel builds passed. Fresh locked editable/runtime installations
+  passed dependency checks; all 618 tests passed against the installed wheel outside the repository.
+  Runtime-only source-seed smoke, CI shell parsing and staged/distribution path/secret-pattern
+  reviews passed, excluding private/runtime artifacts. Hosted CI is checked after push.
+- Updated draft policy, ADR-014, planning guide, README, architecture, roadmap and canonical
+  agent guidance. Next: explicit human review decisions bound to exact wording/evidence snapshots,
+  then measured claim checks and controlled wording assistance. Human approval, semantic proof,
+  PDF/rendering/layout, history, automatic ranking and cloud inference remain unimplemented.

@@ -270,3 +270,30 @@ is declared approved/satisfied. A draft with conflicts exits 3; invalid inputs e
 JSON; no-conflict drafts exit 0 but are not generation-ready. Explicit confirmation precedes all
 CLI input I/O. No default private profile, inference, automatic writes or live services are added.
 See `docs/PLANNING.md` for selection ordering, privacy and the intentional sample conflict.
+
+## ADR-014 — Plan-bound wording drafts remain pending, including verbatim seeds
+
+**Status:** Implemented as a Phase 4 prerequisite in 0.9.0; semantic checks and approval deferred.
+
+Add a strict version-1 `ResumeDocument` boundary before model-assisted wording or rendering.
+Recompute the reviewed-selection plan from source snapshots, then bind its canonical hash and
+require exact section/entry/evidence-slot alignment. Preserve mandatory metadata placeholders,
+full source statements and status caveats in review context. Do not trust supplied plan reports,
+historical wording, claimed approval flags or copied hashes as evidence eligibility/claim proof.
+
+Allow a deterministic source seed or submitted wording on the existing one-accomplishment/slot
+model. All bullets stay `pending_review`; documents can only declare `needs_review`. Distinguish
+literal `verbatim_source` from `edited_requires_review`, not semantic correctness. Flag every edit
+without pretending a verb/number/technology heuristic proves support or detects every fabricated
+claim. Even full source agreement cannot approve biography, metadata, qualifiers or resume fit.
+
+Use frozen nested models/tuples, strict bounded JSON, safe errors and independently versioned
+review output. Source seeds beyond draft limits fail rather than truncate facts. Preserve plan
+conflicts as `blocked_by_plan` with exit 3; conflict-free reviews exit 0 but remain unapproved.
+The offline command requires explicit source paths/review acknowledgement before I/O, accepts
+only the inner document as optional draft input, and performs no inference, rendering or writes.
+
+Next, human review decisions must bind exact wording and evidence snapshots; neither IDs nor old
+review flags can transfer approval to changed content. No new dependency/profile migration,
+automatic relevance ranking, semantic entailment guarantee or live-provider activation is added.
+See `docs/RESUME_DRAFTS.md` for the exact contract, hashes, limitations and privacy boundaries.

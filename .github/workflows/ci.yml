@@ -72,6 +72,14 @@ jobs:
             --selection "$GITHUB_WORKSPACE/examples/plans/backend_intern.selection.json" \
             --confirm-review > "$RUNNER_TEMP/resume-plan.json" || plan_status=$?
           test "$plan_status" -eq 3
+          review_status=0
+          "$RUNNER_TEMP/resumeforge-smoke/bin/resumeforge" review-resume \
+            --profile "$GITHUB_WORKSPACE/examples/profiles/sample.md" \
+            --job "$GITHUB_WORKSPACE/examples/jobs/backend_intern.md" \
+            --requirements "$GITHUB_WORKSPACE/examples/jobs/backend_intern.response.json" \
+            --selection "$GITHUB_WORKSPACE/examples/plans/backend_intern.selection.json" \
+            --confirm-review > "$RUNNER_TEMP/resume-review.json" || review_status=$?
+          test "$review_status" -eq 3
           "$RUNNER_TEMP/resumeforge-smoke/bin/python" - <<'PY'
           import json
           from pathlib import Path
@@ -84,4 +92,8 @@ jobs:
           assert plan["status"] == "needs_review" and plan["constraint_status"] == "conflicts"
           assert plan["budget"]["bullet_slot_count"] == 2
           assert any(f["code"] == "entry_bullet_minimum_not_met" for f in plan["findings"])
+          review = json.loads(Path("resume-review.json").read_text())
+          assert review["mode"] == "source_seed" and review["status"] == "blocked_by_plan"
+          assert len(review["bullets"]) == 2
+          assert all(b["review_status"] == "pending_review" for b in review["bullets"])
           PY

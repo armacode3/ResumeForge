@@ -5,8 +5,9 @@
 Phases 0–2 include profile validation and fake/local Ollama job analysis. Phase 3 now has typed
 completion states/preferences, offline evidence eligibility/lexical retrieval and source-backed
 candidate review signals. Reviewed-selection draft planning now checks count constraints and
-preserves mandatory content. Relevance ranking, wording generation and semantic qualification
-checks are not implemented.
+preserves mandatory content. The first Phase 4 boundary adds structured wording drafts with
+pending review and exact plan binding. Relevance ranking, model-assisted wording generation,
+semantic claim proof and approval workflows are not implemented.
 No cloud provider is enabled.
 Everything below labeled **planned** is a design boundary, not a
 working feature. Prefer a modular monolith: one Python package, with small components and
@@ -44,6 +45,10 @@ src/resumeforge/
     models.py       strict reviewed selection schema and immutable draft-plan snapshots
     selection.py    bounded safe local JSON selection loader
     engine.py       explicit assembly, mandatory placeholders and count-conflict findings
+  resume/
+    models.py       frozen versioned wording drafts and pending review observations
+    documents.py    bounded strict local draft JSON loader
+    engine.py       source seeds, fresh plan binding and literal wording-change observations
 tests/
   unit/             CLI/schema/parser/gap contracts and invalid inputs
   integration/      installed entry points, profile validation, privacy safeguards
@@ -165,6 +170,19 @@ feasibility or wording approval is claimed. The read-only `plan-resume` CLI requ
 paths and acknowledgement, emits private JSON, and exits 3 for a conflict-bearing draft (0 for a
 draft without detected conflicts, 1 for safe input errors). See `docs/PLANNING.md`.
 
+## Implemented wording-draft boundary
+
+`resume.review_resume` rebuilds the plan from original inputs and explicit review acknowledgements.
+It either seeds complete unchanged source statements or revalidates a submitted `ResumeDocument`.
+The document binds a canonical plan hash and must preserve every planned section/entry/evidence
+slot in order. Frozen nested records use immutable tuples; no input can declare itself approved.
+Every bullet has one selected accomplishment reference and remains `pending_review`.
+
+Literal comparison distinguishes unchanged source text from edited wording, not supported from
+unsupported claims. Plan conflicts block the outer review; semantic proof, human approval and
+polished/model-assisted generation are deferred. The read-only `review-resume` command emits
+private documents/review context, not renderable output. See `docs/RESUME_DRAFTS.md`.
+
 ## Planned module responsibilities
 
 Create these modules only as their features are implemented:
@@ -196,8 +214,8 @@ Create these modules only as their features are implemented:
 7. Once history is implemented, persist provenance, validation, decisions, versions and artifact
    references. Failed generations must not masquerade as approved final resumes.
 
-Profile/job/selection schemas and draft-plan snapshots exist now; resume wording schemas remain
-deferred to Phase 4.
+Profile/job/selection schemas, draft-plan snapshots and narrow evidence-linked wording-draft
+schemas now exist. Complete renderable resume content and approval workflows remain deferred.
 Pydantic validates profile input and untrusted structured job responses, which fail actionably.
 `config/resume_rules.md` holds writing policy; planned `config/layout.yaml` will separately
 hold machine-readable page, spacing, and minimum-readability constraints.

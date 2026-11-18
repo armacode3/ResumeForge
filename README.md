@@ -4,7 +4,7 @@ An evidence-first resume tailoring application, built incrementally. The goal is
 a verified Markdown profile and a job description into a reviewable, one-page resume
 without inventing experience, technologies, or metrics.
 
-## Current status: Phase 3 — offline matching and reviewed-selection draft plans
+## Current status: Phase 4 prerequisite — evidence-linked wording drafts
 
 Implemented: an installable Typer CLI with help/version output, unit and installed-entry-point
 tests, privacy-ignore regression coverage, linting, formatting, strict typing, packaging checks,
@@ -32,6 +32,11 @@ support, inferred impact or a relevance score; candidate ordering remains by evi
 `plan-resume` now assembles explicitly reviewed entry/evidence selections into structured drafts,
 preserving mandatory content and exposing count/evidence conflicts. It does not automatically
 rank/select evidence or generate wording. All plans remain unapproved and need review.
+
+`review-resume` now seeds pending bullets from complete unchanged source statements, or inspects
+an edited structured draft against a freshly recomputed plan. Broken/stale references fail;
+all wording changes require review, and even verbatim bullets stay unapproved. This is a draft
+contract, not semantic claim validation or polished wording generation.
 
 **Resume generation is not implemented.** There is no cloud provider, relevance-ranking engine,
 database, template renderer, PDF compiler, API, or browser extension yet.
@@ -74,6 +79,10 @@ resumeforge plan-resume --profile examples/profiles/sample.md \
   --job examples/jobs/backend_intern.md \
   --requirements examples/jobs/backend_intern.response.json \
   --selection examples/plans/backend_intern.selection.json --confirm-review
+resumeforge review-resume --profile examples/profiles/sample.md \
+  --job examples/jobs/backend_intern.md \
+  --requirements examples/jobs/backend_intern.response.json \
+  --selection examples/plans/backend_intern.selection.json --confirm-review
 ```
 
 Running `resumeforge` without arguments also displays help and exits successfully.
@@ -105,6 +114,11 @@ exits **3** with a draft: education lacks a selected bullet while the sample pre
 one per entry. Required content stays visible; no evidence is invented. Exit **0** still means
 an unapproved draft, not a finished resume. See [docs/PLANNING.md](docs/PLANNING.md) for format,
 budgets, findings, privacy and exit codes.
+
+`review-resume` uses the same explicit inputs and confirmation; optional `--draft` accepts only
+the inner `ResumeDocument`, not an outer review report. Without it, source statements are copied
+unchanged into pending wording records. Plan conflicts still exit 3. No output approves facts or
+wording. See [docs/RESUME_DRAFTS.md](docs/RESUME_DRAFTS.md).
 
 ### Create your private profile
 
