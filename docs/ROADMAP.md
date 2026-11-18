@@ -138,8 +138,14 @@ bindings fail, rejections preserve content and plan conflicts block approvals. S
 wording only, not semantic proof, metadata approval or rendering authorization. See
 `docs/REVIEW_DECISIONS.md` and ADR-015.
 
-**Next:** measured claim-review findings, then controlled wording assistance. Model/data policy
-must stay explicit; semantic checks and complete resume/metadata review remain unimplemented.
+Implemented in 0.11.0: deterministic literal numeric-token/source-caveat findings, exact spans,
+versioned provenance-bound IDs/fingerprint, and version-2 decision acknowledgement gates. Partial
+acknowledgement stays pending; findings never imply semantic support or disappear on approval.
+Synthetic characterization documents false alarms and deliberate misses, not real-world accuracy.
+See `docs/CLAIM_FINDINGS.md` and ADR-016. Draft/profile schemas are unchanged.
+
+**Next:** controlled wording assistance. Model/data policy must stay explicit; semantic proof and
+complete resume/metadata review remain unimplemented, as do rendering and automatic ranking.
 
 Generate structured bullets with accomplishment IDs, check unsupported tools/metrics/ownership,
 dates and contradictions, report gaps, and implement review/approval. Gate: fabricated-claim

@@ -4,7 +4,7 @@ An evidence-first resume tailoring application, built incrementally. The goal is
 a verified Markdown profile and a job description into a reviewable, one-page resume
 without inventing experience, technologies, or metrics.
 
-## Current status: Phase 4 — wording drafts and snapshot-bound human decisions
+## Current status: Phase 4 — literal findings and snapshot-bound human decisions
 
 Implemented: an installable Typer CLI with help/version output, unit and installed-entry-point
 tests, privacy-ignore regression coverage, linting, formatting, strict typing, packaging checks,
@@ -42,6 +42,11 @@ With an explicit draft, `--decisions` and separate `--confirm-decisions`, it can
 approve/reject attestations to exact bullet wording/evidence snapshots. Missing decisions stay
 pending, stale decisions fail, and plan conflicts block approvals. This narrow user attestation
 does not approve metadata, prove claim support or authorize rendering.
+
+Inspection now reports literal numeric tokens absent from the cited statement and missing cues
+from a finite caveat vocabulary, with exact spans and documented blind spots. Version-2 decisions
+must bind current findings and explicitly acknowledge them before approval can apply. Empty or
+acknowledged findings are not proof of support. See [docs/CLAIM_FINDINGS.md](docs/CLAIM_FINDINGS.md).
 
 **Resume generation is not implemented.** There is no cloud provider, relevance-ranking engine,
 database, template renderer, PDF compiler, API, or browser extension yet.

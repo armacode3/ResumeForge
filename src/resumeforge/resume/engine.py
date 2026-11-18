@@ -8,6 +8,7 @@ from resumeforge.inputs import MAX_INPUT_BYTES
 from resumeforge.jobs import JobDocument, JobRequirements
 from resumeforge.planning import PlanningError, PlanSelection, ResumePlan, plan_resume
 from resumeforge.profile import UserProfile
+from resumeforge.resume.findings import FINDINGS_VERSION, findings_digest, inspect_claims
 from resumeforge.resume.models import (
     BulletReview,
     ResumeBullet,
@@ -18,7 +19,8 @@ from resumeforge.resume.models import (
     ResumeSectionDraft,
 )
 
-REVIEW_VERSION = "resume-draft-review-v1"
+REVIEW_VERSION = "resume-draft-review-v2"
+MAX_REVIEW_FINDINGS = 4096
 
 
 def _plan_digest(plan: ResumePlan) -> str:
@@ -118,7 +120,7 @@ def review_resume(
                 "Draft belongs to a different plan snapshot; seed/review a current draft."
             )
         _check_alignment(document, plan)
-    reviews = tuple(
+    reviews_iter = (
         BulletReview(
             bullet_id=bullet.id,
             entry_id=entry.entry_id,
@@ -128,22 +130,36 @@ def review_resume(
             if bullet.text == slot.statement
             else "edited_requires_review",
             caveats=slot.caveats,
+            findings=inspect_claims(
+                bullet.id, bullet.accomplishment_id, slot.statement, bullet.text
+            ),
         )
         for section, planned_section in zip(document.sections, plan.sections, strict=True)
         for entry, planned_entry in zip(section.entries, planned_section.entries, strict=True)
         for bullet, slot in zip(entry.bullets, planned_entry.bullet_slots, strict=True)
     )
+    collected: list[BulletReview] = []
+    finding_count = 0
+    for bullet_review in reviews_iter:
+        finding_count += len(bullet_review.findings)
+        if finding_count > MAX_REVIEW_FINDINGS:
+            raise ResumeError("Draft exceeds the literal finding limit; shorten and review again.")
+        collected.append(bullet_review)
+    reviews = tuple(collected)
+    document_digest = sha256(encoded).hexdigest()
     return ResumeReview(
         review_version=REVIEW_VERSION,
+        findings_version=FINDINGS_VERSION,
+        findings_sha256=findings_digest(digest, document_digest, reviews),
         mode="source_seed" if draft is None else "submitted_draft",
         status="blocked_by_plan" if plan.constraint_status == "conflicts" else "needs_review",
-        document_sha256=sha256(encoded).hexdigest(),
+        document_sha256=document_digest,
         document=document,
         plan=plan,
         bullets=reviews,
         warnings=(
             "Every bullet remains pending review, including verbatim source statements.",
-            "Changed wording needs factual/context review; "
+            "Literal numeric/caveat observations need factual/context review; "
             "no semantic support check was performed.",
             "No detection guarantee for invented metrics, technology use, "
             "ownership or lost qualifiers.",

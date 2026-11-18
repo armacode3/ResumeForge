@@ -16,9 +16,11 @@ Phase 3 includes optional completion states/preferences and offline evidence eli
 retrieval with source-backed candidate review signals and explicit reviewed-selection count plans,
 not relevance ranking, wording generation or layout feasibility.
 Phase 4 has plan-bound wording drafts/source seeds, pending literal-change observations and
-snapshot-bound user bullet-wording decisions, not semantic proof or full-resume approval.
-Read `docs/RESUME_DRAFTS.md` and `docs/REVIEW_DECISIONS.md`.
-Omitted states stay unknown; version-1 files need no rewrite. Read `docs/MATCHING.md` for the
+snapshot-bound user bullet-wording decisions plus literal numeric/caveat findings, not semantic
+proof or full-resume approval. Read `docs/RESUME_DRAFTS.md`, `docs/REVIEW_DECISIONS.md` and
+`docs/CLAIM_FINDINGS.md`.
+Omitted states stay unknown; version-1 profile/draft files need no rewrite (not old decisions).
+Read `docs/MATCHING.md` for the
 retrieval boundary.
 Read `docs/PROFILE_FORMAT.md`, `docs/JOB_ANALYSIS.md`, and `docs/OLLAMA.md` as applicable.
 The fake is not extraction; local model results may fail validation or be incomplete. Do not imply
@@ -89,6 +91,11 @@ sources, explicit draft/decision confirmation, current policy and exact document
 Missing stays pending, rejection preserves content, and plan conflicts block approvals. Keep
 scope bullet-wording-only and rendering authorization false; no semantic proof or metadata/
 full-resume approval exists yet. See `docs/REVIEW_DECISIONS.md`.
+Finding policy is finite literal observation, not a support verdict; preserve exact spans and
+documented blind spots. Compare only selected statements, not other source fields or job text.
+Version-2 decisions bind current finding fingerprints and explicit per-bullet acknowledgements;
+missing acknowledgements stay pending, unknown/cross-bullet IDs fail, and findings remain visible
+even when acknowledged. Never automatically upgrade old attestations or truncate excessive findings.
 Job analysis accepts no candidate profile. Keep trusted instructions separate from job data.
 Response text and its quote must be literal source substrings; that is provenance, not proof of
 classification/completeness. Preserve required/preferred distinctions and explicit unknowns.

@@ -32,15 +32,17 @@ def decisions_for(review: ResumeReview) -> ReviewDecisions:
     return parse_review_decisions(
         json.dumps(
             {
-                "schema_version": 1,
+                "schema_version": 2,
                 "review_version": review.review_version,
                 "plan_sha256": review.document.plan_sha256,
                 "document_sha256": review.document_sha256,
+                "findings_sha256": review.findings_sha256,
                 "bullets": [
                     {
                         "bullet_id": bullet.bullet_id,
                         "decision": "approve",
                         "reason": "Fictional reviewer checked wording and evidence in context.",
+                        "acknowledged_finding_ids": [],
                     }
                     for bullet in review.bullets
                 ],
@@ -116,7 +118,7 @@ def test_all_explicit_decisions_are_narrow_immutable_attestations_not_full_appro
     before = decision_inputs.profile.model_dump_json()
     with patch("socket.socket", side_effect=AssertionError("Offline")):
         result = decision_inputs.apply()
-    assert result.decision_version == "snapshot-bound-decisions-v1"
+    assert result.decision_version == "snapshot-bound-decisions-v2"
     assert result.status == "bullet_wording_approved_by_user"
     assert result.scope == "bullet_wording_only" and result.rendering_authorized is False
     assert len(result.decisions_model_sha256) == 64
@@ -261,7 +263,7 @@ def test_edited_wording_requires_new_explicit_attestation_not_an_inferred_semant
     decision_inputs: DecisionInputs,
 ) -> None:
     data = decision_inputs.draft.model_dump(mode="json")
-    data["sections"][1]["entries"][0]["bullets"][0]["text"] = "Added tests under mentor review."
+    data["sections"][1]["entries"][0]["bullets"][0]["text"] = "Added tests under a mentor's review."
     decision_inputs.draft = parse_resume_document(json.dumps(data))
     review = review_resume(
         decision_inputs.profile,
@@ -395,7 +397,7 @@ def test_invalid_decisions_are_safe_and_cannot_self_authorize(
     elif change == "extra":
         data["fictional-private-key"] = "fictional-private-value"
     else:
-        data["schema_version"] = True if change == "version_bool" else 2
+        data["schema_version"] = True if change == "version_bool" else 1
     with pytest.raises(ResumeError) as error:
         parse_review_decisions(json.dumps(data))
     assert "fictional-private" not in str(error.value)
@@ -457,7 +459,158 @@ def test_copied_current_hashes_cannot_reintroduce_old_ineligible_approved_bullet
         update={
             "plan_sha256": current.plan_sha256,
             "document_sha256": current.document_sha256,
+            "findings_sha256": current.findings_sha256,
         }
     )
     with pytest.raises(ResumeError, match="absent"):
+        decision_inputs.apply()
+
+
+def edited_review(inputs: DecisionInputs) -> ResumeReview:
+    data = inputs.draft.model_dump(mode="json")
+    # 99 is not in this bullet's cited statement. Supervision wording is dropped.
+    data["sections"][1]["entries"][0]["bullets"][0]["text"] = "Owned 99 endpoints."
+    data["sections"][2]["entries"][0]["bullets"][0]["text"] = "Owned 99 workers."
+    inputs.draft = parse_resume_document(json.dumps(data))
+    review = review_resume(
+        inputs.profile,
+        inputs.job,
+        inputs.requirements,
+        inputs.selection,
+        inputs.draft,
+        requirements_reviewed=True,
+        selection_reviewed=True,
+    )
+    inputs.decisions = decisions_for(review)
+    return review
+
+
+@pytest.mark.parametrize("acknowledge", ["none", "partial", "all"])
+def test_approval_requires_each_current_finding_acknowledgement(
+    decision_inputs: DecisionInputs, acknowledge: str
+) -> None:
+    review = edited_review(decision_inputs)
+    assert len(review.bullets[0].findings) == 2
+    data = decision_inputs.decisions.model_dump(mode="json")
+    for choice, bullet in zip(data["bullets"], review.bullets, strict=True):
+        ids = [f.id for f in bullet.findings]
+        choice["acknowledged_finding_ids"] = (
+            ids if acknowledge == "all" else ids[:1] if acknowledge == "partial" else []
+        )
+    decision_inputs.decisions = parse_review_decisions(json.dumps(data))
+    result = decision_inputs.apply()
+    assert result.status == (
+        "bullet_wording_approved_by_user" if acknowledge == "all" else "needs_review"
+    )
+    assert result.bullets[0].review_status == (
+        "approved_by_user" if acknowledge == "all" else "pending_review"
+    )
+    assert bool(result.bullets[0].unacknowledged_finding_ids) == (acknowledge != "all")
+    assert result.review == review
+    assert result.rendering_authorized is False
+    assert result.review.document.status == "needs_review"
+
+
+@pytest.mark.parametrize(
+    "mode", ["unknown", "cross_bullet", "stale_fingerprint", "duplicate", "missing_field", "bad_id"]
+)
+def test_invalid_finding_bindings_fail_safely(decision_inputs: DecisionInputs, mode: str) -> None:
+    review = edited_review(decision_inputs)
+    data = decision_inputs.decisions.model_dump(mode="json")
+    choice = data["bullets"][0]
+    if mode == "stale_fingerprint":
+        data["findings_sha256"] = "0" * 64
+    elif mode == "missing_field":
+        choice.pop("acknowledged_finding_ids")
+    elif mode == "duplicate":
+        choice["acknowledged_finding_ids"] = [review.bullets[0].findings[0].id] * 2
+    else:
+        choice["acknowledged_finding_ids"] = [
+            review.bullets[1].findings[0].id
+            if mode == "cross_bullet"
+            else "private-invalid-id"
+            if mode == "bad_id"
+            else "0" * 64
+        ]
+    with pytest.raises(ResumeError) as error:
+        decision_inputs.decisions = parse_review_decisions(json.dumps(data))
+        decision_inputs.apply()
+    assert "private-invalid-id" not in str(error.value)
+
+
+@pytest.mark.parametrize("choice", ["reject", "missing", "plan_conflict"])
+@pytest.mark.parametrize("acknowledge", [False, True])
+def test_findings_do_not_override_rejection_missing_or_plan_conflict_states(
+    decision_inputs: DecisionInputs, choice: str, acknowledge: bool
+) -> None:
+    if choice == "plan_conflict":
+        decision_inputs.profile.resume_preferences.min_bullets_per_entry = 1
+        decision_inputs.reseed()
+    review = edited_review(decision_inputs)
+    data = decision_inputs.decisions.model_dump(mode="json")
+    if acknowledge:
+        for record, bullet in zip(data["bullets"], review.bullets, strict=True):
+            record["acknowledged_finding_ids"] = [finding.id for finding in bullet.findings]
+    if choice == "reject":
+        data["bullets"][0]["decision"] = "reject"
+    elif choice == "missing":
+        data["bullets"] = []
+    decision_inputs.decisions = parse_review_decisions(json.dumps(data))
+    result = decision_inputs.apply()
+    assert (
+        result.status
+        == {
+            "reject": "has_rejections",
+            "missing": "needs_review",
+            "plan_conflict": "blocked_by_plan",
+        }[choice]
+    )
+    assert bool(result.bullets[0].unacknowledged_finding_ids) == (
+        not acknowledge or choice == "missing"
+    )
+    assert result.review.bullets[0].findings
+
+
+def test_changed_findings_policy_invalidates_decisions_even_with_same_draft(
+    decision_inputs: DecisionInputs, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    edited_review(decision_inputs)
+    monkeypatch.setattr("resumeforge.resume.findings.FINDINGS_VERSION", "future-policy")
+    with pytest.raises(ResumeError, match="different findings"):
+        decision_inputs.apply()
+
+
+def test_version_one_attestations_cannot_carry_forward(decision_inputs: DecisionInputs) -> None:
+    data = decision_inputs.decisions.model_dump(mode="json")
+    data.update(schema_version=1, review_version="resume-draft-review-v1")
+    data.pop("findings_sha256")
+    for choice in data["bullets"]:
+        choice.pop("acknowledged_finding_ids")
+    with pytest.raises(ResumeError, match="fields"):
+        parse_review_decisions(json.dumps(data))
+
+
+def test_copied_current_hashes_cannot_transfer_old_finding_acknowledgements(
+    decision_inputs: DecisionInputs,
+) -> None:
+    original = edited_review(decision_inputs)
+    data = decision_inputs.draft.model_dump(mode="json")
+    data["sections"][1]["entries"][0]["bullets"][0]["text"] += " Additional wording."
+    decision_inputs.draft = parse_resume_document(json.dumps(data))
+    current = review_resume(
+        decision_inputs.profile,
+        decision_inputs.job,
+        decision_inputs.requirements,
+        decision_inputs.selection,
+        decision_inputs.draft,
+        requirements_reviewed=True,
+        selection_reviewed=True,
+    )
+    # A malicious/mechanical hash update cannot make old finding IDs current.
+    decisions = decisions_for(current).model_dump(mode="json")
+    decisions["bullets"][0]["acknowledged_finding_ids"] = [
+        finding.id for finding in original.bullets[0].findings
+    ]
+    decision_inputs.decisions = parse_review_decisions(json.dumps(decisions))
+    with pytest.raises(ResumeError, match="current findings on that bullet"):
         decision_inputs.apply()

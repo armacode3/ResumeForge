@@ -70,6 +70,22 @@ class ResumeDocument(ResumeModel):
         return self
 
 
+class ReviewSpan(ResumeModel):
+    """Zero-based, end-exclusive Python string offsets in an unchanged text."""
+
+    start: Annotated[int, Field(ge=0)]
+    end: Annotated[int, Field(gt=0)]
+    text: str
+
+
+class ClaimFinding(ResumeModel):
+    id: Digest
+    code: Literal["numeric_token_absent_from_source", "source_caveat_cue_not_retained"]
+    cue: str | None
+    source_span: ReviewSpan | None
+    draft_span: ReviewSpan | None
+
+
 class BulletReview(ResumeModel):
     bullet_id: str
     entry_id: str
@@ -78,10 +94,13 @@ class BulletReview(ResumeModel):
     wording_status: Literal["verbatim_source", "edited_requires_review"]
     review_status: Literal["pending_review"] = "pending_review"
     caveats: tuple[str, ...]
+    findings: tuple[ClaimFinding, ...]
 
 
 class ResumeReview(ResumeModel):
     review_version: str
+    findings_version: str
+    findings_sha256: Digest
     mode: Literal["source_seed", "submitted_draft"]
     status: Literal["needs_review", "blocked_by_plan"]
     document_sha256: Digest
@@ -96,15 +115,23 @@ class BulletDecision(ResumeModel):
     bullet_id: BulletId
     decision: Literal["approve", "reject"]
     reason: DraftText
+    acknowledged_finding_ids: tuple[Digest, ...]
+
+    @model_validator(mode="after")
+    def distinct_acknowledgements(self) -> Self:
+        if len(set(self.acknowledged_finding_ids)) != len(self.acknowledged_finding_ids):
+            raise ValueError("Finding acknowledgements must be distinct.")
+        return self
 
 
 class ReviewDecisions(ResumeModel):
     """Local user attestations, not signed proof of identity, truth or semantic support."""
 
-    schema_version: Annotated[int, Field(ge=1, le=1)]
-    review_version: Literal["resume-draft-review-v1"]
+    schema_version: Annotated[int, Field(ge=2, le=2)]
+    review_version: Literal["resume-draft-review-v2"]
     plan_sha256: Digest
     document_sha256: Digest
+    findings_sha256: Digest
     bullets: tuple[BulletDecision, ...]
 
     @model_validator(mode="after")
@@ -119,6 +146,8 @@ class AppliedBulletDecision(ResumeModel):
     accomplishment_id: str
     decision: Literal["approve", "reject"] | None
     reason: str | None
+    acknowledged_finding_ids: tuple[Digest, ...]
+    unacknowledged_finding_ids: tuple[Digest, ...]
     review_status: Literal[
         "pending_review", "approved_by_user", "rejected_by_user", "blocked_by_plan"
     ]

@@ -7,7 +7,8 @@ completion states/preferences, offline evidence eligibility/lexical retrieval an
 candidate review signals. Reviewed-selection draft planning now checks count constraints and
 preserves mandatory content. The first Phase 4 boundary adds structured wording drafts with
 pending review and exact plan binding. Separate snapshot-bound human decisions can now attest
-to individual bullet wording. Relevance ranking, model-assisted wording generation, semantic
+to individual bullet wording. Literal numeric/caveat observations now require explicit finding
+acknowledgements before user approval. Relevance ranking, model-assisted wording generation, semantic
 claim proof and full-resume/rendering approval are not implemented.
 No cloud provider is enabled.
 Everything below labeled **planned** is a design boundary, not a
@@ -51,6 +52,7 @@ src/resumeforge/
     documents.py    bounded strict local draft/decision JSON loaders
     engine.py       source seeds, fresh plan binding and literal wording-change observations
     decisions.py    snapshot-bound user attestations, never full-resume/rendering approval
+    findings.py     versioned finite numeric/caveat observations and provenance-bound fingerprints
 tests/
   unit/             CLI/schema/parser/gap contracts and invalid inputs
   integration/      installed entry points, profile validation, privacy safeguards
@@ -191,7 +193,12 @@ document/plan hashes and every referenced bullet. Missing decisions stay pending
 content visible, and plan conflicts block approvals. No input report supplies trusted approval.
 The output records narrow user attestations separately from pending draft/inspection state, with
 mandatory `rendering_authorized: false`. This is not identity authentication, semantic proof or
-metadata/job-fit approval. See `docs/REVIEW_DECISIONS.md`.
+metadata/job-fit approval. Version-2 decisions additionally bind the current finding fingerprint;
+unknown/cross-bullet acknowledgements fail and unacknowledged findings keep approvals pending.
+`resume.findings` compares only selected statements with draft wording, using literal numeric
+tokens and a finite cue vocabulary. Exact spans and empty/acknowledged findings are observations,
+never semantic verdicts. Limits fail closed, not truncated. See `docs/REVIEW_DECISIONS.md` and
+`docs/CLAIM_FINDINGS.md`.
 
 ## Planned module responsibilities
 
