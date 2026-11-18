@@ -860,3 +860,52 @@
 - Next separate slice: define source-bound metadata review/structured-resume completion before
   rendering authorization. Semantic proof, full-resume/metadata approval, PDFs/layout, automatic
   ranking, history and cloud inference remain unimplemented. A worksheet is not a resume or approval.
+
+## Session 023 — Explicit source-bound pending metadata inspection
+
+- User confirmed the pending worksheet feature was merged and authorized the next step. Fetched
+  merged `main` at `1c6e8f1`, fast-forwarded local main and created `feat/source-bound-metadata`
+  from a clean tree. Prior `9474779` hosted Python 3.12/3.13 checks passed. No private profile,
+  draft, decision or review output was read, rewritten, approved or migrated; no live inference.
+- Defined a small first metadata boundary: pending inspection/source copies, not metadata
+  attestations, arbitrary edits, full-resume assembly or rendering authorization. Added an explicit
+  strict field selection, whitelisting person name/email/phone/location/links and background-entry
+  title/organization/location/start/end dates. No implicit name/contact exposure. Only entries
+  already in the fresh non-excluded plan may supply fields, including required placeholders.
+  Details, technologies, skills/coursework, notes and historical wording remain outside this slice.
+- Added independent frozen metadata schemas and `review_metadata`, requiring original sources,
+  explicit wording draft and three exact review flags. Snapshot/revalidate the profile and field
+  selection, freshly recompute original plan/wording inspection and bind metadata to policy,
+  plan, exact wording and field selection. Selected values use logical model refs and explicit
+  field/entry order; no arbitrary path evaluation. Every field remains pending and rendering false.
+- Preserve null/empty missing values with finite missing-source observations. Copy recorded month
+  precision/present only; never infer current dates or completion from each other or verification.
+  Preserve selected-entry completion context separately. Links use existing model normalization,
+  never fetching. Copying metadata does not verify facts/identity or resolve caveats in notes/details.
+  Full original wording/job/plan context and conflicts remain visible, not approved or sanitized.
+- Added `review-metadata` with six explicit paths and `--confirm-review`, checking usage before I/O.
+  No provider or decision options, implicit seed/default private profile or automatic output writes.
+  Field JSON is validated before loading the profile. Output is private JSON, errors/notices static;
+  0 remains pending, 3 retains complete plan conflicts, 1 rejects stale/invalid/oversized inputs or
+  output without partial JSON, 2 rejects usage/confirmation errors. Cap fields at 512, non-null
+  strings at 8,192 characters, and complete default indented output at 1 MiB; never truncate.
+- Tests cover exact selective copies/order/hashes, no implicit contact data, all eight entry
+  categories, missing date/state independence, required placeholders, excluded/unselected/unknown
+  IDs, stale sources/wording, explicit review gates, model snapshots/API revalidation, bounds,
+  unsafe field/key/schema rejection, inert source text, URL normalization without fetching,
+  immutable/privacy/offline/read-only CLI behavior and terminal-styled help. Added a fictional
+  field-selection example and CI installed-wheel metadata smoke preserving the sample conflict.
+- Application 0.17.0; no new dependency. Local Python 3.12.3: 1,088 tests passed with GitHub-like
+  colors and 99.96% branch-aware coverage. Ruff lint/format, strict mypy (77 files) and dependency
+  checks and source/wheel builds passed. Fresh locked editable/runtime-only installs, all 1,088
+  tests against the installed wheel outside the repository and the exact CI runtime-wheel smoke
+  passed. Reviewed all 19 staged public files and both distribution contents/secret patterns;
+  private/runtime artifacts are excluded. Hosted CI is checked after push, not inferred from local
+  success. No frozen corpus, protocol, result, provider
+  payload/prompt or existing wording/decision/observation policy is changed by this feature.
+- Documented exact disclosure, source-model normalization, bindings, limits and blind spots in
+  `docs/METADATA_REVIEW.md`, updated actual-status/context and added ADR-022. Existing v1 profiles/
+  drafts/responses and v3 decisions/inspection remain valid; no old bullet approval transfers to
+  metadata. Next: separate snapshot-bound per-field metadata attestations, before full assembly or
+  rendering authorization. Semantic proof, metadata/full-resume approval, PDFs, ranking, history
+  and cloud inference remain unimplemented.

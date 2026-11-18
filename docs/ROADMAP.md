@@ -181,10 +181,17 @@ complete/remove pending records; unchanged decision gates reject null choices, s
 and unreviewed/revision fragments. A new worksheet is not a prior approval import or migration.
 See `docs/REVIEW_WORKSHEETS.md` and ADR-021. No provider or observation policy changed.
 
-**Next:** define the source-bound metadata review/structured-resume completion boundary, before
-any rendering authorization. Keep copy fallback and the conservative default; semantic proof,
-full-resume/metadata approval, rendering and automatic ranking remain unimplemented. No implicit
-live run or automatic approval follows from worksheet generation or shorter valid text.
+Implemented in 0.17.0: separate source-bound pending metadata inspection for explicitly chosen
+contact and planned-entry fields, requiring the current wording draft and reviewed original inputs.
+No implicit contact disclosure, date inference, metadata edits/approval or old bullet-decision import.
+Missing values remain unset; plan conflicts/context and independent completion states remain visible.
+Metadata selection/document snapshots are bounded and versioned independently; existing wording
+schemas, prompts, gates and frozen comparisons are untouched. See `docs/METADATA_REVIEW.md`, ADR-022.
+
+**Next:** separate snapshot-bound per-field metadata attestations, then structured-resume completion;
+do not conflate these with bullet approval or rendering authorization. Keep the conservative wording
+default; semantic proof, full-resume/metadata approval, rendering and automatic ranking remain
+unimplemented. No implicit live run or automatic approval follows from valid source copies.
 
 Generate structured bullets with accomplishment IDs, check unsupported tools/metrics/ownership,
 dates and contradictions, report gaps, and implement review/approval. Gate: fabricated-claim

@@ -33,8 +33,10 @@ from resumeforge.resume import (
     ReviewWorksheet,
     apply_review_decisions,
     build_review_worksheet,
+    load_metadata_selection,
     load_resume_document,
     load_review_decisions,
+    review_metadata,
     review_resume,
     suggest_wording,
 )
@@ -478,4 +480,66 @@ def review_resume_command(
         typer.echo(
             "Review remains pending, rejected or plan-blocked; inspect the result.", err=True
         )
+        raise typer.Exit(code=3)
+
+
+@app.command("review-metadata")
+def review_metadata_command(
+    profile: Annotated[Path, typer.Option("--profile", help="Explicit local Markdown profile.")],
+    job: Annotated[Path, typer.Option("--job", help="Exact local job source.")],
+    requirements: Annotated[
+        Path, typer.Option("--requirements", help="Reviewed JobRequirements JSON; no inference.")
+    ],
+    selection: Annotated[
+        Path, typer.Option("--selection", help="Reviewed version-1 content selection JSON.")
+    ],
+    draft: Annotated[
+        Path, typer.Option("--draft", help="Explicit current wording ResumeDocument.")
+    ],
+    metadata_selection: Annotated[
+        Path,
+        typer.Option(
+            "--metadata-selection", help="Explicit metadata fields to expose in private output."
+        ),
+    ],
+    confirm_review: Annotated[
+        bool,
+        typer.Option(
+            "--confirm-review",
+            help="Acknowledge requirements, content and metadata selections, not approval.",
+        ),
+    ] = False,
+) -> None:
+    """Inspect pending source-bound metadata; no metadata decisions or rendering authorization."""
+    if not confirm_review:
+        raise typer.BadParameter(
+            "Review requirements, content and metadata selections, then pass --confirm-review."
+        )
+    try:
+        document = load_job(job)
+        analysis = analyze_job(document, FakeProvider.from_file(requirements))
+        choices = load_selection(selection)
+        proposed = load_resume_document(draft)
+        metadata_choices = load_metadata_selection(metadata_selection)
+        candidate = load_profile(profile)
+        result = review_metadata(
+            candidate.profile,
+            document,
+            analysis.requirements,
+            choices,
+            proposed,
+            metadata_choices,
+            requirements_reviewed=True,
+            selection_reviewed=True,
+            metadata_selection_reviewed=True,
+        )
+    except (ProfileError, InputError, JobAnalysisError, PlanningError, ResumeError) as error:
+        typer.echo(f"Metadata review failed:\n{error}", err=True)
+        raise typer.Exit(code=1) from None
+    typer.echo(
+        "Offline selected metadata inspection; no inference, approval or rendering authorization.",
+        err=True,
+    )
+    typer.echo(result.model_dump_json(indent=2))
+    if result.status == "blocked_by_plan":
         raise typer.Exit(code=3)

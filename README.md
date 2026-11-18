@@ -85,6 +85,13 @@ stay null; no findings are acknowledged. Extract and deliberately complete the t
 applying decisions with separate confirmation. See
 [docs/REVIEW_WORKSHEETS.md](docs/REVIEW_WORKSHEETS.md). This reduces copying, not user review.
 
+`review-metadata` now copies explicitly selected contact and planned-entry fields into pending
+source-bound records, tied to the current wording draft. Missing dates stay unset; no `present`
+value or metadata approval is inferred. Contact disclosure requires a separate explicit field
+selection; ordinary reviews/provider requests stay unchanged. See
+[docs/METADATA_REVIEW.md](docs/METADATA_REVIEW.md). Metadata decisions and full-resume assembly
+remain unimplemented, and rendering stays unauthorized.
+
 **End-to-end resume generation is not implemented.** There is no cloud provider, relevance-ranking engine,
 database, template renderer, PDF compiler, API, or browser extension yet.
 Local verification and hosted CI results are reported separately.

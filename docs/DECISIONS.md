@@ -481,3 +481,28 @@ are not a new input format or converter, and generated worksheets import no earl
 No profile/draft/response/decision or inspection-policy migration is needed. Provider prompts,
 observation policies, frozen evaluations and rendering prohibition remain unchanged. See
 `docs/REVIEW_WORKSHEETS.md` for exact workflow, limits and privacy boundaries.
+
+## ADR-022 — Explicit source-bound metadata inspection before metadata attestations
+
+**Status:** Implemented in 0.17.0, offline only; metadata decisions and full assembly remain deferred.
+
+Do not extend narrow bullet approvals to contact/entry facts or silently include all profile
+metadata. Add a separate `review-metadata` boundary with explicit whitelisted field choices,
+original sources, current wording draft and exact review acknowledgements. Snapshot/revalidate
+the profile, freshly recompute the plan/wording inspection and expose only chosen fields for
+entries already in the non-excluded plan. Required metadata-only placeholders can be inspected
+without approving them or widening accomplishment eligibility. No arbitrary path evaluation.
+
+Copy profile-model values with logical references, source order determined by explicit choices,
+pending states and independently versioned metadata bindings. Preserve null/empty values and
+record missing-source observations, not inferred facts. Keep literal months/recorded present and
+completion context independent. Links use existing model normalization, never fetching. Details,
+technologies, skills/coursework, notes and historical wording are not metadata evidence here.
+
+Retain full original plan/wording context and conflicts, with selection/document/output caps and
+safe no-partial-output failures. Source copying is provenance, not verification, identity or full
+resume completeness. Correct disputed metadata in the private profile, then seed/review a new
+wording draft; do not accept edited metadata copies as facts. Existing v3 decisions, worksheets,
+profile/draft/response schemas, provider payloads/prompts and frozen measurements remain unchanged.
+No new dependency, provider, private migration or rendering authority. See `docs/METADATA_REVIEW.md`
+for disclosure, exact field/hash semantics, limits and the separate next attestation slice.

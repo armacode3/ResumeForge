@@ -24,6 +24,7 @@ def test_help_describes_only_implemented_commands(option: str) -> None:
     assert "match-evidence" in help_text
     assert "plan-resume" in help_text
     assert "review-resume" in help_text
+    assert "review-metadata" in help_text
     assert "--version" in help_text
     assert "generate" not in help_text
 

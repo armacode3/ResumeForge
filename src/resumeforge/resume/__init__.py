@@ -9,6 +9,12 @@ from resumeforge.resume.documents import (
     parse_wording_response,
 )
 from resumeforge.resume.engine import review_resume
+from resumeforge.resume.metadata import (
+    load_metadata_selection,
+    parse_metadata_selection,
+    review_metadata,
+)
+from resumeforge.resume.metadata_models import MetadataDocument, MetadataReview, MetadataSelection
 from resumeforge.resume.models import (
     ResumeDocument,
     ResumeError,
@@ -23,6 +29,9 @@ from resumeforge.resume.wording import suggest_wording
 from resumeforge.resume.worksheet import build_review_worksheet
 
 __all__ = [
+    "MetadataDocument",
+    "MetadataReview",
+    "MetadataSelection",
     "ResumeDocument",
     "ResumeError",
     "ResumeReview",
@@ -33,11 +42,14 @@ __all__ = [
     "WordingResult",
     "apply_review_decisions",
     "build_review_worksheet",
+    "load_metadata_selection",
     "load_resume_document",
     "load_review_decisions",
+    "parse_metadata_selection",
     "parse_resume_document",
     "parse_review_decisions",
     "parse_wording_response",
+    "review_metadata",
     "review_resume",
     "suggest_wording",
 ]

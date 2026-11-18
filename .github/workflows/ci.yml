@@ -121,6 +121,16 @@ jobs:
             --decisions "$RUNNER_TEMP/review-decisions.json" \
             --confirm-review --confirm-decisions > "$RUNNER_TEMP/decision-result.json" || decision_status=$?
           test "$decision_status" -eq 3
+          metadata_status=0
+          "$RUNNER_TEMP/resumeforge-smoke/bin/resumeforge" review-metadata \
+            --profile "$GITHUB_WORKSPACE/examples/profiles/sample.md" \
+            --job "$GITHUB_WORKSPACE/examples/jobs/backend_intern.md" \
+            --requirements "$GITHUB_WORKSPACE/examples/jobs/backend_intern.response.json" \
+            --selection "$GITHUB_WORKSPACE/examples/plans/backend_intern.selection.json" \
+            --draft "$RUNNER_TEMP/resume-draft.json" \
+            --metadata-selection "$GITHUB_WORKSPACE/examples/metadata/backend_intern.fields.json" \
+            --confirm-review > "$RUNNER_TEMP/metadata-review.json" || metadata_status=$?
+          test "$metadata_status" -eq 3
           "$RUNNER_TEMP/resumeforge-smoke/bin/python" - <<'PY'
           import json
           from pathlib import Path
@@ -129,6 +139,17 @@ jobs:
           assert result["status"] == "blocked_by_plan"
           assert result["scope"] == "bullet_wording_only" and not result["rendering_authorized"]
           assert all(b["review_status"] == "blocked_by_plan" for b in result["bullets"])
+          metadata = json.loads(Path("metadata-review.json").read_text())
+          assert metadata["status"] == "blocked_by_plan"
+          assert metadata["scope"] == "selected_metadata_only" and not metadata["rendering_authorized"]
+          assert metadata["document"]["metadata_version"] == "source-bound-metadata-v1"
+          assert all(f["review_status"] == "pending_review" for f in metadata["document"]["fields"])
+          values = {f["source_ref"]: f["value"] for f in metadata["document"]["fields"]}
+          assert values["person.email"] == "alex@example.com"  # explicitly selected fictional contact
+          assert "person.phone" not in values
+          assert values["projects.proj_queue.end_date"] == "present"
+          assert values["education.edu_example.end_date"] == "2027-05"
+          assert metadata["wording_review"]["document"]["status"] == "needs_review"
           PY
           "$RUNNER_TEMP/resumeforge-smoke/bin/python" - <<'PY'
           import json
