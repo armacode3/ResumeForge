@@ -509,3 +509,46 @@
   coverage. Ruff lint/format, strict mypy (56 files), dependency checks and source/wheel builds
   passed; no unmerged paths remain. Staged content/privacy and hosted checks are verified before
   completion. The next feature remains snapshot-bound human review decisions, not new generation.
+
+## Session 016 — Snapshot-bound human bullet-wording decisions
+
+- User confirmed PR #8 was merged and authorized the next step. Fetched main at `17c4bf1`,
+  fast-forwarded local main and created `feat/snapshot-bound-review-decisions` from that clean
+  merged base, not another stacked branch. No prior branches/history or private inputs changed.
+- Defined a narrow human-attestation slice, not semantic proof or full-resume approval. Added
+  strict frozen `ReviewDecisions` with inspection version, exact document/plan hashes, unique
+  bullet IDs, approve/reject choices and required reasons. Missing decisions stay pending, even
+  for verbatim wording. Duplicate/unknown/stale bindings fail safely; no implicit seed approvals.
+- Added `apply_review_decisions`, requiring three exact-boolean acknowledgements and original
+  source inputs plus an explicit draft. Recompute inspection/planning/matching before applying
+  decisions. Any wording/source/plan change invalidates old bindings; copied hashes cannot restore
+  ineligible/excluded or unselected bullets. Decision order cannot reorder content or references.
+- Keep original pending draft/inspection records intact and emit separate immutable user decision
+  records. Rejection preserves selected/mandatory content; plan conflicts block all attempted
+  approvals. Empty documents cannot pass by vacuity. Only nonempty wholly approved bullet records
+  under a conflict-free plan yield `bullet_wording_approved_by_user`, with scope always limited
+  to bullet wording and `rendering_authorized` always false. Metadata, job fit, layout and factual
+  truth remain outside these unsigned local assertions; profile verification is never promoted.
+- Extended `review-resume` with explicit `--decisions` and separate `--confirm-decisions`, requiring
+  `--draft` and checking option/acknowledgement combinations before input I/O. Ordinary inspection
+  keeps its prior behavior. Decision mode emits a complete result with exit 3 for pending/rejected/
+  plan-blocked outcomes, or 0 for wholly user-approved bullet wording; invalid/stale inputs exit 1
+  without partial JSON and usage failures exit 2. No input writes, live inference or dependencies.
+- Shared the existing resume JSON reader's bounded duplicate-key/depth/UTF-8/schema checks between
+  draft and decision models. File/API decisions remain bounded to 1 MiB and 8,192-character reasons.
+  Receipts are not accepted as decision input, authenticated identity, a history DB or evidence.
+- Added tests for explicit scoped approval, partial/rejected/empty/blocked outcomes, whole-snapshot
+  invalidation, current-policy checks, copied-hash eligibility bypasses, gate ordering, malformed
+  input, immutable/privacy/offline behavior and installed CLI reports. CI's runtime-wheel smoke
+  now attempts fictional approvals against the intentionally blocked plan and asserts none apply.
+- Application 0.10.0. Local Python 3.12.3: 602 unit + 89 integration = 691 tests passed with
+  GitHub-like colors and 99.95% branch-aware coverage. Ruff lint/format, strict mypy (59 files),
+  dependency checks and source/wheel builds passed. Fresh locked editable and runtime-only wheel
+  installs passed; all 691 tests also passed against the installed wheel outside the repository.
+  Executed the exact CI runtime-wheel smoke block, including blocked decision assertions, locally
+  outside the repository. Staged/distribution path and secret-pattern reviews passed, excluding
+  private/runtime artifacts. Hosted CI is checked after push.
+- Updated decision policy, ADR-015, draft guide, README, architecture, roadmap and canonical agent
+  guidance. Next: measured claim-review findings, then controlled wording assistance under explicit
+  model/data policy. Semantic proof, complete metadata/resume review, rendering/PDF/readability,
+  persistent history, automatic relevance ranking and cloud inference remain unimplemented.

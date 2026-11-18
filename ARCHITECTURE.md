@@ -6,8 +6,9 @@ Phases 0–2 include profile validation and fake/local Ollama job analysis. Phas
 completion states/preferences, offline evidence eligibility/lexical retrieval and source-backed
 candidate review signals. Reviewed-selection draft planning now checks count constraints and
 preserves mandatory content. The first Phase 4 boundary adds structured wording drafts with
-pending review and exact plan binding. Relevance ranking, model-assisted wording generation,
-semantic claim proof and approval workflows are not implemented.
+pending review and exact plan binding. Separate snapshot-bound human decisions can now attest
+to individual bullet wording. Relevance ranking, model-assisted wording generation, semantic
+claim proof and full-resume/rendering approval are not implemented.
 No cloud provider is enabled.
 Everything below labeled **planned** is a design boundary, not a
 working feature. Prefer a modular monolith: one Python package, with small components and
@@ -47,8 +48,9 @@ src/resumeforge/
     engine.py       explicit assembly, mandatory placeholders and count-conflict findings
   resume/
     models.py       frozen versioned wording drafts and pending review observations
-    documents.py    bounded strict local draft JSON loader
+    documents.py    bounded strict local draft/decision JSON loaders
     engine.py       source seeds, fresh plan binding and literal wording-change observations
+    decisions.py    snapshot-bound user attestations, never full-resume/rendering approval
 tests/
   unit/             CLI/schema/parser/gap contracts and invalid inputs
   integration/      installed entry points, profile validation, privacy safeguards
@@ -179,9 +181,17 @@ slot in order. Frozen nested records use immutable tuples; no input can declare 
 Every bullet has one selected accomplishment reference and remains `pending_review`.
 
 Literal comparison distinguishes unchanged source text from edited wording, not supported from
-unsupported claims. Plan conflicts block the outer review; semantic proof, human approval and
-polished/model-assisted generation are deferred. The read-only `review-resume` command emits
+unsupported claims. Plan conflicts block the outer review; semantic proof and polished/model-
+assisted generation are deferred. The read-only `review-resume` command emits
 private documents/review context, not renderable output. See `docs/RESUME_DRAFTS.md`.
+
+`resume.apply_review_decisions` requires original inputs, an explicit draft, a strict decision file
+and separate exact-boolean confirmation. It freshly recomputes inspection and checks policy,
+document/plan hashes and every referenced bullet. Missing decisions stay pending, rejection keeps
+content visible, and plan conflicts block approvals. No input report supplies trusted approval.
+The output records narrow user attestations separately from pending draft/inspection state, with
+mandatory `rendering_authorized: false`. This is not identity authentication, semantic proof or
+metadata/job-fit approval. See `docs/REVIEW_DECISIONS.md`.
 
 ## Planned module responsibilities
 
@@ -215,7 +225,8 @@ Create these modules only as their features are implemented:
    references. Failed generations must not masquerade as approved final resumes.
 
 Profile/job/selection schemas, draft-plan snapshots and narrow evidence-linked wording-draft
-schemas now exist. Complete renderable resume content and approval workflows remain deferred.
+schemas and narrow human bullet-wording decisions now exist. Complete renderable resume content,
+metadata review and rendering authorization remain deferred.
 Pydantic validates profile input and untrusted structured job responses, which fail actionably.
 `config/resume_rules.md` holds writing policy; planned `config/layout.yaml` will separately
 hold machine-readable page, spacing, and minimum-readability constraints.

@@ -132,8 +132,14 @@ conflicts/context. All edits require review; even verbatim wording stays pending
 semantic claim proof, fabricated-claim detection or a human approval workflow. See
 `docs/RESUME_DRAFTS.md` and ADR-014.
 
-**Next:** explicit human review decisions bound to exact document/evidence snapshots, followed by
-measured claim checks and controlled wording assistance. Model/data policy must stay explicit.
+Implemented in 0.10.0: explicit human approve/reject decisions with reasons, bound to the exact
+current inspection policy, document and plan. Missing decisions remain pending; stale/unknown
+bindings fail, rejections preserve content and plan conflicts block approvals. Scope is bullet
+wording only, not semantic proof, metadata approval or rendering authorization. See
+`docs/REVIEW_DECISIONS.md` and ADR-015.
+
+**Next:** measured claim-review findings, then controlled wording assistance. Model/data policy
+must stay explicit; semantic checks and complete resume/metadata review remain unimplemented.
 
 Generate structured bullets with accomplishment IDs, check unsupported tools/metrics/ownership,
 dates and contradictions, report gaps, and implement review/approval. Gate: fabricated-claim
