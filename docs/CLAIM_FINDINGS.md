@@ -106,6 +106,7 @@ never truncate findings. These are resource limits, not resume length/evidence s
 No network, downloads, write-back or history persistence occurs. Spans/IDs/hashes, reports and
 decision reasons remain private. Untrusted text cannot activate tools or grant approval.
 
-Next: controlled wording assistance under the explicit local-model policy. Semantic proof,
+Source-bound wording assistance now uses these same inspection gates; see `docs/WORDING_ASSISTANCE.md`.
+Next: explicitly opted-in synthetic wording-quality evaluation. Semantic proof,
 metadata/full-resume approval, rendering, automatic ranking and cloud inference remain out of
 scope. Changed observation policies must be versioned to invalidate prior attestations.

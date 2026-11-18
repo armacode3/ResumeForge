@@ -346,3 +346,34 @@ This conservative contract is preferable to a broad unsupported-claim classifier
 quality or an LLM judge treated as truth. Full-resume/metadata approval and rendering remain outside
 scope. Changed observation policies need explicit versioning; do not mechanically upgrade historical
 decisions. See `docs/CLAIM_FINDINGS.md` and `docs/REVIEW_DECISIONS.md`.
+
+## ADR-017 — Source-bound wording proposals, never provider-owned plans or approvals
+
+**Status:** Implemented in 0.12.0; real-model wording quality has not been evaluated.
+
+Reuse the existing structured-output provider Protocol and guarded local Ollama adapter, with
+explicit offline replay as the default. Revalidate original sources and reviewed selections, seed
+from entire scoped statements, and skip provider calls for conflicted/empty plans. Never feed old
+bullet wording, user decisions, notes or parent metadata back as biographical evidence.
+
+Minimize the request to selected statements/IDs/status caveats, snapshot hashes and complete
+reviewed job items with categories/quotes/lexical associations. Keep trusted versioned instructions
+separate; job context cannot supply candidate facts. Wording changes involve profile-derived data,
+unlike job analysis, so require separate explicit `--confirm-local-data` for local mode in addition
+to source-review acknowledgement. No contact fields, cloud fallback, runtime/model setup, implicit
+inference, automatic retries or new dependencies. No live inference/private data was used to
+implement this feature; mock tests are not model-quality or injection-resistance evidence.
+
+Accept only a strict snapshot-bound list containing one text per existing bullet/evidence pair in
+the same order. Code owns structure, metadata placeholders and pending states. Reject omission,
+reordering, reference changes, self-approval, unknown fields and bounded-input violations. Rebuild
+inspection after substitution, retaining findings and caveats. All wording stays pending; unchanged
+text gains no new approval, and changed text invalidates prior document-bound decisions.
+
+Record prompt/policy versions, provider/model and request/raw-response digests in an immutable
+result, not raw prompt logs or stored source facts. Hashes are not identity, pinned weights, semantic
+support or evidence that the provider obeyed its instructions. Suggestions may still transfer facts
+between bullets, hallucinate, lose qualifiers or fail strict schema/budgets. The existing finite
+findings cannot certify support. Full-resume/metadata approval, rendering, history and automatic
+ranking remain separate. Next is an explicitly opted-in synthetic wording-quality evaluation.
+See `docs/WORDING_ASSISTANCE.md`.

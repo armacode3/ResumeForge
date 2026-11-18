@@ -164,3 +164,35 @@ class ReviewDecisionResult(ResumeModel):
     review: ResumeReview
     bullets: tuple[AppliedBulletDecision, ...]
     warnings: tuple[str, ...]
+
+
+class WordingBullet(ResumeModel):
+    bullet_id: BulletId
+    accomplishment_id: AccomplishmentId
+    text: DraftText
+
+
+class WordingResponse(ResumeModel):
+    """Untrusted wording only: no model-authored layout, selection or approval fields."""
+
+    schema_version: Annotated[int, Field(ge=1, le=1)]
+    plan_sha256: Digest
+    seed_document_sha256: Digest
+    bullets: tuple[WordingBullet, ...]
+
+
+class WordingAttempt(ResumeModel):
+    provider: str
+    model: str
+    request_sha256: Digest
+    response_sha256: Digest
+
+
+class WordingResult(ResumeModel):
+    wording_version: str
+    prompt_version: str
+    status: Literal["needs_review", "blocked_by_plan"]
+    rendering_authorized: Literal[False] = False
+    attempt: WordingAttempt | None
+    review: ResumeReview
+    warnings: tuple[str, ...]

@@ -34,6 +34,7 @@ from resumeforge.resume import (
     load_resume_document,
     load_review_decisions,
     review_resume,
+    suggest_wording,
 )
 
 
@@ -44,7 +45,7 @@ class ProviderChoice(StrEnum):
 
 app = typer.Typer(
     help="ResumeForge: evidence-first resumes. Profile validation, job analysis "
-    "and offline evidence retrieval/planning/draft review.",
+    "and evidence retrieval/planning/draft review with opt-in wording assistance.",
     add_completion=False,
     invoke_without_command=True,
     pretty_exceptions_enable=False,
@@ -229,6 +230,110 @@ def plan_resume_command(
     typer.echo(json.dumps(asdict(plan), ensure_ascii=False, indent=2))
     if plan.constraint_status == "conflicts":
         typer.echo("Plan has constraint conflicts; review findings before proceeding.", err=True)
+        raise typer.Exit(code=3)
+
+
+@app.command("suggest-wording")
+def suggest_wording_command(
+    profile: Annotated[Path, typer.Option("--profile", help="Explicit local Markdown profile.")],
+    job: Annotated[Path, typer.Option("--job", help="Exact local job source.")],
+    requirements: Annotated[
+        Path, typer.Option("--requirements", help="Reviewed JobRequirements JSON; no extraction.")
+    ],
+    selection: Annotated[
+        Path, typer.Option("--selection", help="Reviewed version-1 entry/evidence selection JSON.")
+    ],
+    mock_response: Annotated[
+        Path | None,
+        typer.Option("--mock-response", help="Snapshot-bound wording JSON; fake replay only."),
+    ] = None,
+    provider: Annotated[
+        ProviderChoice,
+        typer.Option("--provider", help="Fake replay by default; local inference is opt-in."),
+    ] = ProviderChoice.FAKE,
+    confirm_review: Annotated[
+        bool,
+        typer.Option("--confirm-review", help="Acknowledge review of requirements and selection."),
+    ] = False,
+    confirm_local_data: Annotated[
+        bool,
+        typer.Option(
+            "--confirm-local-data",
+            help="Allow selected statements, caveats and reviewed job items to local Ollama; "
+            "no contact/notes.",
+        ),
+    ] = False,
+    model: Annotated[
+        str, typer.Option("--model", help="Downloaded local Ollama model.")
+    ] = DEFAULT_MODEL,
+    ollama_port: Annotated[int, typer.Option("--ollama-port", min=1, max=65535)] = DEFAULT_PORT,
+    timeout: Annotated[float, typer.Option("--timeout", min=1, max=600)] = DEFAULT_TIMEOUT,
+    max_output_tokens: Annotated[
+        int, typer.Option("--max-output-tokens", min=128, max=8192)
+    ] = DEFAULT_OUTPUT_TOKENS,
+) -> None:
+    """Propose pending source-bound wording, never select evidence or approve a resume."""
+    if not confirm_review:
+        raise typer.BadParameter("Review requirements and selection, then pass --confirm-review.")
+    if provider == ProviderChoice.FAKE and mock_response is None:
+        raise typer.BadParameter(
+            "Fake wording mode requires --mock-response; it does not generate text."
+        )
+    if provider == ProviderChoice.OLLAMA and (mock_response is not None or not confirm_local_data):
+        raise typer.BadParameter(
+            "Local wording requires --confirm-local-data and no --mock-response."
+        )
+    if provider == ProviderChoice.FAKE and (
+        confirm_local_data
+        or model != DEFAULT_MODEL
+        or ollama_port != DEFAULT_PORT
+        or timeout != DEFAULT_TIMEOUT
+        or max_output_tokens != DEFAULT_OUTPUT_TOKENS
+    ):
+        raise typer.BadParameter("Local data/model options require --provider ollama.")
+    try:
+        document = load_job(job)
+        analysis = analyze_job(document, FakeProvider.from_file(requirements))
+        choices = load_selection(selection)
+        adapter: StructuredOutputProvider
+        if provider == ProviderChoice.FAKE:
+            assert mock_response is not None
+            adapter = FakeProvider.from_file(mock_response)
+        else:
+            adapter = OllamaProvider(model, ollama_port, timeout, max_output_tokens)
+        candidate = load_profile(profile)
+        result = suggest_wording(
+            candidate.profile,
+            document,
+            analysis.requirements,
+            choices,
+            adapter,
+            requirements_reviewed=True,
+            selection_reviewed=True,
+            provider_data_confirmed=provider == ProviderChoice.FAKE or confirm_local_data,
+        )
+    except (
+        ProfileError,
+        InputError,
+        JobAnalysisError,
+        PlanningError,
+        ResumeError,
+        ProviderError,
+    ) as error:
+        typer.echo(f"Wording assistance failed:\n{error}", err=True)
+        raise typer.Exit(code=1) from None
+    if result.attempt is None:
+        notice = "No wording provider called: inspect the conflicted or empty plan."
+    elif provider == ProviderChoice.FAKE:
+        notice = "Offline wording response replay; no model inference or approval performed."
+    else:
+        notice = (
+            "Local Ollama wording proposals; selected-source data used, "
+            "no semantic proof or approval."
+        )
+    typer.echo(notice, err=True)
+    typer.echo(result.model_dump_json(indent=2))
+    if result.status == "blocked_by_plan":
         raise typer.Exit(code=3)
 
 

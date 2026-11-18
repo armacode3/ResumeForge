@@ -7,6 +7,15 @@ Ollama server. The model fills the existing JSON schema; the engine applies the 
 schema, ID, literal-text and source-quotation checks as fake replay. No candidate profile is
 loaded implicitly, no tools are supplied or executed, and no biography is approved or generated.
 
+Version 0.12.0 also supports `suggest-wording --provider ollama --confirm-local-data`, with explicit
+source paths and requirements/selection review. Unlike job analysis, this sends **selected profile
+statements**, IDs/status caveats and all reviewed job items/quotes/categories, but no contact,
+notes, parent metadata or historical bullets. Statements/quotes can still identify people. This
+additional data flow needs separate acknowledgement each invocation. Conflicted/empty plans do not
+call the wording provider. No live wording-quality evaluation has been performed; all suggestions
+stay pending fresh inspection and human decisions. See `docs/WORDING_ASSISTANCE.md` for the complete
+disclosure, strict response contract, fake-first workflow and limitations.
+
 The initial target is **Qwen3:4b** (Q4_K_M, approximately 2.5 GB of weights). It requires more
 memory during inference than its download size, and CPU execution may be slow. This is a
 starting point for evaluation, not a guarantee that a small model will extract every job correctly.
@@ -114,7 +123,8 @@ For each inference the adapter:
 2. Calls `POST /api/show` with only the selected model name. Requires GGUF/completion metadata,
    with no `remote_host` or `remote_model`, including aliases that might otherwise hide cloud use.
 3. Only after those checks, calls `POST /api/chat` with trusted instructions/schema separately
-   from the selected untrusted job text. No profile or tool registry is included.
+   from the selected untrusted input. Job analysis includes no profile; wording assistance includes
+   only the explicitly acknowledged selected-source/job payload described above. Neither has tools.
 
 HTTPX uses a literal loopback host, no environment proxies (`trust_env=False`), and no redirects.
 There is no remote-base-URL option; `OLLAMA_HOST` in the ResumeForge process cannot redirect it.

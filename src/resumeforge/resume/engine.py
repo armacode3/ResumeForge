@@ -163,6 +163,7 @@ def review_resume(
             "no semantic support check was performed.",
             "No detection guarantee for invented metrics, technology use, "
             "ownership or lost qualifiers.",
-            "No approval, model inference, rendering or page/readability validation was performed.",
+            "Inspection itself performs no approval, model inference, rendering "
+            "or page/readability validation.",
         ),
     )

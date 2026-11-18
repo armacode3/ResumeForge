@@ -83,9 +83,7 @@ def _reject_constant(value: str) -> NoReturn:
 def _remaining(deadline: float) -> float:
     remaining = deadline - monotonic()
     if remaining <= 0:
-        raise ProviderError(
-            "Local Ollama analysis exceeded its request deadline; reduce the input."
-        )
+        raise ProviderError("Local Ollama request exceeded its deadline; reduce the input.")
     return remaining
 
 
@@ -185,7 +183,7 @@ class OllamaProvider:
             raise ProviderError("Ollama input must contain valid UTF-8 text.") from None
         if budget + self.max_output_tokens + 1024 > CONTEXT_TOKENS:
             raise ProviderError(
-                "Job/schema exceeds the conservative local context budget; shorten the job "
+                "Input/schema exceeds the conservative local context budget; shorten the input "
                 "or lower --max-output-tokens. Nothing was sent."
             )
         deadline = monotonic() + self.timeout
@@ -208,7 +206,7 @@ class OllamaProvider:
                 )
                 if model.remote_host or model.remote_model or model.details.format != "gguf":
                     raise ProviderError(
-                        "Selected model is not reported as a local GGUF model; no job sent."
+                        "Selected model is not reported as a local GGUF model; no input data sent."
                     )
                 if "completion" not in model.capabilities:
                     raise ProviderError("Selected local model does not support text completion.")
