@@ -140,8 +140,8 @@ def review_metadata(
                 "and present is copied only when explicitly recorded.",
                 "This private output includes only explicitly selected metadata values; "
                 "links are model-normalized strings and are never fetched.",
-                "No metadata decisions, bullet approval transfer, full-resume assembly, "
-                "model inference or rendering authorization was performed.",
+                "Metadata inspection itself applies no decisions, transfers no bullet approval, "
+                "assembles no full resume, calls no model and authorizes no rendering.",
             ),
         )
         encoded = result.model_dump_json(indent=2).encode("utf-8", errors="strict")

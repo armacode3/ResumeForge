@@ -89,8 +89,11 @@ applying decisions with separate confirmation. See
 source-bound records, tied to the current wording draft. Missing dates stay unset; no `present`
 value or metadata approval is inferred. Contact disclosure requires a separate explicit field
 selection; ordinary reviews/provider requests stay unchanged. See
-[docs/METADATA_REVIEW.md](docs/METADATA_REVIEW.md). Metadata decisions and full-resume assembly
-remain unimplemented, and rendering stays unauthorized.
+[docs/METADATA_REVIEW.md](docs/METADATA_REVIEW.md). With separate `--decisions` and explicit
+`--confirm-decisions`, selected nonempty metadata values can now receive snapshot-bound user
+approve/reject attestations. Missing decisions/values stay pending; plan conflicts block approval.
+See [docs/METADATA_DECISIONS.md](docs/METADATA_DECISIONS.md). These do not approve bullet wording,
+prove facts or assemble/authorize rendering of a complete resume.
 
 **End-to-end resume generation is not implemented.** There is no cloud provider, relevance-ranking engine,
 database, template renderer, PDF compiler, API, or browser extension yet.

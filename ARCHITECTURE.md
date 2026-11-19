@@ -60,6 +60,7 @@ src/resumeforge/
     worksheet.py    fresh review and null-only decision scaffolds, never automatic attestations
     metadata_models.py explicit field exposure and pending source-bound metadata snapshots
     metadata.py     selected contact/entry inspection with draft binding, no metadata approvals
+    metadata_decisions.py exact selected-field user attestations, no wording/full-resume approval
     wording.py      source-bound provider proposals, minimized inputs, exact slots and fresh review
     benchmark.py    fixed synthetic wording replay/live harness, no automatic quality verdicts
 tests/
@@ -262,8 +263,19 @@ plan, and copies only chosen contact/entry values with logical source refs and p
 Missing values stay null/empty; dates and completion context remain independent. A bounded
 metadata document binds policy, plan, wording and field-selection identity; full wording/plan
 context remains visible in the outer report. Ordinary reviews and provider requests acquire no
-contact/entry values. No metadata input draft, edit/approval path or bullet-approval import is
-added. See `docs/METADATA_REVIEW.md` and ADR-022.
+contact/entry values. The inspector accepts no metadata input draft or bullet-approval import and
+performs no approvals. See `docs/METADATA_REVIEW.md` and ADR-022.
+
+`resume.apply_metadata_decisions` freshly reconstructs selected metadata from original sources,
+explicit wording draft and field selection, requiring four exact review/decision flags. A separate
+strict v1 decision file binds metadata and decision policy plus the current plan, wording, selection
+and complete source-copy document. Unknown/unselected refs and stale bindings fail without partial
+results. Requested approve/reject/reasons remain separate from pending source records: missing
+decisions or unset values stay pending, rejection retains content, and plan conflicts block approval.
+Only wholly user-approved nonempty selected sets get the narrow metadata status. Underlying wording
+is never approved or stripped of findings; scope is selected metadata only and rendering remains
+false. Input/output are bounded, with no new source edits, migration, provider or persistence.
+See `docs/METADATA_DECISIONS.md` and ADR-023.
 
 `resume.benchmark` preflights a fixed fictional six-case/seven-bullet corpus and invokes the same
 wording engine. Source-seed replay is the default, independent-response replay is explicit, and
@@ -306,8 +318,8 @@ Create these modules only as their features are implemented:
 
 Profile/job/selection schemas, draft-plan snapshots and narrow evidence-linked wording-draft
 schemas and narrow human bullet-wording decisions now exist. Pending selected metadata inspection
-also exists. Metadata attestations, complete renderable resume content and rendering authorization
-remain deferred.
+and separate narrow user metadata attestations also exist. Complete renderable resume content,
+full-resume approval and rendering authorization remain deferred.
 Pydantic validates profile input and untrusted structured job responses, which fail actionably.
 `config/resume_rules.md` holds writing policy; planned `config/layout.yaml` will separately
 hold machine-readable page, spacing, and minimum-readability constraints.

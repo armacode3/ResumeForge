@@ -506,3 +506,27 @@ wording draft; do not accept edited metadata copies as facts. Existing v3 decisi
 profile/draft/response schemas, provider payloads/prompts and frozen measurements remain unchanged.
 No new dependency, provider, private migration or rendering authority. See `docs/METADATA_REVIEW.md`
 for disclosure, exact field/hash semantics, limits and the separate next attestation slice.
+
+## ADR-023 — Selected metadata attestations do not approve wording, unknowns or publication
+
+**Status:** Implemented in 0.18.0, offline only.
+
+Extend `review-metadata` with a distinct v1 decision file and separate confirmation rather than
+reusing bullet decisions or trusting an old metadata report. Recompute selected metadata from
+original sources and explicit wording/field selections. Require current metadata/decision policy
+and exact plan/wording/selection/document bindings; reject duplicate, unselected or stale refs,
+unknown fields and excessive input/output without partial approval. No metadata edits or new values.
+
+Require approve/reject plus nonblank reasons for records actually reviewed. Missing decisions stay
+pending; rejection preserves values/context. Plan conflicts dominate collective status and block
+approvals. Null/empty source values cannot be approved or waived through reasons: they stay unknown
+and pending, with findings visible. Empty selected sets cannot pass by vacuity. Input order cannot
+reorder source copies. Preserve requested choices/reasons and missing-value signals independently
+from effective status, and keep all underlying metadata/wording records pending.
+
+Only a nonempty wholly user-approved selected set yields the narrow selected-metadata state. It is
+an unsigned local assertion, not proof of facts/identity/semantic support, required-field sufficiency,
+bullet approval, full-resume publication or rendering authority. Retain `rendering_authorized: false`.
+No provider, dependency, source schema/policy migration, metadata rewriting, history or live run.
+Current metadata v1 and bullet v3 contracts/providers/frozen comparisons are unchanged. See
+`docs/METADATA_DECISIONS.md` for exact format, state/exit semantics and privacy limits.
