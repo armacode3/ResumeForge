@@ -62,6 +62,15 @@ preserves values, plan conflicts block approvals, empty selected sets never pass
 metadata/wording records pending, preserve findings and authorize no rendering. No bullet approval
 or full-resume/identity/truth proof follows. Next: structured-resume assembly/readiness with explicit
 unresolved content/required-field issues, not implicit inference, full approval or rendering.
+Offline `assemble-resume` now reconstructs exact selected components and finite readiness; read
+`docs/STRUCTURED_ASSEMBLY.md`. Require original sources, current draft/explicit fields, three review
+gates and independently paired bullet/metadata decision confirmations. Reapply existing decisions,
+never receipts; preserve all pending/rejected content, findings and separate scopes. Minimum selected
+name/title, nonempty values, explicit required entries, resolved states and nonempty overall content
+are limited prerequisites, not full-resume sufficiency. Skills/coursework remain unresolved
+placeholders without implicit value exposure. Keep source states pending, output bounded/private,
+and rendering false even for `components_reviewed`. Next: explicit selected skills/coursework content
+and its separate evidence/review contract, not implicit inference or publication authorization.
 Omitted states stay unknown; version-1 profile/draft files need no rewrite (not old decisions).
 Read `docs/MATCHING.md` for the
 retrieval boundary.
