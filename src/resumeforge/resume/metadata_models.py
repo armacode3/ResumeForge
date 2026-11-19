@@ -4,7 +4,7 @@ from typing import Annotated, Literal, Self
 
 from pydantic import Field, model_validator
 
-from resumeforge.profile.models import CompletionStatus, EntryId, ResumeSection
+from resumeforge.profile.models import CompletionStatus, EntryId, ResumeSection, Text
 from resumeforge.resume.models import Digest, DraftText, ResumeModel, ResumeReview
 
 PersonMetadataField = Literal["name", "email", "phone", "location", "links"]
@@ -72,4 +72,52 @@ class MetadataReview(ResumeModel):
     document: MetadataDocument
     findings: tuple[MetadataFinding, ...]
     wording_review: ResumeReview
+    warnings: tuple[str, ...]
+
+
+class MetadataFieldDecision(ResumeModel):
+    source_ref: Text
+    decision: Literal["approve", "reject"]
+    reason: DraftText
+
+
+class MetadataDecisions(ResumeModel):
+    """Unsigned user attestations for selected source copies, not metadata edits."""
+
+    schema_version: Annotated[int, Field(ge=1, le=1)]
+    decision_version: Literal["metadata-field-decisions-v1"]
+    metadata_version: Literal["source-bound-metadata-v1"]
+    plan_sha256: Digest
+    wording_document_sha256: Digest
+    metadata_selection_sha256: Digest
+    metadata_document_sha256: Digest
+    fields: Annotated[tuple[MetadataFieldDecision, ...], Field(max_length=512)]
+
+    @model_validator(mode="after")
+    def distinct_fields(self) -> Self:
+        if len({field.source_ref for field in self.fields}) != len(self.fields):
+            raise ValueError("Each metadata field may have only one decision.")
+        return self
+
+
+class AppliedMetadataDecision(ResumeModel):
+    source_ref: str
+    decision: Literal["approve", "reject"] | None
+    reason: str | None
+    source_value_missing: bool
+    review_status: Literal[
+        "pending_review", "approved_by_user", "rejected_by_user", "blocked_by_plan"
+    ]
+
+
+class MetadataDecisionResult(ResumeModel):
+    decision_version: str
+    scope: Literal["selected_metadata_only"] = "selected_metadata_only"
+    rendering_authorized: Literal[False] = False
+    status: Literal[
+        "needs_review", "blocked_by_plan", "has_rejections", "metadata_fields_approved_by_user"
+    ]
+    decisions_model_sha256: Digest
+    review: MetadataReview
+    fields: tuple[AppliedMetadataDecision, ...]
     warnings: tuple[str, ...]

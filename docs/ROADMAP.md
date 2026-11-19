@@ -188,10 +188,16 @@ Missing values remain unset; plan conflicts/context and independent completion s
 Metadata selection/document snapshots are bounded and versioned independently; existing wording
 schemas, prompts, gates and frozen comparisons are untouched. See `docs/METADATA_REVIEW.md`, ADR-022.
 
-**Next:** separate snapshot-bound per-field metadata attestations, then structured-resume completion;
-do not conflate these with bullet approval or rendering authorization. Keep the conservative wording
-default; semantic proof, full-resume/metadata approval, rendering and automatic ranking remain
-unimplemented. No implicit live run or automatic approval follows from valid source copies.
+Implemented in 0.18.0: separate explicit per-field user metadata attestations bound to current
+policy, plan, wording, field selection and source-copy snapshot. Freshly rebuild inspection, reject
+unknown/stale refs, keep missing decisions and unset values pending, preserve rejections and block
+approvals on plan conflicts. All source/wording states remain pending; no bullet approval transfer,
+metadata editing, semantic proof or rendering authorization. See `docs/METADATA_DECISIONS.md`, ADR-023.
+
+**Next:** structured-resume assembly/readiness with separate bullet/metadata attestations and
+explicit unresolved content/skills/coursework/required-field issues, not a renderer or implicit
+full-resume approval. Keep the conservative wording default; semantic proof, full-resume approval,
+rendering and automatic ranking remain unimplemented. No implicit live run follows from attestations.
 
 Generate structured bullets with accomplishment IDs, check unsupported tools/metrics/ownership,
 dates and contradictions, report gaps, and implement review/approval. Gate: fabricated-claim

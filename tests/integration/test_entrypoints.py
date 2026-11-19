@@ -48,7 +48,16 @@ def test_installed_entrypoints_are_read_only(entrypoint: str, tmp_path: Path) ->
         (["match-evidence", "--help"], ["--profile", "--requirements", "--confirm-review"]),
         (["plan-resume", "--help"], ["--selection", "--confirm-review"]),
         (["review-resume", "--help"], ["--draft", "--confirm-review", "--worksheet"]),
-        (["review-metadata", "--help"], ["--draft", "--metadata-selection", "--confirm-review"]),
+        (
+            ["review-metadata", "--help"],
+            [
+                "--draft",
+                "--metadata-selection",
+                "--confirm-review",
+                "--decisions",
+                "--confirm-decisions",
+            ],
+        ),
         (["suggest-wording", "--help"], ["--provider", "--confirm-local-data", "--objective"]),
     ],
 )

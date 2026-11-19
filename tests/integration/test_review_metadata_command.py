@@ -199,10 +199,8 @@ def test_metadata_preserves_complete_plan_conflicts_and_missing_source_values(
     assert not report["rendering_authorized"]
 
 
-@pytest.mark.parametrize("option", ["--provider", "--decisions"])
-def test_metadata_command_has_no_inference_or_approval_options(
-    metadata_args: list[str], option: str
-) -> None:
+@pytest.mark.parametrize("option", ["--provider", "--model"])
+def test_metadata_command_has_no_inference_options(metadata_args: list[str], option: str) -> None:
     result = runner.invoke(app, [*metadata_args, option, "unused"])
     assert result.exit_code == 2 and result.stdout == ""
     help_result = runner.invoke(app, ["review-metadata", "--help"])

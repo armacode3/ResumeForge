@@ -1,9 +1,10 @@
 # Source-bound pending metadata — 0.17.0
 
 `review-metadata` makes explicitly chosen contact and background-entry fields visible beside a
-fresh wording review. This first slice **copies profile-model values into pending records**; it
-does not edit/approve metadata, verify identity/dates, assemble a complete resume or authorize
-rendering. Bullet wording decisions and accomplishment verification do not substantiate metadata.
+fresh wording review. Inspection **copies profile-model values into pending records**; it does not
+edit/approve metadata, verify identity/dates, assemble a complete resume or authorize rendering.
+Separate explicitly confirmed user field attestations are now available; see
+`docs/METADATA_DECISIONS.md`. Bullet wording decisions do not substantiate metadata.
 
 The command is offline, read-only and separate from ordinary wording review. Contact values are
 not added to ordinary reviews, worksheets, prompts or provider requests. No URL is fetched, model
@@ -59,8 +60,10 @@ resumeforge review-metadata \
 
 These are private files you must create/review. `--confirm-review` acknowledges the reviewed job,
 content selection and intended field exposure, **not metadata or wording approval**. All paths and
-confirmation are required before input I/O. There is no provider/decision option, implicit source
-seed, default private profile or automatic file write. Stdout is private JSON; explicitly redirect
+confirmation are required before input I/O. There is no provider option, implicit source
+seed, default private profile or automatic file write. Optional `--decisions` additionally requires
+separate `--confirm-decisions`; ordinary inspection without these options is unchanged. Stdout is
+private JSON; explicitly redirect
 it to a new private file if needed. Redirection can overwrite files and is not performed by the app.
 
 `examples/metadata/backend_intern.fields.json` is a fictional selection for the shared sample. To
@@ -84,7 +87,8 @@ seed/review a new wording draft. Profile changes invalidate the existing plan/dr
   even when dates are unknown. A status does not resolve conflicting dates or approve metadata.
 - Every selected field has `review_status: pending_review`. Empty selections remain pending and
   are not complete resumes or implicit approval. No required header/content-completeness policy
-  or metadata-decision format exists in this slice.
+  exists yet. Separate version-1 metadata decisions can attest only to selected nonempty values;
+  see `docs/METADATA_DECISIONS.md`. They do not change the pending source records.
 
 `MetadataReview` contains `scope: selected_metadata_only`, `rendering_authorized: false`, status,
 `document_sha256`, the pending `document`, missing-value `findings`, full fresh `wording_review`
@@ -130,5 +134,5 @@ requirements_reviewed=True, selection_reviewed=True, metadata_selection_reviewed
 `MetadataReview`. All three flags require exact true; no supplied report/receipt grants authority.
 `MetadataSelection`, `MetadataDocument`, `MetadataReview`, `parse_metadata_selection` and
 `load_metadata_selection` are exported from `resumeforge.resume`. Safe failures raise `ResumeError`
-(file reads can raise `InputError`). Next: separate snapshot-bound per-field metadata attestations,
-not automatic approval, full-resume assembly or rendering authorization.
+(file reads can raise `InputError`). Narrow per-field metadata attestations are available separately;
+full-resume assembly/readiness and rendering authorization remain unimplemented.

@@ -150,6 +150,38 @@ jobs:
           assert values["projects.proj_queue.end_date"] == "present"
           assert values["education.edu_example.end_date"] == "2027-05"
           assert metadata["wording_review"]["document"]["status"] == "needs_review"
+          Path("metadata-decisions.json").write_text(json.dumps({
+              "schema_version": 1, "decision_version": "metadata-field-decisions-v1",
+              "metadata_version": metadata["document"]["metadata_version"],
+              "plan_sha256": metadata["document"]["plan_sha256"],
+              "wording_document_sha256": metadata["document"]["wording_document_sha256"],
+              "metadata_selection_sha256": metadata["document"]["metadata_selection_sha256"],
+              "metadata_document_sha256": metadata["document_sha256"],
+              "fields": [{"source_ref": f["source_ref"], "decision": "approve",
+                          "reason": "Fictional gate assertion; plan conflicts must block approval."}
+                         for f in metadata["document"]["fields"]],
+          }))
+          PY
+          metadata_decision_status=0
+          "$RUNNER_TEMP/resumeforge-smoke/bin/resumeforge" review-metadata \
+            --profile "$GITHUB_WORKSPACE/examples/profiles/sample.md" \
+            --job "$GITHUB_WORKSPACE/examples/jobs/backend_intern.md" \
+            --requirements "$GITHUB_WORKSPACE/examples/jobs/backend_intern.response.json" \
+            --selection "$GITHUB_WORKSPACE/examples/plans/backend_intern.selection.json" \
+            --draft "$RUNNER_TEMP/resume-draft.json" \
+            --metadata-selection "$GITHUB_WORKSPACE/examples/metadata/backend_intern.fields.json" \
+            --decisions "$RUNNER_TEMP/metadata-decisions.json" --confirm-review --confirm-decisions \
+            > "$RUNNER_TEMP/metadata-decision-result.json" || metadata_decision_status=$?
+          test "$metadata_decision_status" -eq 3
+          "$RUNNER_TEMP/resumeforge-smoke/bin/python" - <<'PY'
+          import json
+          from pathlib import Path
+
+          result = json.loads(Path("metadata-decision-result.json").read_text())
+          assert result["status"] == "blocked_by_plan"
+          assert result["scope"] == "selected_metadata_only" and not result["rendering_authorized"]
+          assert all(f["review_status"] == "blocked_by_plan" for f in result["fields"])
+          assert all(f["review_status"] == "pending_review" for f in result["review"]["document"]["fields"])
           PY
           "$RUNNER_TEMP/resumeforge-smoke/bin/python" - <<'PY'
           import json
@@ -232,6 +264,35 @@ jobs:
                                      "--confirm-decisions"], capture_output=True, text=True,
                                      check=False, timeout=10)
           assert untouched.returncode == 1 and untouched.stdout == ""
+          metadata_args = args.copy()
+          metadata_args[3] = "review-metadata"
+          metadata_args += draft_args + ["--metadata-selection",
+              str(root / "examples/metadata/backend_intern.fields.json")]
+
+          def run_metadata(options, expected):
+              process = subprocess.run(metadata_args + options, capture_output=True, text=True,
+                                       check=False, timeout=10)
+              assert process.returncode == expected, process.stderr
+              return json.loads(process.stdout)
+
+          metadata = run_metadata([], 0)
+          doc = metadata["document"]
+          choices = {"schema_version": 1, "decision_version": "metadata-field-decisions-v1",
+              "metadata_version": doc["metadata_version"], "plan_sha256": doc["plan_sha256"],
+              "wording_document_sha256": doc["wording_document_sha256"],
+              "metadata_selection_sha256": doc["metadata_selection_sha256"],
+              "metadata_document_sha256": metadata["document_sha256"],
+              "fields": [{"source_ref": f["source_ref"], "decision": "approve",
+                          "reason": "Fictional metadata gate assertion; not factual proof."}
+                         for f in doc["fields"]]}
+          Path("complete-metadata-decisions.json").write_text(json.dumps(choices))
+          result = run_metadata(["--decisions", "complete-metadata-decisions.json",
+                                 "--confirm-decisions"], 0)
+          assert result["status"] == "metadata_fields_approved_by_user"
+          assert result["review"]["wording_review"]["bullets"][0]["findings"]
+          assert all(b["review_status"] == "pending_review"
+                     for b in result["review"]["wording_review"]["bullets"])
+          assert not result["rendering_authorized"]
           seed = run([], 0)
           response = {"schema_version": 1,
                       "plan_sha256": seed["document"]["plan_sha256"],

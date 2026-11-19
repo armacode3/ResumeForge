@@ -158,5 +158,7 @@ exported from `resumeforge.resume`. Safe failures raise `ResumeError` (file read
 is offline and does not alter the frozen model comparisons or authorize another live run.
 
 Separate `review-metadata` inspection now exposes only explicitly selected source-bound metadata
-in pending records; it does not consume these bullet decisions or approve dates/contact/entry
-fields. See `docs/METADATA_REVIEW.md`. The v3 bullet decision contract above is unchanged.
+in pending records; it does not consume these bullet decisions. Narrow metadata user attestations
+are now available through a different decision format and separate confirmation; see
+`docs/METADATA_DECISIONS.md`. They do not approve wording or confer full-resume approval. The v3
+bullet decision contract above is unchanged.

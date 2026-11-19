@@ -909,3 +909,54 @@
   metadata. Next: separate snapshot-bound per-field metadata attestations, before full assembly or
   rendering authorization. Semantic proof, metadata/full-resume approval, PDFs, ranking, history
   and cloud inference remain unimplemented.
+
+## Session 024 — Snapshot-bound selected metadata field attestations
+
+- User confirmed the source-bound metadata branch was merged and authorized the next step. Fetched
+  merged `main` at `787a7e5`, fast-forwarded local main and created `feat/metadata-field-decisions`
+  from a clean tree. Prior `b96c900` hosted Python 3.12/3.13 checks passed. No private profiles,
+  drafts, decisions or receipts were read, migrated, rewritten or approved; no live inference.
+- Defined a narrow explicit user-attestation slice, separate from bullet approval, source editing,
+  complete-resume readiness or rendering. Added strict frozen v1 `MetadataDecisions` with current
+  metadata/decision policy, exact plan/wording/field-selection/document hashes, unique selected
+  field refs, approve/reject choices and nonblank reasons. No new/replacement metadata values,
+  self-approval flags or arbitrary path expressions can enter the decision format.
+- Added `apply_metadata_decisions`, requiring original sources, explicit current wording draft,
+  explicit metadata selection and four exact review/decision flags. Recompute selected metadata
+  and wording review before checking bindings and applying choices. Stale policies/snapshots,
+  duplicate/unselected refs and malformed inputs fail safely without partial approvals. Decision
+  input order cannot reorder source records; whole-source document binding invalidates old choices
+  after any bound source/selection/wording/context change. Hashes are not proof of human attention.
+- Keep missing choices and attempted approvals of null/empty source values pending; reasons cannot
+  fill or waive unknown metadata. Rejection retains source values/context and is visible even when
+  plan conflicts dominate collective status. Plan conflicts block approvals and empty selected
+  sets cannot pass by vacuity. All copies/findings/context and underlying metadata/wording records
+  remain pending/visible. Applied field records retain requested choices/reasons, missing-value
+  signals and effective status; rendering authorization remains false, scope selected metadata only.
+- Extended `review-metadata` with distinct metadata `--decisions` and separate `--confirm-decisions`,
+  checking usage before input reads and loading decision JSON before the profile. Ordinary
+  inspection is unchanged. Decision mode exits 0 only for wholly user-approved nonempty selected
+  metadata, 3 for pending/rejected/blocked reports, 1 for invalid/stale/oversized input/output with
+  no partial JSON, and 2 for usage/confirmation errors. App output is private JSON, with safe static
+  notices/errors. No writes, metadata corrections, identity authentication or factual proof.
+- Retained strict bounded JSON/API revalidation, 512 decision-record and 8,192-character reason
+  limits plus 1 MiB input/default indented output caps. Added tests for full/partial/rejected/
+  conflicted/empty/unset outcomes, date/context preservation, source/wording/selection/policy
+  invalidation, copied-binding unselected-ref bypasses, all confirmation gates, no wording approval
+  transfer, schema/malformed/privacy/immutability/limits and installed CLI/read-only behavior.
+  CI wheel smoke now checks blocked metadata approvals and narrow metadata attestation with pending
+  wording findings. No provider or frozen comparison was run or changed.
+- Application 0.18.0, no new dependency. Local Python 3.12.3: 1,178 tests passed with GitHub-like
+  colors and 99.96% branch-aware coverage. Ruff lint/format, strict mypy (80 files) and dependency
+  checks and source/wheel builds passed. Fresh locked editable/runtime-only installs, all 1,178
+  tests against the installed wheel outside the repository (99.96% coverage) and the exact CI
+  runtime-wheel smoke passed. Reviewed all 20 staged public files and both distribution contents/
+  secret patterns; private/runtime artifacts are excluded and package sources match staged files.
+  Hosted results are checked after push, not inferred from local success.
+- Added `docs/METADATA_DECISIONS.md`/ADR-023 and updated actual-status/context/related guides.
+  Existing metadata source-copy v1 and bullet v3 policies/schemas, profiles/drafts/responses,
+  worksheets, provider minimization and frozen measurements remain unchanged; no old approval
+  transfer or automatic migration. Clarified that pending inspection itself performs no decisions.
+- Next: structured-resume assembly/readiness retaining separate attestations and explicit unresolved
+  content/skills/coursework/required-field issues. Semantic proof, full-resume publication approval,
+  rendering/PDFs, automatic ranking, history and cloud inference remain unimplemented.

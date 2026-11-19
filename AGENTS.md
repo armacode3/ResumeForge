@@ -51,10 +51,17 @@ Separate offline `review-metadata` now exposes only explicitly selected contact/
 fields as pending source copies bound to current wording and field selection. Read
 `docs/METADATA_REVIEW.md`. Require all original sources, explicit draft and all three review flags;
 reject unknown/unselected/excluded entries. No implicit name/contact disclosure in other commands
-or providers, no metadata editing/approval or transfer from bullet decisions. Missing values stay
+or providers, no metadata editing or transfer from bullet decisions. Missing values stay
 null/empty; recorded present and completion status stay independent. Links are model-normalized,
-never fetched. Keep metadata private and bounded. Next: separate per-field metadata attestations,
-then structured-resume completion, not implicit inference or rendering authorization.
+never fetched. Keep metadata private and bounded.
+Narrow v1 metadata user decisions now require original sources, current explicit draft/field
+selection, four exact flags and separate confirmation. Read `docs/METADATA_DECISIONS.md`. Bind current
+metadata/decision policies and plan/wording/selection/document hashes; reject stale/unselected refs.
+Missing decisions or null/empty values stay pending (reasons cannot fill/waive them); rejection
+preserves values, plan conflicts block approvals, empty selected sets never pass. Keep underlying
+metadata/wording records pending, preserve findings and authorize no rendering. No bullet approval
+or full-resume/identity/truth proof follows. Next: structured-resume assembly/readiness with explicit
+unresolved content/required-field issues, not implicit inference, full approval or rendering.
 Omitted states stay unknown; version-1 profile/draft files need no rewrite (not old decisions).
 Read `docs/MATCHING.md` for the
 retrieval boundary.
@@ -84,7 +91,7 @@ cloud inference, resume generation, semantic claim proof, PDFs or history alread
 - `config/resume_rules.md`: policy only, not currently loaded by code.
 - `docs/`: decisions, roadmap, development log; `.github/workflows/ci.yml`: checks.
 - `data/profile/user_information.md`: default private input, ignored; never create real data in Git.
-- Planned only: relevance ranking/automatic selection, semantic claim checks/metadata approval,
+- Planned only: relevance ranking/automatic selection, semantic claim checks/full-resume approval,
   Jinja2, LaTeX/PyMuPDF, SQLite,
   then Docker, FastAPI, and a Manifest V3 extension. Add dependencies when needed.
 
@@ -127,8 +134,8 @@ accept self-declared approval, stale hashes, unselected evidence or silent omiss
 Applied human decisions are separate attestations, not draft self-approval: require original
 sources, explicit draft/decision confirmation, current policy and exact document/plan bindings.
 Missing stays pending, rejection preserves content, and plan conflicts block approvals. Keep
-scope bullet-wording-only and rendering authorization false; no semantic proof or metadata/
-full-resume approval exists yet. See `docs/REVIEW_DECISIONS.md`.
+scope bullet-wording-only and rendering authorization false; those decisions confer neither semantic
+proof, metadata nor full-resume approval. See `docs/REVIEW_DECISIONS.md`.
 Finding policy is finite literal observation, not a support verdict; preserve exact spans and
 documented blind spots. Compare only selected statements, not other source fields or job text.
 Version-3 decisions retain current finding fingerprints and explicit per-bullet acknowledgements;

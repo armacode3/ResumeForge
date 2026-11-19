@@ -27,12 +27,16 @@ from resumeforge.providers.ollama import (
     DEFAULT_TIMEOUT,
 )
 from resumeforge.resume import (
+    MetadataDecisionResult,
+    MetadataReview,
     ResumeError,
     ResumeReview,
     ReviewDecisionResult,
     ReviewWorksheet,
+    apply_metadata_decisions,
     apply_review_decisions,
     build_review_worksheet,
+    load_metadata_decisions,
     load_metadata_selection,
     load_resume_document,
     load_review_decisions,
@@ -502,6 +506,18 @@ def review_metadata_command(
             "--metadata-selection", help="Explicit metadata fields to expose in private output."
         ),
     ],
+    decisions: Annotated[
+        Path | None,
+        typer.Option(
+            "--decisions", help="Explicit version-1 metadata field decisions, not bullet decisions."
+        ),
+    ] = None,
+    confirm_decisions: Annotated[
+        bool,
+        typer.Option(
+            "--confirm-decisions", help="Attest that you reviewed these exact metadata decisions."
+        ),
+    ] = False,
     confirm_review: Annotated[
         bool,
         typer.Option(
@@ -510,36 +526,63 @@ def review_metadata_command(
         ),
     ] = False,
 ) -> None:
-    """Inspect pending source-bound metadata; no metadata decisions or rendering authorization."""
+    """Inspect selected metadata or apply narrow snapshot-bound user attestations."""
     if not confirm_review:
         raise typer.BadParameter(
             "Review requirements, content and metadata selections, then pass --confirm-review."
         )
+    if decisions is not None and not confirm_decisions:
+        raise typer.BadParameter("--decisions requires separate --confirm-decisions.")
+    if confirm_decisions and decisions is None:
+        raise typer.BadParameter("--confirm-decisions requires --decisions.")
     try:
         document = load_job(job)
         analysis = analyze_job(document, FakeProvider.from_file(requirements))
         choices = load_selection(selection)
         proposed = load_resume_document(draft)
         metadata_choices = load_metadata_selection(metadata_selection)
+        field_decisions = load_metadata_decisions(decisions) if decisions is not None else None
         candidate = load_profile(profile)
-        result = review_metadata(
-            candidate.profile,
-            document,
-            analysis.requirements,
-            choices,
-            proposed,
-            metadata_choices,
-            requirements_reviewed=True,
-            selection_reviewed=True,
-            metadata_selection_reviewed=True,
-        )
+        result: MetadataReview | MetadataDecisionResult
+        if field_decisions is not None:
+            result = apply_metadata_decisions(
+                candidate.profile,
+                document,
+                analysis.requirements,
+                choices,
+                proposed,
+                metadata_choices,
+                field_decisions,
+                requirements_reviewed=True,
+                selection_reviewed=True,
+                metadata_selection_reviewed=True,
+                decisions_confirmed=confirm_decisions,
+            )
+            blocked = result.status != "metadata_fields_approved_by_user"
+        else:
+            result = review_metadata(
+                candidate.profile,
+                document,
+                analysis.requirements,
+                choices,
+                proposed,
+                metadata_choices,
+                requirements_reviewed=True,
+                selection_reviewed=True,
+                metadata_selection_reviewed=True,
+            )
+            blocked = result.status == "blocked_by_plan"
     except (ProfileError, InputError, JobAnalysisError, PlanningError, ResumeError) as error:
         typer.echo(f"Metadata review failed:\n{error}", err=True)
         raise typer.Exit(code=1) from None
-    typer.echo(
-        "Offline selected metadata inspection; no inference, approval or rendering authorization.",
-        err=True,
+    notice = (
+        "Offline user metadata attestations; no inference, semantic proof "
+        "or rendering authorization."
+        if decisions is not None
+        else "Offline selected metadata inspection; no inference, approval "
+        "or rendering authorization."
     )
+    typer.echo(notice, err=True)
     typer.echo(result.model_dump_json(indent=2))
-    if result.status == "blocked_by_plan":
+    if blocked:
         raise typer.Exit(code=3)
