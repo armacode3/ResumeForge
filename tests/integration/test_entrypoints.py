@@ -59,6 +59,17 @@ def test_installed_entrypoints_are_read_only(entrypoint: str, tmp_path: Path) ->
             ],
         ),
         (["suggest-wording", "--help"], ["--provider", "--confirm-local-data", "--objective"]),
+        (
+            ["assemble-resume", "--help"],
+            [
+                "--draft",
+                "--metadata-selection",
+                "--bullet-decisions",
+                "--metadata-decisions",
+                "--confirm-bullet-decisions",
+                "--confirm-metadata-decisions",
+            ],
+        ),
     ],
 )
 def test_help_options_survive_terminal_styling(

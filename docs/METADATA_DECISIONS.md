@@ -97,7 +97,9 @@ An individual rejection remains visible even when plan conflicts dominate collec
 If an optional field is genuinely unset and should not be published, deliberately revise the field
 selection rather than invent a value or an approval. If a source value is wrong, correct the private
 profile and seed/review a new wording draft. Both changes require fresh metadata review/decisions;
-they do not transfer approvals. No required-header/full-resume completeness policy exists yet.
+they do not transfer approvals. Separate `assemble-resume` now checks limited name/title and
+component prerequisites; see `docs/STRUCTURED_ASSEMBLY.md`. It is not a full-resume completeness
+policy or publication authorization, and does not change metadata decision semantics.
 
 `MetadataDecisionResult` contains `decision_version`, `scope: selected_metadata_only`,
 `rendering_authorized: false`, status, `decisions_model_sha256` (validated compact input JSON),

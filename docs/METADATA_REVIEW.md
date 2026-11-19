@@ -86,8 +86,8 @@ seed/review a new wording draft. Profile changes invalidate the existing plan/dr
 - Each chosen entry's recorded `completion_status` is preserved separately in `entry_contexts`,
   even when dates are unknown. A status does not resolve conflicting dates or approve metadata.
 - Every selected field has `review_status: pending_review`. Empty selections remain pending and
-  are not complete resumes or implicit approval. No required header/content-completeness policy
-  exists yet. Separate version-1 metadata decisions can attest only to selected nonempty values;
+  are not complete resumes or implicit approval. The inspector applies no required-header or
+  content-completeness policy. Separate version-1 metadata decisions attest only to selected values;
   see `docs/METADATA_DECISIONS.md`. They do not change the pending source records.
 
 `MetadataReview` contains `scope: selected_metadata_only`, `rendering_authorized: false`, status,
@@ -135,4 +135,6 @@ requirements_reviewed=True, selection_reviewed=True, metadata_selection_reviewed
 `MetadataSelection`, `MetadataDocument`, `MetadataReview`, `parse_metadata_selection` and
 `load_metadata_selection` are exported from `resumeforge.resume`. Safe failures raise `ResumeError`
 (file reads can raise `InputError`). Narrow per-field metadata attestations are available separately;
-full-resume assembly/readiness and rendering authorization remain unimplemented.
+finite structured-component assembly/readiness is now available separately through
+`assemble-resume`; see `docs/STRUCTURED_ASSEMBLY.md`. Full-resume/publication and rendering
+authorization remain unimplemented.

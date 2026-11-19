@@ -135,4 +135,6 @@ inspection states remain unchanged. Literal findings and explicit source-fragmen
 available. Source-bound `suggest-wording` proposals are available in
 0.12.0 with fake replay or explicitly acknowledged guarded local inference; see
 `docs/WORDING_ASSISTANCE.md`. Full-resume approval, PDF/layout/rendering, history, automatic ranking
-and cloud inference remain unimplemented.
+and cloud inference remain unimplemented. Separate `assemble-resume` now combines current wording
+with explicitly selected metadata and finite readiness issues; see `docs/STRUCTURED_ASSEMBLY.md`.
+Its output-only structured document is not an input wording draft or rendering approval.

@@ -95,6 +95,13 @@ approve/reject attestations. Missing decisions/values stay pending; plan conflic
 See [docs/METADATA_DECISIONS.md](docs/METADATA_DECISIONS.md). These do not approve bullet wording,
 prove facts or assemble/authorize rendering of a complete resume.
 
+`assemble-resume` now combines the exact current wording and explicitly selected metadata into a
+structured component snapshot. It lists unresolved content, required-field and review issues, with
+optional separately confirmed current bullet/metadata decisions. `components_reviewed` means only
+that the limited v1 checklist passed, not full-resume approval, semantic proof or rendering authority.
+Skills/coursework remain unresolved placeholders. See
+[docs/STRUCTURED_ASSEMBLY.md](docs/STRUCTURED_ASSEMBLY.md).
+
 **End-to-end resume generation is not implemented.** There is no cloud provider, relevance-ranking engine,
 database, template renderer, PDF compiler, API, or browser extension yet.
 Local verification and hosted CI results are reported separately.

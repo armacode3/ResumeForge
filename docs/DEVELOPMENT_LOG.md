@@ -960,3 +960,56 @@
 - Next: structured-resume assembly/readiness retaining separate attestations and explicit unresolved
   content/skills/coursework/required-field issues. Semantic proof, full-resume publication approval,
   rendering/PDFs, automatic ranking, history and cloud inference remain unimplemented.
+
+## Session 025 — Exact structured components and finite readiness
+
+- User confirmed metadata decisions were merged and authorized the next step. Fetched merged
+  `main` at `dff6431`, fast-forwarded local main and created `feat/structured-resume-readiness`
+  from a clean tree. Prior `3827d9f` hosted Python 3.12/3.13 checks passed. No private profiles,
+  drafts, decisions or receipts were read, migrated or approved; no live inference or model setup.
+- Defined a narrow assembly prerequisite, not full-resume truth/publication/rendering approval.
+  Added output-only frozen schema-1 `StructuredResume` with independent assembly policy, exact
+  plan/wording/field-selection/metadata-document bindings, selected header/entry source copies and
+  unchanged pending bullet IDs/evidence/text/order. Preserve all planned sections/entries, recorded
+  completion states and placeholders. Required unselected fields yield refs/issues, not disclosure.
+- Added `assemble_resume` with original sources/current explicit draft/fields and exact three review
+  gates. Optional current bullet v3 and metadata v1 decisions each require their own paired exact
+  confirmation and original-engine reapplication. Reject stale/malformed/unselected inputs and
+  inconsistent reconstructed reviews. Retain fresh full context once, with separate scoped applied
+  attestations/reasons/hashes and all finding acknowledgements/fragment dispositions still visible.
+- Introduced finite readiness v1, deliberately not universal resume sufficiency: selected name and
+  every planned entry title; nonempty approved selected values and approved bullet wording; nonempty
+  overall entries/bullets; explicit required-entry choices; resolved recorded entry states; no plan
+  conflict, empty background section or skills/coursework placeholder. Metadata-only entries can
+  remain metadata-only. No email/phone/organization/date requirement or state/date inference; no
+  skill/coursework values are silently copied or approved. All unresolved issues remain blocking.
+- Status prioritizes `blocked_by_plan`, then `needs_review`, otherwise `components_reviewed` only
+  for these limited gates. All source copies and wording remain pending; rejections retain content,
+  findings/caveats/conflicts remain visible and rendering authorization stays false. The assembly
+  document/hash is independent of user decision reasons; whole source bindings remain conservative.
+- Added offline read-only `assemble-resume` with six required paths, `--confirm-review` and separate
+  `--bullet-decisions`/`--confirm-bullet-decisions` and metadata equivalents. No generic approval,
+  provider, implicit seed/profile or write path. Usage is validated before I/O and decision formats
+  before profile access. Exit 0 is finite component readiness only; 3 preserves unresolved reports,
+  1 rejects invalid/stale/oversized inputs/output without JSON, 2 rejects usage/confirmation errors.
+  Bound complete default indented output to 1 MiB, never truncating facts or rationale.
+- Tests cover exact selective copies and order, independent confirmations/scopes, pending/partial/
+  rejected/blocked/empty outcomes, missing/unselected name/title/values, status/date independence,
+  required choices, skills/coursework placeholders, inherited v3 finding/fragment gates, source/hash
+  staleness, unchecked API inputs, no inferred contact disclosure and installed read-only behavior.
+  Added CI wheel smoke for blocked and partial assemblies and finite component success retaining
+  synthetic wording findings. No provider or frozen comparison was run or changed.
+- Application 0.19.0; no dependency changes. Local Python 3.12.3: all 1,272 tests passed with
+  GitHub-like colors and 99.97% branch-aware coverage. Ruff lint/format, strict mypy (84 files),
+  dependency checks and source/wheel builds passed. Fresh locked editable/runtime-only installs,
+  all 1,272 tests against the installed wheel outside the repository (99.97% coverage) and the
+  exact CI runtime-wheel smoke passed. Reviewed all 20 staged public files and both distributions'
+  paths/content/secret patterns; no private/runtime files included, package sources match staging,
+  protected contracts unchanged and historical log append-only. Hosted results are checked after
+  push, not inferred from local success.
+- Added `docs/STRUCTURED_ASSEMBLY.md`/ADR-024 and updated actual-status/related guides. Existing
+  profiles/drafts/responses, metadata source-copy/decisions v1, bullet v3, provider payloads/prompts,
+  worksheets and frozen evaluations remain unchanged. Assembly has no loader or approval migration.
+- Next: explicit selected skills/coursework content and its separate evidence/review contract,
+  before any full-resume/publication attestation or trusted rendering. Semantic proof, PDFs/layout,
+  automatic ranking, history and cloud inference remain unimplemented.

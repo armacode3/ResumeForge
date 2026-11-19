@@ -35,6 +35,7 @@ from resumeforge.resume import (
     ReviewWorksheet,
     apply_metadata_decisions,
     apply_review_decisions,
+    assemble_resume,
     build_review_worksheet,
     load_metadata_decisions,
     load_metadata_selection,
@@ -585,4 +586,90 @@ def review_metadata_command(
     typer.echo(notice, err=True)
     typer.echo(result.model_dump_json(indent=2))
     if blocked:
+        raise typer.Exit(code=3)
+
+
+@app.command("assemble-resume")
+def assemble_resume_command(
+    profile: Annotated[Path, typer.Option("--profile", help="Explicit local Markdown profile.")],
+    job: Annotated[Path, typer.Option("--job", help="Exact local job source.")],
+    requirements: Annotated[
+        Path, typer.Option("--requirements", help="Reviewed requirements JSON.")
+    ],
+    selection: Annotated[
+        Path, typer.Option("--selection", help="Reviewed content selection JSON.")
+    ],
+    draft: Annotated[
+        Path, typer.Option("--draft", help="Explicit current wording ResumeDocument.")
+    ],
+    metadata_selection: Annotated[
+        Path, typer.Option("--metadata-selection", help="Explicit fields to expose; no defaults.")
+    ],
+    bullet_decisions: Annotated[
+        Path | None,
+        typer.Option("--bullet-decisions", help="Current v3 bullet decisions, not a receipt."),
+    ] = None,
+    metadata_decisions: Annotated[
+        Path | None,
+        typer.Option("--metadata-decisions", help="Current v1 metadata field decisions."),
+    ] = None,
+    confirm_review: Annotated[
+        bool,
+        typer.Option(
+            "--confirm-review", help="Acknowledge reviewed requirements and both selections."
+        ),
+    ] = False,
+    confirm_bullet_decisions: Annotated[
+        bool,
+        typer.Option("--confirm-bullet-decisions", help="Confirm these exact bullet decisions."),
+    ] = False,
+    confirm_metadata_decisions: Annotated[
+        bool,
+        typer.Option(
+            "--confirm-metadata-decisions", help="Confirm these exact metadata decisions."
+        ),
+    ] = False,
+) -> None:
+    """Assemble selected components and unresolved issues; no full-resume or rendering approval."""
+    if not confirm_review:
+        raise typer.BadParameter(
+            "Review requirements and both selections, then pass --confirm-review."
+        )
+    if (bullet_decisions is not None) != confirm_bullet_decisions:
+        raise typer.BadParameter("Pair --bullet-decisions with --confirm-bullet-decisions.")
+    if (metadata_decisions is not None) != confirm_metadata_decisions:
+        raise typer.BadParameter("Pair --metadata-decisions with --confirm-metadata-decisions.")
+    try:
+        document = load_job(job)
+        analysis = analyze_job(document, FakeProvider.from_file(requirements))
+        choices = load_selection(selection)
+        proposed = load_resume_document(draft)
+        metadata_choices = load_metadata_selection(metadata_selection)
+        bullet_choices = load_review_decisions(bullet_decisions) if bullet_decisions else None
+        field_choices = load_metadata_decisions(metadata_decisions) if metadata_decisions else None
+        candidate = load_profile(profile)
+        result = assemble_resume(
+            candidate.profile,
+            document,
+            analysis.requirements,
+            choices,
+            proposed,
+            metadata_choices,
+            bullet_decisions=bullet_choices,
+            metadata_decisions=field_choices,
+            requirements_reviewed=True,
+            selection_reviewed=True,
+            metadata_selection_reviewed=True,
+            bullet_decisions_confirmed=confirm_bullet_decisions,
+            metadata_decisions_confirmed=confirm_metadata_decisions,
+        )
+    except (ProfileError, InputError, JobAnalysisError, PlanningError, ResumeError) as error:
+        typer.echo(f"Structured assembly failed:\n{error}", err=True)
+        raise typer.Exit(code=1) from None
+    typer.echo(
+        "Offline component assembly; no inference, full-resume approval or rendering authority.",
+        err=True,
+    )
+    typer.echo(result.model_dump_json(indent=2))
+    if result.status != "components_reviewed":
         raise typer.Exit(code=3)

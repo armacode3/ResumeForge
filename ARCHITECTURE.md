@@ -61,6 +61,8 @@ src/resumeforge/
     metadata_models.py explicit field exposure and pending source-bound metadata snapshots
     metadata.py     selected contact/entry inspection with draft binding, no metadata approvals
     metadata_decisions.py exact selected-field user attestations, no wording/full-resume approval
+    assembly_models.py output-only structured components, separate attestations and readiness issues
+    assembly.py     exact source-bound assembly and finite readiness, never rendering authority
     wording.py      source-bound provider proposals, minimized inputs, exact slots and fresh review
     benchmark.py    fixed synthetic wording replay/live harness, no automatic quality verdicts
 tests/
@@ -277,6 +279,19 @@ is never approved or stripped of findings; scope is selected metadata only and r
 false. Input/output are bounded, with no new source edits, migration, provider or persistence.
 See `docs/METADATA_DECISIONS.md` and ADR-023.
 
+`resume.assemble_resume` reconstructs current metadata/wording inspection from six explicit inputs
+and exact review gates. Optional bullet v3 and metadata v1 decisions each require independent
+confirmation and unchanged reapplication through their original engines. The output-only structured
+document preserves plan section/entry/bullet order and exact wording, exposing only selected fields.
+It never fills an unselected minimum field, filters rejected content or copies unscoped sections.
+Independent applied-attestation summaries retain reasons/scopes/findings dispositions without
+duplicating the fresh review context. A separately versioned finite checklist exposes unresolved
+name/title selections, null values, unreviewed/rejected components, required choices, statuses,
+empty content, skills/coursework placeholders and plan conflicts. `components_reviewed` is neither
+complete-resume/publication approval nor semantic proof; rendering stays false and source records
+pending. Complete default output is bounded to 1 MiB. No assembly input parser, provider, writer,
+new dependency or policy migration is added. See `docs/STRUCTURED_ASSEMBLY.md` and ADR-024.
+
 `resume.benchmark` preflights a fixed fictional six-case/seven-bullet corpus and invokes the same
 wording engine. Source-seed replay is the default, independent-response replay is explicit, and
 guarded local mode needs a separate data acknowledgement. Invalid outputs stay in totals; reports
@@ -318,7 +333,8 @@ Create these modules only as their features are implemented:
 
 Profile/job/selection schemas, draft-plan snapshots and narrow evidence-linked wording-draft
 schemas and narrow human bullet-wording decisions now exist. Pending selected metadata inspection
-and separate narrow user metadata attestations also exist. Complete renderable resume content,
+and separate narrow user metadata attestations also exist. Structured component assembly and finite
+readiness now exist, retaining unresolved unscoped content. Complete renderable resume content,
 full-resume approval and rendering authorization remain deferred.
 Pydantic validates profile input and untrusted structured job responses, which fail actionably.
 `config/resume_rules.md` holds writing policy; planned `config/layout.yaml` will separately

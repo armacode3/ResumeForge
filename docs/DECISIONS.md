@@ -530,3 +530,27 @@ bullet approval, full-resume publication or rendering authority. Retain `renderi
 No provider, dependency, source schema/policy migration, metadata rewriting, history or live run.
 Current metadata v1 and bullet v3 contracts/providers/frozen comparisons are unchanged. See
 `docs/METADATA_DECISIONS.md` for exact format, state/exit semantics and privacy limits.
+
+## ADR-024 — Structured component readiness is not full-resume or rendering approval
+
+**Status:** Implemented in 0.19.0, offline only.
+
+Add an output-only structured component snapshot before any rendering contract. Recompute original
+metadata/wording inspection, keep exact planned structure/text and only explicitly selected fields.
+Require all original sources, explicit draft/field selection and review acknowledgement. Reapply
+optional bullet v3 and metadata v1 choices through unchanged engines with independent confirmations;
+old receipts, bulk inferred approval and user-edited metadata copies are not input authority.
+Retain fresh full context once, separate scoped applied attestations and every rejected/pending value.
+
+Use a deliberately limited independently versioned readiness policy: minimum selected name/title,
+nonempty selected metadata, nonempty overall entries/bullets, current per-component attestations,
+explicit required-entry choices, resolved recorded states, no empty/unscoped section placeholders
+or plan conflicts. Do not invent contact-method/date requirements, infer fields/states, or turn
+skills/coursework into unsupported claims. All unresolved issues remain explicit and blocking for
+this checklist. Metadata-only explicitly selected entries are permitted, without invented bullets.
+
+`components_reviewed` means only that these finite prerequisites passed, not source truth, semantic
+proof, complete content, publication consent or layout feasibility. Preserve pending source/wording
+states, full findings/caveats and `rendering_authorized: false`. Bound complete default output to
+1 MiB and fail without truncation. No new dependency, provider, persistence, source/bullet/metadata
+policy migration or live run. See `docs/STRUCTURED_ASSEMBLY.md` for exact scopes, gates and limits.

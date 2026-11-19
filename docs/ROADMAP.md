@@ -194,10 +194,15 @@ unknown/stale refs, keep missing decisions and unset values pending, preserve re
 approvals on plan conflicts. All source/wording states remain pending; no bullet approval transfer,
 metadata editing, semantic proof or rendering authorization. See `docs/METADATA_DECISIONS.md`, ADR-023.
 
-**Next:** structured-resume assembly/readiness with separate bullet/metadata attestations and
-explicit unresolved content/skills/coursework/required-field issues, not a renderer or implicit
-full-resume approval. Keep the conservative wording default; semantic proof, full-resume approval,
-rendering and automatic ranking remain unimplemented. No implicit live run follows from attestations.
+Implemented in 0.19.0: offline structured component assembly/readiness with exact current wording,
+explicit metadata exposure and optional independently confirmed/reapplied bullet/metadata decisions.
+Finite name/title/nonempty/review/content/state gates expose issues rather than fill/omit values;
+skills/coursework remain unresolved placeholders. `components_reviewed` is not complete-resume,
+truth, publication or rendering approval. See `docs/STRUCTURED_ASSEMBLY.md` and ADR-024.
+
+**Next:** explicit selected skills/coursework content and its separate evidence/review contract,
+before full-resume/publication attestation or rendering. Keep the conservative wording default;
+semantic proof, full-resume approval, rendering and ranking remain unimplemented. No implicit live run.
 
 Generate structured bullets with accomplishment IDs, check unsupported tools/metrics/ownership,
 dates and contradictions, report gaps, and implement review/approval. Gate: fabricated-claim
