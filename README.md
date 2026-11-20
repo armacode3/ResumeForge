@@ -102,6 +102,14 @@ that the limited v1 checklist passed, not full-resume approval, semantic proof o
 Skills/coursework remain unresolved placeholders. See
 [docs/STRUCTURED_ASSEMBLY.md](docs/STRUCTURED_ASSEMBLY.md).
 
+`review-content` now inspects explicitly selected recorded skills/coursework, with optional
+user-cited current-plan accomplishment context and neutral usage/contribution questions. Every
+item remains pending; literal mentions do not prove proficiency, attendance or qualification.
+No answers are saved or approvals transferred, and assembly blockers remain unchanged. See
+[docs/SECTION_CONTENT_REVIEW.md](docs/SECTION_CONTENT_REVIEW.md). The adopted evidence-first
+tailoring boundaries and planned intake/gap/change-report stages are recorded in
+[docs/TAILORING_WORKFLOW.md](docs/TAILORING_WORKFLOW.md).
+
 **End-to-end resume generation is not implemented.** There is no cloud provider, relevance-ranking engine,
 database, template renderer, PDF compiler, API, or browser extension yet.
 Local verification and hosted CI results are reported separately.

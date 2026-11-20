@@ -71,6 +71,18 @@ are limited prerequisites, not full-resume sufficiency. Skills/coursework remain
 placeholders without implicit value exposure. Keep source states pending, output bounded/private,
 and rendering false even for `components_reviewed`. Next: explicit selected skills/coursework content
 and its separate evidence/review contract, not implicit inference or publication authorization.
+Offline `review-content` now exposes only selected recorded skill/coursework labels and explicitly
+cited eligible current-plan accomplishments; read `docs/SECTION_CONTENT_REVIEW.md`. Require original
+sources/current explicit draft and three exact review gates. Validate whitelisted categories,
+zero-based indices/exact labels, planned sections, distinct selected refs and bounded input/output.
+Keep context statements/states/caveats intact, missing context unknown and all items pending.
+Literal mentions can be negated/incidental and do not prove skill use/proficiency or attendance.
+Neutral review questions save no answers or confirmations; no automatic "VERIFIED SKILLS" promotion,
+contact/unselected-list disclosure, provider calls or assembly-blocker clearance. Existing schemas,
+policies and frozen evaluations stay unchanged. Next: separate snapshot-bound content decisions
+and deliberate assembly integration. Follow adopted tailoring boundaries in
+`docs/TAILORING_WORKFLOW.md`; guided new-answer intake and gap/change reports remain future slices,
+not permission for research, PDF import, automatic ranking or rendering.
 Omitted states stay unknown; version-1 profile/draft files need no rewrite (not old decisions).
 Read `docs/MATCHING.md` for the
 retrieval boundary.

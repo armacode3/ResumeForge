@@ -63,6 +63,8 @@ src/resumeforge/
     metadata_decisions.py exact selected-field user attestations, no wording/full-resume approval
     assembly_models.py output-only structured components, separate attestations and readiness issues
     assembly.py     exact source-bound assembly and finite readiness, never rendering authority
+    section_content_models.py explicit skill/course source indices/labels and pending context
+    section_content.py pending source copies, selected accomplishment context and review questions
     wording.py      source-bound provider proposals, minimized inputs, exact slots and fresh review
     benchmark.py    fixed synthetic wording replay/live harness, no automatic quality verdicts
 tests/
@@ -291,6 +293,19 @@ empty content, skills/coursework placeholders and plan conflicts. `components_re
 complete-resume/publication approval nor semantic proof; rendering stays false and source records
 pending. Complete default output is bounded to 1 MiB. No assembly input parser, provider, writer,
 new dependency or policy migration is added. See `docs/STRUCTURED_ASSEMBLY.md` and ADR-024.
+
+`resume.review_section_content` separately reconstructs wording/plan inspection from original
+sources, current explicit draft and strict skill/coursework selection, with three exact review
+gates. Whitelisted skill categories plus zero-based source indices and exact expected labels
+prevent arbitrary paths/new values. Only already planned sections and explicitly cited eligible
+selected accomplishments are accepted. Copies/context remain pending; source statements, parent
+states and caveats stay intact. Nullable bounded literal label mentions are observations, not
+skill use, proficiency or attendance proof; absent evidence remains unknown. Neutral review
+questions have no prefilled answers/confirmations and save nothing. Independently versioned
+content snapshots bind plan/wording/selection; complete output is bounded to 1 MiB. No contact,
+unselected raw lists, provider, new-answer intake, content approval or assembly integration is
+added. Existing unscoped-section readiness blockers remain. See `docs/SECTION_CONTENT_REVIEW.md`,
+`docs/TAILORING_WORKFLOW.md` and ADR-025.
 
 `resume.benchmark` preflights a fixed fictional six-case/seven-bullet corpus and invokes the same
 wording engine. Source-seed replay is the default, independent-response replay is explicit, and

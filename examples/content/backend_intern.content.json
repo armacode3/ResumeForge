@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "skills": [
+    {"category": "languages", "source_index": 0, "expected_text": "Python", "accomplishment_ids": ["acc_api"]},
+    {"category": "tools", "source_index": 0, "expected_text": "Git", "accomplishment_ids": []}
+  ],
+  "coursework": [
+    {"source_index": 1, "expected_text": "Databases", "accomplishment_ids": []}
+  ]
+}

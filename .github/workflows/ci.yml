@@ -331,6 +331,40 @@ jobs:
               assert result["review"]["wording_review"]["bullets"][0]["findings"]
               assert result["document"]["status"] == "needs_review"
               assert not result["rendering_authorized"]
+          content_args = args.copy()
+          content_args[content_args.index("--selection") + 1] = str(
+              root / "examples/content/backend_intern.plan.json")
+          process = subprocess.run(content_args, capture_output=True, text=True,
+                                   check=False, timeout=10)
+          assert process.returncode == 0, process.stderr
+          Path("content-draft.json").write_text(json.dumps(json.loads(process.stdout)["document"]))
+          content_args[3] = "review-content"
+          content_args += ["--draft", "content-draft.json", "--content-selection",
+                           str(root / "examples/content/backend_intern.content.json")]
+          process = subprocess.run(content_args, capture_output=True, text=True,
+                                   check=False, timeout=10)
+          assert process.returncode == 0, process.stderr
+          result = json.loads(process.stdout)
+          assert result["status"] == "needs_review" and not result["rendering_authorized"]
+          assert result["document"]["section_content_version"] == "source-bound-section-content-v1"
+          skills, courses = result["document"]["sections"]
+          assert [i["text"] for i in skills["items"]] == ["Python", "Git"]
+          assert [i["text"] for i in courses["items"]] == ["Databases"]
+          assert skills["items"][0]["cited_context"][0]["literal_label_mention"] is None
+          assert all(i["review_status"] == "pending_review" and i["review_questions"]
+                     for s in result["document"]["sections"] for i in s["items"])
+          assert "alex@example.com" not in process.stdout
+          content_args[3] = "assemble-resume"
+          content_args[content_args.index("--content-selection")] = "--metadata-selection"
+          content_args[content_args.index("--metadata-selection") + 1] = str(
+              root / "examples/metadata/backend_intern.fields.json")
+          process = subprocess.run(content_args, capture_output=True, text=True,
+                                   check=False, timeout=10)
+          assert process.returncode == 3, process.stderr
+          result = json.loads(process.stdout)
+          assert {i["section"] for i in result["issues"]
+                  if i["code"] == "unscoped_section_unresolved"} == {"skills", "coursework"}
+          assert not result["rendering_authorized"]
           seed = run([], 0)
           response = {"schema_version": 1,
                       "plan_sha256": seed["document"]["plan_sha256"],

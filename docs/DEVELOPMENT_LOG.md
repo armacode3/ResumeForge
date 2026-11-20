@@ -1013,3 +1013,63 @@
 - Next: explicit selected skills/coursework content and its separate evidence/review contract,
   before any full-resume/publication attestation or trusted rendering. Semantic proof, PDFs/layout,
   automatic ranking, history and cloud inference remain unimplemented.
+
+## Session 026 — Pending skills/coursework source choices and review questions
+
+- User approved selectively adopting the evidence-first tailoring recommendation and authorized
+  implementation starting with the next slice. Fetched merged `main` at `89ce34f`, fast-forwarded
+  local main and created `feat/source-bound-section-content` from a clean tree. Prior `34dbaaa`
+  hosted Python 3.12/3.13 CI passed. No private profiles, drafts, decisions or receipts were read,
+  approved or migrated; no provider activation, model setup, research or PDF import.
+- Recorded adopted workflow boundaries in `docs/TAILORING_WORKFLOW.md`: imports/new answers start
+  pending; neutral usage/contribution/context questions; no automatic verified-skill promotion;
+  gap reports must distinguish unknown/not documented from user-confirmed absence; future proposed
+  change/omission reports precede edits. Preserve qualifiers and mandatory content, avoid forced
+  tools/results/metrics, keep learning suggestions separate and layout targets subject to actual
+  compilation. These future stages are not claimed as implemented by this slice.
+- Added strict frozen v1 `SectionContentSelection` for explicit existing skill category/source index/
+  exact label and coursework source index/label, plus optional distinct accomplishment citations.
+  No inferred taxonomy, arbitrary attribute/path, replacement label, proficiency, self-approval or
+  new-answer fields. Preserve existing profile lists/schemas and duplicate recorded strings at
+  distinct source positions; refs are snapshot-local, not newly invented durable skill IDs.
+- Added `review_section_content` with original sources, explicit current wording draft, explicit
+  content selection and three exact review gates. Snapshot/revalidate profile/selection and freshly
+  recompute existing plan/wording review. Selected sections must already be planned, source indices/
+  labels must match and every cited accomplishment must be eligible and already selected in that
+  plan. Unknown/unselected/excluded/unfinished references fail safely, with no partial exposure.
+- Copy only explicitly chosen labels, preserving plan section order and explicit item/citation
+  order. Keep full source statements, original entry/section identity, parent completion states and
+  caveats. Nullable bounded case-insensitive literal label mentions are observations, including
+  negated/incidental mentions; absent context/mentions mean unknown, not missing experience or a
+  support verdict. Do not inherit facts from parent technology lists, job text or historical wording.
+- Every skill/course remains pending, even with literal mentions and cited verified accomplishments.
+  Neutral review questions have no answers/confirmations and allow non-use/uncertainty; course names
+  and project citations cannot prove attendance, completion, grades, institution or proficiency.
+  Expose missing citations/empty sections and independent usage/coursework review observations.
+  Content snapshots bind current plan/wording/selection and default complete output is bounded to
+  1 MiB. Limit 512 combined items/links, 32 links/item, 8,192-character labels; never truncate.
+- Added offline read-only `review-content` with six explicit paths and `--confirm-review`, validated
+  before I/O; content format validates before profile access. Exit 0 is pending conflict-free
+  inspection, 3 retains pending conflicted reports, 1 rejects invalid/stale/oversized input/output
+  without partial JSON, 2 rejects usage errors. No provider or approval options, contact/unselected
+  raw-list copying, writes, answer capture or promotion. Existing assembly unscoped-section blockers
+  remain; no bullet/metadata approvals transfer and rendering authorization stays false.
+- Added synthetic content/plan choices and unit/installed-CLI coverage for exact sources/order,
+  literal limitations, all skill categories, empty/required/conflicted sections, stale sources/drafts,
+  selected-evidence privacy/eligibility, exact gates, strict malformed/unknown/self-approval inputs,
+  API revalidation, independent bounds, read-only/offline behavior and unchanged assembly blockers.
+  CI wheel smoke now exercises pending content, missing literal labels and retained readiness issues.
+- Application 0.20.0, no dependency changes. Local Python 3.12.3: all 1,373 tests passed with
+  GitHub-like colors and 99.97% branch-aware coverage. Ruff lint/format, strict mypy (88 files),
+  dependency checks and source/wheel builds passed. Fresh locked editable/runtime-only installs,
+  all 1,373 tests against the installed wheel outside the repository (99.97% coverage) and the exact
+  CI runtime-wheel smoke passed. Reviewed all 21 staged public files and both distributions' paths/
+  content/secret patterns; private/runtime files are excluded, package sources match staging,
+  protected contracts remain unchanged and historical log append-only. Hosted CI is checked after
+  push, not inferred from local success.
+- Added `docs/SECTION_CONTENT_REVIEW.md`/ADR-025 and updated actual-status/related guides. Original
+  examples/frozen corpora/results/protocols, provider prompts/payloads, matching/eligibility, wording/
+  metadata/decision/assembly policies, schemas and gates remain unchanged. No live evaluation rerun.
+- Next: separately confirmed snapshot-bound skill/coursework user decisions and deliberate assembly
+  integration; new-answer source intake and before-edit gap/change reports follow separately. No
+  semantic proof, full-resume/publication approval, rendering/PDFs, ranking, history or cloud inference.
