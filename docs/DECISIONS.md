@@ -554,3 +554,30 @@ proof, complete content, publication consent or layout feasibility. Preserve pen
 states, full findings/caveats and `rendering_authorized: false`. Bound complete default output to
 1 MiB and fail without truncation. No new dependency, provider, persistence, source/bullet/metadata
 policy migration or live run. See `docs/STRUCTURED_ASSEMBLY.md` for exact scopes, gates and limits.
+
+## ADR-025 — Recorded skill/course names and cited contexts are pending, not verified proficiency
+
+**Status:** Implemented in 0.20.0, offline only.
+
+Adopt evidence-first tailoring boundaries incrementally rather than one unconstrained prompt.
+Start with explicit existing skill/coursework source choices and context/questions, not inferred
+keywords, PDF import, new-answer promotion, automatic ranking or a qualification/satisfaction judge.
+Preserve the profile schema's existing lists: use whitelisted categories, zero-based indices and
+exact expected labels, bound to current source/plan/wording snapshots. These refs are not durable
+skill IDs; changed lists require reinspection, not guessed migration or automatic deduplication.
+
+Require original sources, explicit draft, separately reviewed content selection and fresh plan/
+wording reconstruction. Selected sections must already be planned; context citations may reference
+only eligible currently selected accomplishments. Retain full original statements, recorded parent
+states and caveats; do not inherit evidence from job text, parent technologies or old wording.
+Literal label mentions can be negated/incidental and absent mentions mean unknown, not missing
+experience. A project/work citation does not prove course attendance, completion or proficiency.
+
+All items remain pending and neutral questions have no inferred answers/confirmations. Expose
+missing contexts/empty sections and independent skill/coursework review needs. Do not transfer
+bullet/metadata approval or clear assembly blockers. Bound selection to 512 combined items/links,
+32 links per item, 8,192-character labels and 1 MiB input/default full output; fail without partial
+JSON or truncation. No contact or unselected list disclosure, provider, write-back, source migration,
+new dependency, content decisions or rendering authorization. See `docs/SECTION_CONTENT_REVIEW.md`.
+`docs/TAILORING_WORKFLOW.md` records adopted future intake/gap/change-report/research/rendering limits;
+those are not claims that the future stages already work.

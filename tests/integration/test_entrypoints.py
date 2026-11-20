@@ -60,6 +60,10 @@ def test_installed_entrypoints_are_read_only(entrypoint: str, tmp_path: Path) ->
         ),
         (["suggest-wording", "--help"], ["--provider", "--confirm-local-data", "--objective"]),
         (
+            ["review-content", "--help"],
+            ["--profile", "--draft", "--content-selection", "--confirm-review"],
+        ),
+        (
             ["assemble-resume", "--help"],
             [
                 "--draft",

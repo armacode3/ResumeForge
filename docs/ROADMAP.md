@@ -200,9 +200,17 @@ Finite name/title/nonempty/review/content/state gates expose issues rather than 
 skills/coursework remain unresolved placeholders. `components_reviewed` is not complete-resume,
 truth, publication or rendering approval. See `docs/STRUCTURED_ASSEMBLY.md` and ADR-024.
 
-**Next:** explicit selected skills/coursework content and its separate evidence/review contract,
-before full-resume/publication attestation or rendering. Keep the conservative wording default;
-semantic proof, full-resume approval, rendering and ranking remain unimplemented. No implicit live run.
+Implemented in 0.20.0: separate pending selected skill/coursework source copies with exact
+source positions/labels, explicit current-plan accomplishment contexts, finite literal observations
+and neutral usage/contribution questions. No proficiency/attendance inference, new-answer capture,
+content approval or assembly integration; all content/blockers stay pending. See
+`docs/SECTION_CONTENT_REVIEW.md`, `docs/TAILORING_WORKFLOW.md` and ADR-025.
+
+**Next:** separately confirmed snapshot-bound skill/coursework user decisions and deliberate assembly
+integration. Guided new-answer source intake, before-edit requirement gap reports and proposed
+change/omission reports follow as separate slices under the adopted tailoring policy. Keep the
+conservative wording default; semantic proof, full-resume approval, rendering and ranking remain
+unimplemented. No implicit research/live run, PDF import or model setup.
 
 Generate structured bullets with accomplishment IDs, check unsupported tools/metrics/ownership,
 dates and contradictions, report gaps, and implement review/approval. Gate: fabricated-claim

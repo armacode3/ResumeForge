@@ -38,6 +38,12 @@ from resumeforge.resume.models import (
     WordingResponse,
     WordingResult,
 )
+from resumeforge.resume.section_content import (
+    load_section_content_selection,
+    parse_section_content_selection,
+    review_section_content,
+)
+from resumeforge.resume.section_content_models import SectionContentReview, SectionContentSelection
 from resumeforge.resume.wording import suggest_wording
 from resumeforge.resume.worksheet import build_review_worksheet
 
@@ -54,6 +60,8 @@ __all__ = [
     "ReviewDecisionResult",
     "ReviewDecisions",
     "ReviewWorksheet",
+    "SectionContentReview",
+    "SectionContentSelection",
     "StructuredResume",
     "WordingResponse",
     "WordingResult",
@@ -65,12 +73,15 @@ __all__ = [
     "load_metadata_selection",
     "load_resume_document",
     "load_review_decisions",
+    "load_section_content_selection",
     "parse_metadata_decisions",
     "parse_metadata_selection",
     "parse_resume_document",
     "parse_review_decisions",
+    "parse_section_content_selection",
     "parse_wording_response",
     "review_metadata",
     "review_resume",
+    "review_section_content",
     "suggest_wording",
 ]

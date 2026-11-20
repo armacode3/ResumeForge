@@ -41,8 +41,10 @@ from resumeforge.resume import (
     load_metadata_selection,
     load_resume_document,
     load_review_decisions,
+    load_section_content_selection,
     review_metadata,
     review_resume,
+    review_section_content,
     suggest_wording,
 )
 
@@ -672,4 +674,66 @@ def assemble_resume_command(
     )
     typer.echo(result.model_dump_json(indent=2))
     if result.status != "components_reviewed":
+        raise typer.Exit(code=3)
+
+
+@app.command("review-content")
+def review_content_command(
+    profile: Annotated[Path, typer.Option("--profile", help="Explicit local Markdown profile.")],
+    job: Annotated[Path, typer.Option("--job", help="Exact local job source.")],
+    requirements: Annotated[
+        Path, typer.Option("--requirements", help="Reviewed requirements JSON.")
+    ],
+    selection: Annotated[Path, typer.Option("--selection", help="Reviewed plan selection JSON.")],
+    draft: Annotated[
+        Path, typer.Option("--draft", help="Explicit current wording ResumeDocument.")
+    ],
+    content_selection: Annotated[
+        Path,
+        typer.Option(
+            "--content-selection",
+            help="Explicit skill/coursework source indices, labels and context refs.",
+        ),
+    ],
+    confirm_review: Annotated[
+        bool,
+        typer.Option(
+            "--confirm-review",
+            help="Acknowledge requirements, plan and content selection review; not approval.",
+        ),
+    ] = False,
+) -> None:
+    """Inspect pending selected skills/coursework and context; no verification or rendering."""
+    if not confirm_review:
+        raise typer.BadParameter(
+            "Review requirements and both selections, then pass --confirm-review."
+        )
+    try:
+        document = load_job(job)
+        analysis = analyze_job(document, FakeProvider.from_file(requirements))
+        choices = load_selection(selection)
+        proposed = load_resume_document(draft)
+        content_choices = load_section_content_selection(content_selection)
+        candidate = load_profile(profile)
+        result = review_section_content(
+            candidate.profile,
+            document,
+            analysis.requirements,
+            choices,
+            proposed,
+            content_choices,
+            requirements_reviewed=True,
+            selection_reviewed=True,
+            content_selection_reviewed=True,
+        )
+    except (ProfileError, InputError, JobAnalysisError, PlanningError, ResumeError) as error:
+        typer.echo(f"Section content review failed:\n{error}", err=True)
+        raise typer.Exit(code=1) from None
+    typer.echo(
+        "Offline pending skill/coursework review; no inference, verification "
+        "or rendering authority.",
+        err=True,
+    )
+    typer.echo(result.model_dump_json(indent=2))
+    if result.status == "blocked_by_plan":
         raise typer.Exit(code=3)

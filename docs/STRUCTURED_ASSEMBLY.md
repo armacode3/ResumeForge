@@ -145,5 +145,7 @@ Set each decision confirmation to exact `True` only when that file was actually 
 absent decisions require exact `False`. The API and `AssemblyResult`/`StructuredResume` are exported
 from `resumeforge.resume`. Safe failures raise `ResumeError`; local file reads can raise `InputError`.
 
-Next: deliberate selected skills/coursework content and its separate evidence/review contract,
-before any full-resume/publication attestation or trusted rendering work.
+Separate `review-content` now inspects pending explicitly selected skill/coursework names and
+user-cited accomplishment contexts; see `SECTION_CONTENT_REVIEW.md`. It is not assembly input and
+does not clear the blockers above. Next: a separately confirmed content-decision contract and
+deliberate assembly integration, before full-resume/publication attestation or trusted rendering.
